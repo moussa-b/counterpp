@@ -1,23 +1,31 @@
 import 'package:counterpp/models/counter.dart';
+import 'package:counterpp/models/settings.dart';
+import 'package:counterpp/models/sorting_options.dart';
+import 'package:counterpp/providers/counter_repository_provider.dart';
+import 'package:counterpp/providers/counters_provider.dart';
+import 'package:counterpp/providers/settings_provider.dart';
 import 'package:counterpp/widgets/counter_grid_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
-class EditableCounterGrid extends StatelessWidget {
+class EditableCounterGrid extends ConsumerWidget {
   final List<Counter> counters;
 
   const EditableCounterGrid({super.key, required this.counters});
 
   @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ReorderableGridView.builder(
       padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
-      itemBuilder: (ctx, index) {
+      itemBuilder: (BuildContext ctx, int index) {
         final Counter counter = counters[index];
         final String keyValue =
             '${counter.id!}-${counter.lastModificationTimeStamp!}';
         return CounterGridItem(
-          key: ValueKey<String>(keyValue),
-          counter: counter,
+            key: ValueKey<String>(keyValue),
+            counter: counter,
+            active: false
         );
       },
       itemCount: counters.length,
@@ -27,7 +35,14 @@ class EditableCounterGrid extends StatelessWidget {
         crossAxisSpacing: 8.0, // spacing between columns
         childAspectRatio: 1.5,
       ),
+      onReorder: (int oldIndex, int newIndex) async {
+        bool result = await ref.read(countersProvider.notifier).onReorder(oldIndex, newIndex);
+        if (result) {
+          Settings settings = await ref.read(counterRepositoryProvider).getSettings();
+          settings.counterSorting = SortingOptions.custom;
+          ref.read(settingsProvider.notifier).updateSettings(settings);
+        }
+      },
     );
-
   }
 }

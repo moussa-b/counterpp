@@ -12,8 +12,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CounterGridItem extends ConsumerStatefulWidget {
   final Counter counter;
+  final bool active;
 
-  const CounterGridItem({super.key, required this.counter});
+  const CounterGridItem({super.key, required this.counter, this.active = true});
 
   @override
   ConsumerState<CounterGridItem> createState() => _CounterGridItemState();
@@ -37,7 +38,7 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
     final Color color = Utils.hexToColor(widget.counter.color!);
     return Material(
       child: InkWell(
-        onTap: () {
+        onTap: !widget.active ? null : () {
           setState(() {
             _count = _count + getStep();
             final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
@@ -75,6 +76,9 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                       child: MaterialButton(
                         minWidth: 0,
                         onPressed: () {
+                          if (!widget.active) {
+                            return;
+                          }
                           showModalBottomSheet<void>(
                             context: context,
                             builder: (BuildContext context) {
