@@ -36,7 +36,7 @@ class EditableCounterGrid extends ConsumerWidget {
         childAspectRatio: 1.5,
       ),
       onReorder: (int oldIndex, int newIndex) async {
-        bool result = await ref.read(countersProvider.notifier).onReorder(oldIndex, newIndex);
+        bool result = await ref.read(countersProvider.notifier).onReorder(oldIndex, newIndex + 1); // newIndex + 1 to have behavior similar to ReorderableListView
         if (result) {
           Settings settings = await ref.read(counterRepositoryProvider).getSettings();
           settings.counterSorting = SortingOptions.custom;
