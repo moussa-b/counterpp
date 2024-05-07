@@ -1,0 +1,30 @@
+import 'package:counterpp/models/counter.dart';
+import 'package:counterpp/providers/last_modified_counter_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+class LastModifiedCounter extends ConsumerWidget {
+  const LastModifiedCounter({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    AsyncValue<Counter?> lastModifiedCounter =
+        ref.watch(lastModifiedCounterProvider);
+    if (lastModifiedCounter.hasValue && lastModifiedCounter.value != null) {
+      final String lastModificationLabel =
+          '${lastModifiedCounter.value!.name} - ${DateFormat('dd/MM/yy').format(DateTime.fromMillisecondsSinceEpoch(lastModifiedCounter.value!.lastModificationTimeStamp!))}';
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Text(
+          AppLocalizations.of(context)!
+              .lastCounterModified(lastModificationLabel),
+          style: TextStyle(color: Theme.of(context).textTheme.titleMedium!.color),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+}

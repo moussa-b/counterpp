@@ -1,0 +1,252 @@
+{
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings label"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Add label"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel label"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home label"
+  },
+  "folders": "Folders",
+  "@folders": {
+    "description": "Folders label"
+  },
+  "folder": "Folder",
+  "@folder": {
+    "description": "Folder label"
+  },
+  "counters": "Counters",
+  "@counters": {
+    "description": "Counters label"
+  },
+  "noFolder": "No folder",
+  "@noFolder": {
+    "description": "No folders label"
+  },
+  "folderList": "List of folders",
+  "@folderList": {
+    "description": "List of folders label"
+  },
+  "createNewFolder": "Create new folder",
+  "@createNewFolder": {
+    "description": "Create new folder button label"
+  },
+  "createNewCounter": "Create new counter",
+  "@createNewCounter": {
+    "description": "Create new counter button label"
+  },
+  "editCounter": "Edit counter",
+  "@editCounter": {
+    "description": "Edit counter label"
+  },
+  "createNewFolderPlaceholder": "Enter the name of the folder",
+  "@createNewFolderPlaceholder": {
+    "description": "Create new folder dialog input placeholder"
+  },
+  "counterName": "Counter name",
+  "@counterName": {
+    "description": "Counter name label"
+  },
+  "limit": "Limit",
+  "@limit": {
+    "description": "Limit label"
+  },
+  "pleaseEnterValidValue": "Please enter valid value",
+  "@pleaseEnterValidValue": {
+    "description": "Label to show if user entered invalid value in form field"
+  },
+  "counterNumber": "{count, plural, =0{No counter} =1{1 Counter} other{{count} Counters}}",
+  "@counterNumber": {
+    "description": "Display the number of counter in a folder",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "validate": "Validate",
+  "@validate": {
+    "description": "Validate label"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset label"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes label"
+  },
+  "addFolder": "Add folder",
+  "@addFolder": {
+    "description": "Add folder label"
+  },
+  "rename": "Rename",
+  "@rename": {
+    "description": "Rename label"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete label"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close label"
+  },
+  "renameFolder": "Rename folder",
+  "@renameFolder": {
+    "description": "Rename folder label"
+  },
+  "noCounter": "No counter",
+  "@noCounter": {
+    "description": "No counter label"
+  },
+  "color": "Color",
+  "@color": {
+    "description": "Color label"
+  },
+  "value": "Value",
+  "@value": {
+    "description": "Value label"
+  },
+  "incrementationValue": "Incrementation value",
+  "@incrementationValue": {
+    "description": "Incrementation value label"
+  },
+  "duplicate": "Duplicate",
+  "@duplicate": {
+    "description": "Duplicate label"
+  },
+  "resetAllCounters": "Reset all counters",
+  "@resetAllCounters": {
+    "description": "Reset all counters label"
+  },
+  "deleteAllCounters": "Delete all counters",
+  "@deleteAllCounters": {
+    "description": "Delete all counters label"
+  },
+  "statistics": "Statistics",
+  "@statistics": {
+    "description": "Statistics label"
+  },
+  "copy": "Copy",
+  "@copy": {
+    "description": "Copy label"
+  },
+  "warning": "Warning",
+  "@warning": {
+    "description": "Warning label"
+  },
+  "warningMsgDeleteFolder": "This action will permanently delete the folder and all its counters. Are you sure?",
+  "@warningMsgDeleteFolder": {
+    "description": "Warning message when deleting folder"
+  },
+  "warningMsgResetFolderCounters": "This action will reset all counters in this folder. Are you sure?",
+  "@warningMsgResetFolderCounters": {
+    "description": "Warning message when resetting folder counters"
+  },
+  "warningMsgDeleteFolderCounters": "This action will delete all counters in this folder. Are you sure?",
+  "@warningMsgDeleteFolderCounters": {
+    "description": "Warning message when deleting folder counters"
+  },
+  "warningMsgDeleteCounter": "This action will permanently delete the counter. Are you sure?",
+  "@warningMsgDeleteCounter": {
+    "description": "Warning message when deleting counter"
+  },
+  "warningMsgResetCounter": "This action will reset the counter. Are you sure?",
+  "@warningMsgResetCounter": {
+    "description": "Warning message when resetting counter"
+  },
+  "objective": "Objective",
+  "@objective": {
+    "description": "Objective label"
+  },
+  "listView": "List view",
+  "@listView": {
+    "description": "List view label"
+  },
+  "compactView": "Compact view",
+  "@compactView": {
+    "description": "Compact view label"
+  },
+  "sortBy": "Sort by",
+  "@sortBy": {
+    "description": "Sort by label"
+  },
+  "custom": "Custom",
+  "@custom": {
+    "description": "Custom label"
+  },
+  "alphabeticalOrderWithSuffix": "Alphabetical order {suffix}",
+  "@alphabeticalOrderWithSuffix": {
+    "description": "Alphabetical order label",
+    "placeholders": {
+      "suffix": {
+        "type": "String",
+        "example": "A-Z"
+      }
+    }
+  },
+  "valueWithSuffix": "Value {suffix}",
+  "@valueWithSuffix": {
+    "description": "Value label with suffix",
+    "placeholders": {
+      "suffix": {
+        "type": "String",
+        "example": "0-9"
+      }
+    }
+  },
+  "oldestFirst": "Oldest first",
+  "@oldestFirst": {
+    "description": "Oldest first label"
+  },
+  "newestFirst": "Newest first",
+  "@newestFirst": {
+    "description": "Newest first label"
+  },
+  "alphabeticalOrder": "Alphabetical order",
+  "@alphabeticalOrder": {
+    "description": "Alphabetical order label"
+  },
+  "counterCountOrder": "Counter count",
+  "@counterCountOrder": {
+    "description": "Counter count label"
+  },
+  "creationDate": "Creation date",
+  "@creationDate": {
+    "description": "Creation date label"
+  },
+  "counterCountWithSuffix": "Counter count {suffix}",
+  "@counterCountWithSuffix": {
+    "description": "Counter count label with suffix",
+    "placeholders": {
+      "suffix": {
+        "type": "String",
+        "example": "0-9"
+      }
+    }
+  },
+  "lastCounterModified": "Last counter modified : {detail}",
+  "@lastCounterModified": {
+    "description": "Last counter modified label with details",
+    "placeholders": {
+      "detail": {
+        "type": "String",
+        "example": "Counter 1 - 01/01/24"
+      }
+    }
+  },
+  "fullScreen": "Full screen",
+  "@fullScreen": {
+    "description": "Full screen label"
+  }
+}
