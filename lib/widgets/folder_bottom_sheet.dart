@@ -1,5 +1,7 @@
 import 'package:counterpp/models/folder.dart';
+import 'package:counterpp/providers/counters_provider.dart';
 import 'package:counterpp/providers/folders_provider.dart';
+import 'package:counterpp/screens/folder_statistics_screen.dart';
 import 'package:counterpp/widgets/bottom_sheet_item.dart';
 import 'package:counterpp/widgets/folder_dialog.dart';
 import 'package:flutter/material.dart';
@@ -107,12 +109,23 @@ class FolderBottomSheet extends ConsumerWidget {
               Navigator.pop(context);
             },
           ),
-        BottomSheetItem(
-          icon: const Icon(Icons.bar_chart),
-          label: AppLocalizations.of(context)!.statistics,
-          onTap: () {
-          },
-        ),
+        if (hasCounters)
+          BottomSheetItem(
+            icon: const Icon(Icons.bar_chart),
+            label: AppLocalizations.of(context)!.statistics,
+            onTap: () {
+              ref
+                  .read(countersProvider.notifier)
+                  .setFolderId(folder.id!)
+                  .then((value) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) {
+                    return FolderStatisticsScreen(folder: folder);
+                  }),
+                );
+              });
+            },
+          ),
       ],
     );
   }
