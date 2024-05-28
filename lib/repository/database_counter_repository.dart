@@ -3,6 +3,7 @@ import 'package:counterpp/models/folder.dart';
 import 'package:counterpp/models/reorder_item.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/models/sorting_options.dart';
+import 'package:counterpp/models/statistics.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart' as sql;
@@ -58,14 +59,20 @@ class DatabaseCounterRepository implements CounterRepository {
           sql = await rootBundle
               .loadString('assets/sql_scripts/settings_table_create.sql');
           await db.execute(sql);
+          // sql = await rootBundle.loadString(
+          //     'assets/sql_scripts/folder_table_sample.sql'); // TODO replace by folder_table_populate.sql
+          // await db.execute(sql);
+          // sql = await rootBundle.loadString(
+          //     'assets/sql_scripts/counter_table_sample.sql'); // TODO replace by counter_table_populate.sql
+          // await db.execute(sql);
+          // sql = await rootBundle.loadString(
+          //     'assets/sql_scripts/statistics_table_sample.sql'); // TODO remove
+          // await db.execute(sql);
           sql = await rootBundle.loadString(
-              'assets/sql_scripts/folder_table_sample.sql'); // TODO replace by folder_table_populate.sql
+              'assets/sql_scripts/folder_table_populate.sql');
           await db.execute(sql);
           sql = await rootBundle.loadString(
-              'assets/sql_scripts/counter_table_sample.sql'); // TODO replace by counter_table_populate.sql
-          await db.execute(sql);
-          sql = await rootBundle.loadString(
-              'assets/sql_scripts/statistics_table_sample.sql'); // TODO remove
+              'assets/sql_scripts/counter_table_populate.sql');
           await db.execute(sql);
         },
       );
@@ -79,6 +86,7 @@ class DatabaseCounterRepository implements CounterRepository {
       final bool updateDated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = 0, lastModificationTimeStamp = ? WHERE id = ?', [lastModificationTimeStamp, counterId]);
+        addStatistics(Statistics.fromJson({'counterId': counterId, 'type': StatisticsType.RESET.name}));
         return count > 0;
       });
       return updateDated;
@@ -94,6 +102,9 @@ class DatabaseCounterRepository implements CounterRepository {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = (IFNULL(counterCount, 0) - ?), lastModificationTimeStamp = ? WHERE id = ?',
             [value, lastModificationTimeStamp, counterId]);
+        if (count > 0) {
+          addStatistics(Statistics.fromJson({'counterId': counterId, 'type': StatisticsType.DECREMENT.name, 'value': value}));
+        }
         return count > 0;
       });
       return updateDated;
@@ -109,6 +120,9 @@ class DatabaseCounterRepository implements CounterRepository {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = (IFNULL(counterCount, 0) + ?), lastModificationTimeStamp = ? WHERE id = ?',
             [value, lastModificationTimeStamp, counterId]);
+        if (count > 0) {
+          addStatistics(Statistics.fromJson({'counterId': counterId, 'type': StatisticsType.INCREMENT.name, 'value': value}));
+        }
         return count > 0;
       });
       return updateDated;
@@ -127,7 +141,6 @@ class DatabaseCounterRepository implements CounterRepository {
         name,
         counterCount,
         creationTimeStamp,
-        lastModificationTimeStamp,
         counterLimit,
         folderId,
         color,
@@ -136,22 +149,11 @@ class DatabaseCounterRepository implements CounterRepository {
         step,
         note
         )
-        VALUES (
-        "${counter.name}",
-        ${counter.counterCount},
-        $now,
-        $now,
-        ${counter.counterLimit},
-        ${counter.folder?.id},
-        '${counter.color}',
-        1 + (SELECT COUNT(*) FROM counters),
+        VALUES (?, ?, ?, ?, ?, ?, 1 + (SELECT COUNT(*) FROM counters),
         ${counter.folder?.id != null && counter.folder!.id! > 0 ? ('1 + (SELECT COUNT(*) FROM counters WHERE folderId = ${counter.folder!.id!})') : null}, 
-        ${counter.step ?? 1},
-        "${counter.note}"
-        );
+        ?, ?)
         """;
-        print(query);
-        int insertedId = await txn.rawInsert(query);
+        int insertedId = await txn.rawInsert(query, [counter.name, counter.counterCount, now, counter.counterLimit, counter.folder?.id, counter.color, counter.step ?? 1, counter.note]);
         return insertedId;
       });
       if (id > 0) {
@@ -396,12 +398,12 @@ class DatabaseCounterRepository implements CounterRepository {
   Future<Folder> createFolder(String folderName) async {
     if (_db != null) {
       final id = await _db!.transaction((txn) async {
-        final String query = """
-        INSERT INTO folders(name, creationTimeStamp, lastModificationTimeStamp, "folderOrder")
-        VALUES("$folderName", $lastModificationTimeStamp, $lastModificationTimeStamp, (SELECT COUNT(*) FROM folders))
+        final now = lastModificationTimeStamp;
+        const String query = """
+        INSERT INTO folders(name, creationTimeStamp, lastModificationTimeStamp, folderOrder)
+        VALUES(?, ?, (SELECT COUNT(*) FROM folders))
         """;
-        print(query);
-        int insertedId = await txn.rawInsert(query);
+        int insertedId = await txn.rawInsert(query, [folderName, now]);
         return insertedId;
       });
       if (id > 0) {
@@ -462,6 +464,7 @@ class DatabaseCounterRepository implements CounterRepository {
       final bool updateDated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = 0, lastModificationTimeStamp = ? WHERE folderId = ?', [lastModificationTimeStamp, folderId]);
+        addStatisticsForFolder(folderId, StatisticsType.RESET);
         return count > 0;
       });
       return updateDated;
@@ -515,5 +518,52 @@ class DatabaseCounterRepository implements CounterRepository {
       }
     }
     return Settings.copy(settings);
+  }
+
+  @override
+  Future<Statistics> addStatistics(Statistics statistics) async {
+    if (_db != null && statistics.counterId! > 1) {
+      statistics.id = await _db!.transaction((txn) async {
+        const String sql = 'INSERT INTO statistics (counterId, folderId, type, value, dateTimeStamp) VALUES (?, (SELECT folderId FROM counters WHERE id = ? LIMIT 1), ?, ?, ?)';
+        final int statisticsId = await txn.rawInsert(sql, [statistics.counterId, statistics.counterId, statistics.type.toString().split('.').last, statistics.value, statistics.dateTimeStamp ?? lastModificationTimeStamp]);
+        return statisticsId;
+      });
+    }
+    return statistics;
+  }
+
+  @override
+  Future<void> addStatisticsForFolder(int folderId, StatisticsType statisticsType) async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> maps = await _db!.query(
+        'counters',
+        columns: ['id'],
+        where: 'folderId = ?',
+        whereArgs: [folderId],
+      );
+      final List<int> ids = List<int>.from(maps.map((map) => map['id']));
+      if (ids.isNotEmpty) {
+        for (var counterId in ids) {
+          addStatistics(Statistics.fromJson({'counterId': counterId, 'type': StatisticsType.RESET.name}));
+        }
+      }
+    }
+  }
+
+  @override
+  Future<List<Statistics>> getCounterStatistics(int counterId, DateTime start, DateTime end) async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> maps = await _db!.query(
+        'statistics',
+        where: 'counterId = ? AND (dateTimeStamp BETWEEN ? AND ?)',
+        whereArgs: [counterId, start.millisecondsSinceEpoch, end.millisecondsSinceEpoch],
+      );
+      List<Statistics> statistics = maps
+          .map((Map<String, dynamic> json) => Statistics.fromJson(json))
+          .toList();
+      statistics.sort((a, b) => a.dateTimeStamp!.compareTo(b.dateTimeStamp!));
+      return statistics;
+    }
+    return List.empty();
   }
 }

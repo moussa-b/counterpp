@@ -34,14 +34,14 @@ class _FolderStatisticsScreenState extends ConsumerState<FolderStatisticsScreen>
         children: [
           Expanded(
             flex: 1,
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
               child: FolderStatisticsChart(counters: counters.value!),
             ),
           ),
           Expanded(
             flex: 1,
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
               child: SingleChildScrollView(
                 child: SizedBox(
@@ -57,7 +57,7 @@ class _FolderStatisticsScreenState extends ConsumerState<FolderStatisticsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.statistics),
+        title: Text(AppLocalizations.of(context)!.folderStatistics(widget.folder.name!)),
         scrolledUnderElevation: 0.0,
       ),
       body: SafeArea(

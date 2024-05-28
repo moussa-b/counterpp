@@ -12,7 +12,7 @@ class CounterList extends StatelessWidget {
     return ListView.builder(
       itemBuilder: (ctx, index) {
         final Counter counter = counters[index];
-        final String keyValue = '${counter.id!}-${counter.lastModificationTimeStamp!}';
+        final String keyValue = '${counter.id!}-${counter.creationTimeStamp!}';
         return CounterListItem(
           key: ValueKey<String>(keyValue),
           counter: counter,

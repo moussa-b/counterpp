@@ -3,6 +3,7 @@ import 'package:counterpp/providers/counters_provider.dart';
 import 'package:counterpp/providers/last_modified_counter_provider.dart';
 import 'package:counterpp/screens/counter_form_screen.dart';
 import 'package:counterpp/screens/counter_screen.dart';
+import 'package:counterpp/screens/counter_statistics_screen.dart';
 import 'package:counterpp/widgets/bottom_sheet_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -95,6 +96,11 @@ class CounterBottomSheet extends ConsumerWidget {
           icon: const Icon(Icons.bar_chart),
           label: AppLocalizations.of(context)!.statistics,
           onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (ctx) {
+                return CounterStatisticsScreen(counter: counter);
+              }),
+            );
           },
         ),
       ],

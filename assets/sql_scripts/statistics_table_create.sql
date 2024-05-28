@@ -1,7 +1,10 @@
 CREATE TABLE [statistics] (
-  [counterId] INTEGER,
-  [dateTimeStamp] INTEGER,
-  [id] INTEGER,
-  [type] TEXT,
-  [value] INTEGER
+    [id] INTEGER PRIMARY KEY AUTOINCREMENT,
+    [counterId] INTEGER,
+    [folderId] INTEGER,
+    [type] TEXT,
+    [value] INTEGER,
+    [dateTimeStamp] INTEGER,
+    FOREIGN KEY(folderId) REFERENCES folders(id) ON DELETE CASCADE,
+    FOREIGN KEY(counterId) REFERENCES counters(id) ON DELETE CASCADE
 );

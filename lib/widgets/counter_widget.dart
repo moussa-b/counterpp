@@ -78,7 +78,7 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (_name != null && _name!.isNotEmpty)
+                if (_name != null && _name!.isNotEmpty && _id != null && _id! > 1)
                   ...[
                     Text(
                     _name!,

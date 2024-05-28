@@ -5,6 +5,7 @@ import 'package:counterpp/models/folder.dart';
 import 'package:counterpp/models/reorder_item.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/models/sorting_options.dart';
+import 'package:counterpp/models/statistics.dart';
 
 abstract interface class CounterRepository {
   bool isInitialized();
@@ -32,4 +33,7 @@ abstract interface class CounterRepository {
   Future<Settings> updateSettings(Settings settings);
   Future<bool> reorderFolders(List<ReorderItem> reorderItems);
   Future<bool> reorderCounters(List<ReorderItem> reorderItems);
+  Future<Statistics> addStatistics(Statistics statistics);
+  Future<void> addStatisticsForFolder(int folderId, StatisticsType statisticsType);
+  Future<List<Statistics>> getCounterStatistics(int counterId, DateTime start, DateTime end);
 }

@@ -1,4 +1,4 @@
-import 'package:counterpp/models/statistic.dart';
+import 'package:counterpp/models/statistics.dart';
 
 import 'counter.dart';
 import 'folder.dart';
@@ -7,7 +7,7 @@ class Export {
   List<Counter>? counters;
   int? databaseVersion;
   List<Folder>? folders;
-  List<Statistic>? statistics;
+  List<Statistics>? statistics;
   int? versionCode;
   String? versionName;
 
@@ -34,9 +34,9 @@ class Export {
       });
     }
     if (json['statistics'] != null) {
-      statistics = <Statistic>[];
+      statistics = <Statistics>[];
       json['statistics'].forEach((v) {
-        statistics!.add(Statistic.fromJson(v));
+        statistics!.add(Statistics.fromJson(v));
       });
     }
     versionCode = json['versionCode'];

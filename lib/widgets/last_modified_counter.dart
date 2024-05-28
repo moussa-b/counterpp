@@ -12,9 +12,13 @@ class LastModifiedCounter extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue<Counter?> lastModifiedCounter =
         ref.watch(lastModifiedCounterProvider);
-    if (lastModifiedCounter.hasValue && lastModifiedCounter.value != null) {
-      final String lastModificationLabel =
-          '${lastModifiedCounter.value!.name} - ${DateFormat('dd/MM/yy').format(DateTime.fromMillisecondsSinceEpoch(lastModifiedCounter.value!.lastModificationTimeStamp!))}';
+    if (lastModifiedCounter.hasValue) {
+      final String lastModificationLabel;
+      if (lastModifiedCounter.value != null) {
+        lastModificationLabel = '${lastModifiedCounter.value!.name} - ${DateFormat('dd/MM/yy').format(DateTime.fromMillisecondsSinceEpoch(lastModifiedCounter.value!.lastModificationTimeStamp!))}';
+      } else {
+        lastModificationLabel = AppLocalizations.of(context)!.none;
+      }
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Text(

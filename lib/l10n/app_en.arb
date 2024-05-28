@@ -248,5 +248,145 @@
   "fullScreen": "Full screen",
   "@fullScreen": {
     "description": "Full screen label"
+  },
+  "folderStatistics": "Statistics of folder {folderName}",
+  "@folderStatistics": {
+    "description": "Folder statistics with folder name",
+    "placeholders": {
+      "folderName": {
+        "type": "String",
+        "example": "Folder 1"
+      }
+    }
+  },
+  "counterStatistics": "Statistics of counter {counterName}",
+  "@counterStatistics": {
+    "description": "Counter statistics with folder name",
+    "placeholders": {
+      "counterName": {
+        "type": "String",
+        "example": "Counter 1"
+      }
+    }
+  },
+  "day": "Day",
+  "@day": {
+    "description": "Day label"
+  },
+  "week": "Week",
+  "@week": {
+    "description": "Week label"
+  },
+  "month": "Month",
+  "@month": {
+    "description": "Month label"
+  },
+  "year": "Year",
+  "@year": {
+    "description": "Year label"
+  },
+  "shortDateMonday": "Mon",
+  "@shortDateMonday": {
+    "description": "Short monday label"
+  },
+  "shortDateTuesday": "Tue",
+  "@shortDateTuesday": {
+    "description": "Short tuesday label"
+  },
+  "shortDateWednesday": "Wed",
+  "@shortDateWednesday": {
+    "description": "Short wednesday label"
+  },
+  "shortDateThursday": "Thu",
+  "@shortDateThursday": {
+    "description": "Short thursday label"
+  },
+  "shortDateFriday": "Fri",
+  "@shortDateFriday": {
+    "description": "Short friday label"
+  },
+  "shortDateSaturday": "Sat",
+  "@shortDateSaturday": {
+    "description": "Short saturday label"
+  },
+  "shortDateSunday": "Sun",
+  "@shortDateSunday": {
+    "description": "Short sunday label"
+  },
+  "shortDateJanuary": "Jan",
+  "@shortDateJanuary": {
+    "description": "Short january label"
+  },
+  "shortDateFebruary": "Feb",
+  "@shortDateFebruary": {
+    "description": "Short february label"
+  },
+  "shortDateMarch": "Mar",
+  "@shortDateMarch": {
+    "description": "Short march label"
+  },
+  "shortDateApril": "Apr",
+  "@shortDateApril": {
+    "description": "Short april label"
+  },
+  "shortDateMay": "May",
+  "@shortDateMay": {
+    "description": "Short may label"
+  },
+  "shortDateJune": "Jun",
+  "@shortDateJune": {
+    "description": "Short june label"
+  },
+  "shortDateJuly": "Jul",
+  "@shortDateJuly": {
+    "description": "Short july label"
+  },
+  "shortDateAugust": "Aug",
+  "@shortDateAugust": {
+    "description": "Short august label"
+  },
+  "shortDateSeptember": "Sep",
+  "@shortDateSeptember": {
+    "description": "Short september label"
+  },
+  "shortDateOctober": "Oct",
+  "@shortDateOctober": {
+    "description": "Short october label"
+  },
+  "shortDateNovember": "Nov",
+  "@shortDateNovember": {
+    "description": "Short november label"
+  },
+  "shortDateDecember": "Dec",
+  "@shortDateDecember": {
+    "description": "Short december label"
+  },
+  "none": "None",
+  "@none": {
+    "description": "None label"
+  },
+  "date": "Date",
+  "@date": {
+    "description": "Date label"
+  },
+  "type": "Type",
+  "@type": {
+    "description": "Type label"
+  },
+  "resetName": "Reset",
+  "@resetName": {
+    "description": "Reset name label not verb"
+  },
+  "increment": "Increment",
+  "@increment": {
+    "description": "Increment label"
+  },
+  "decrement": "Decrement",
+  "@decrement": {
+    "description": "Decrement label"
+  },
+  "noStatistics": "No statistics",
+  "@noStatistics": {
+    "description": "No statistics label"
   }
 }
