@@ -142,19 +142,36 @@ class CounterStatisticsDataTable extends ConsumerWidget {
       case CalendarPeriod.month:
       {
         final int day = statDate.day;
-        if (day % 3 == 0) {
-          return '$day - ${formatDate(statDate.add(const Duration(days: 2)))}';
-        } else {
-          final int closestDayDivisibleBy3 = 3 * (day / 3.0).floor();
-          DateTime closestDateDivisibleBy3 = DateTime(statDate.year, statDate.month, closestDayDivisibleBy3);
-          return '${closestDateDivisibleBy3.day} - ${formatDate(closestDateDivisibleBy3.add(const Duration(days: 2)))}';
-        }
+        final int lowerBound = getLowerBound(day);
+        int lastDayOfMonth = Utils.getLastDayOfMonth(statDate).day;
+        final int upperBound = day >= 28 ? lastDayOfMonth : getUpperBound(day);
+        final DateTime upperBoundDate = DateTime(statDate.year, statDate.month, upperBound);
+        return '${lowerBound.toString().padLeft(2, '0')} - ${formatDate(upperBoundDate)}';
       }
       case CalendarPeriod.year:
         {
           final DateTime startOfMonth = Utils.getFirstDayOfMonth(statDate);
           return formatDate(startOfMonth);
         }
+    }
+  }
+
+  int getLowerBound(int day) {
+    if (day > 30) {
+      return 28;
+    }
+    if (day % 3 != 0) {
+      return 1 + 3 * (day / 3.0).floor();
+    } else {
+      return day - 2;
+    }
+  }
+
+  int getUpperBound(int day) {
+    if (day % 3 != 0) {
+      return 3 * (day / 3.0).ceil();
+    } else {
+      return day;
     }
   }
 }

@@ -87,7 +87,8 @@ class CounterStatisticsChart extends StatelessWidget {
         {
           int daysInMonth = Utils.getDaysInMonth(selectedDate);
           for (int i = 1; i <= daysInMonth; i++) {
-            if (i % 3 == 0) {
+            final int index = getIndexWithLowerBound(i);
+            if (index > (increments.length - 1)) {
               increments.add(0);
               decrements.add(0);
               resets.add(0);
@@ -119,7 +120,7 @@ class CounterStatisticsChart extends StatelessWidget {
             index = statDateTime.weekday - 1;
             break;
           case CalendarPeriod.month:
-            index = statDateTime.day < 30 ? (statDateTime.day / 3.0).floor() : 9;
+            index = getIndexWithLowerBound(statDateTime.day);
             break;
           case CalendarPeriod.year:
             index = statDateTime.month - 1;
@@ -165,6 +166,18 @@ class CounterStatisticsChart extends StatelessWidget {
       ));
     }
     return datas;
+  }
+
+  int getIndexWithLowerBound(int day) { // must match CounterStatisticsDataTable.getLowerBound
+    int closestLowerBound;
+    if (day > 30) {
+      closestLowerBound = 28;
+    } else if (day % 3 != 0) {
+      closestLowerBound = 1 + 3 * (day / 3.0).floor();
+    } else {
+      closestLowerBound = day - 2;
+    }
+    return (closestLowerBound / 3.0).floor();
   }
 
   SideTitleWidget getTitlesWidgetForDay(double value, TitleMeta meta) {
