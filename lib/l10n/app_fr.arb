@@ -118,5 +118,7 @@
   "year": "Année",
   "errorMsgGeneric": "Une erreur s'est produite, veuillez contacter le support",
   "successfulMsgExportData": "Export réussi : vos données sont dans {filepath}",
-  "notSupportedMsgExportData": "L'export de données n'est supporté"
+  "notSupportedMsgExportData": "L'export de données n'est supporté",
+  "errorMsgImportData": "The file is invalid",
+  "successfulMsgImportData": "Données importées avec succès"
 }

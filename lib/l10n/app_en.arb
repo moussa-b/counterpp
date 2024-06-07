@@ -521,6 +521,14 @@
   "@notSupportedMsgExportData": {
     "description": "Message to show when data export is not supported"
   },
+  "errorMsgImportData": "Data export is not supported",
+  "@errorMsgImportData": {
+    "description": "Message to show when importing a file failed"
+  },
+  "successfulMsgImportData": "Data successfully imported",
+  "@successfulMsgImportData": {
+    "description": "Message to show when importing a file succeed"
+  },
   "successfulMsgExportData": "Export successful: your data is in {filepath}",
   "@successfulMsgExportData": {
     "description": "Message to show when data has been successfully exported",

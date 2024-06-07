@@ -164,6 +164,49 @@ class DatabaseCounterRepository implements CounterRepository {
   }
 
   @override
+  Future<Counter> insertCounter(Counter counter) async {
+    if (_db != null) {
+      final id = await _db!.transaction((txn) async {
+        const String query = """
+        INSERT INTO counters (
+        id,
+        name,
+        counterCount,
+        creationTimeStamp,
+        lastModificationTimeStamp,
+        counterLimit,
+        folderId,
+        color,
+        counterOrder,
+        orderInFolder,
+        step,
+        note
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+        int insertedId = await txn.rawInsert(query, [
+          counter.id,
+          counter.name,
+          counter.counterCount,
+          counter.creationTimeStamp,
+          counter.lastModificationTimeStamp,
+          counter.counterLimit,
+          counter.folder?.id,
+          counter.color,
+          counter.counterOrder,
+          counter.orderInFolder,
+          counter.step ?? 1,
+          counter.note]);
+        return insertedId;
+      });
+      if (id > 0) {
+        return getCounterById(id);
+      }
+    }
+    return Counter();
+  }
+
+  @override
   Future<bool> deleteCounterById(int counterId) async {
     int deleted = 0;
     if (_db != null) {
@@ -414,6 +457,24 @@ class DatabaseCounterRepository implements CounterRepository {
   }
 
   @override
+  Future<Folder> insertFolder(Folder folder) async {
+    if (_db != null) {
+      final id = await _db!.transaction((txn) async {
+        const String query = """
+        INSERT INTO folders(id, name, creationTimeStamp, lastModificationTimeStamp, folderOrder)
+        VALUES(?, ?, ?, ?, ?)
+        """;
+        int insertedId = await txn.rawInsert(query, [folder.id, folder.name, folder.creationTimeStamp, folder.lastModificationTimeStamp, folder.folderOrder]);
+        return insertedId;
+      });
+      if (id > 0) {
+        return getFolderById(id);
+      }
+    }
+    return Folder();
+  }
+
+  @override
   Future<Folder> renameFolder(int folderId, String folderName) async {
     if (_db != null) {
       bool updated = await _db!.transaction((txn) async {
@@ -454,8 +515,16 @@ class DatabaseCounterRepository implements CounterRepository {
         whereArgs: [folderId],
       );
     }
-
     return deleted == 1;
+  }
+
+  @override
+  Future<bool> deleteAllFolders() async {
+    int deleted = 0;
+    if (_db != null) {
+      deleted = await _db!.delete('folders');
+    }
+    return deleted > 0;
   }
 
   @override

@@ -8,6 +8,7 @@ import 'package:counterpp/models/statistics.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/providers/settings_provider.dart';
 import 'package:counterpp/utils/permission-utils.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -138,6 +139,64 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  importData(BuildContext ctx) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      final File file = File(result.files.single.path!);
+      final contents = await file.readAsString();
+      if (contents.isNotEmpty) {
+        var data = json.decode(contents);
+        if (data['settings'] != null || data['folders'] != null || data['counters'] != null) {
+          if (data['settings'] != null) {
+            Settings settings = Settings.fromJson(data['settings']);
+            await ref.read(counterRepositoryProvider).updateSettings(settings);
+          }
+          if (data['folders'] != null) {
+            List<Folder> folders = data['folders'].map<Folder>((json) => Folder.fromJson(json)).toList();
+            await ref.read(counterRepositoryProvider).deleteAllFolders();
+            for (int i = 0; i < folders.length; i++) {
+              Folder folder = folders[i];
+              await ref.read(counterRepositoryProvider).insertFolder(folder);
+            }
+          }
+          if (data['counters'] != null) {
+            List<Counter> counters = data['counters'].map<Counter>((json) => Counter.fromJson(json)).toList();
+            await ref.read(counterRepositoryProvider).deleteAllCounters();
+            for (int i = 0; i < counters.length; i++) {
+              Counter counter = counters[i];
+              await ref.read(counterRepositoryProvider).createCounter(counter);
+            }
+          }
+          if (!ctx.mounted) {
+            return;
+          }
+          final SnackBar snackBar = SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.white),
+                const SizedBox(width: 10),
+                Flexible(child: Text(AppLocalizations.of(ctx)!.successfulMsgImportData)),
+              ],
+            ),
+          );
+          ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+          return;
+        }
+      }
+      if (!ctx.mounted) {
+        return null;
+      }
+      _showDialog(
+          ctx,
+          Text(AppLocalizations.of(ctx)!.error),
+          Text(AppLocalizations.of(ctx)!.errorMsgImportData),
+          null,
+          showCancel: false,
+          validateLabel: AppLocalizations.of(ctx)!.ok
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -224,8 +283,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.importData),
                   subtitle: Text(AppLocalizations.of(context)!.importDataSummary),
-                  onTap: () {
-                  },
+                  onTap: importData(context),
                 ),
               ],
             ),
