@@ -29,6 +29,7 @@ abstract interface class CounterRepository {
   Future<bool> deleteFolderById(int folderId);
   Future<bool> resetAllCountersForFolderId(int folderId);
   Future<bool> deleteAllCountersForFolderId(int folderId);
+  Future<bool> deleteAllCounters();
   Future<Settings> getSettings();
   Future<Settings> updateSettings(Settings settings);
   Future<bool> reorderFolders(List<ReorderItem> reorderItems);
@@ -36,4 +37,5 @@ abstract interface class CounterRepository {
   Future<Statistics> addStatistics(Statistics statistics);
   Future<void> addStatisticsForFolder(int folderId, StatisticsType statisticsType);
   Future<List<Statistics>> getCounterStatistics(int counterId, DateTime start, DateTime end);
+  Future<List<Statistics>> getAllStatistics();
 }

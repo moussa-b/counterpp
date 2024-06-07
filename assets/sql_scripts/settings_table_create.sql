@@ -4,5 +4,8 @@ CREATE TABLE settings
     counterCompactView        INTEGER,
     counterSorting            INTEGER,
     folderSorting             INTEGER,
+    activateSounds            INTEGER,
+    activateVibrator          INTEGER,
+    keepScreenOn              INTEGER,
     lastModificationTimeStamp INTEGER
 );

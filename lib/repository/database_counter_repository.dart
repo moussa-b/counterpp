@@ -401,7 +401,7 @@ class DatabaseCounterRepository implements CounterRepository {
         final now = lastModificationTimeStamp;
         const String query = """
         INSERT INTO folders(name, creationTimeStamp, lastModificationTimeStamp, folderOrder)
-        VALUES(?, ?, (SELECT COUNT(*) FROM folders))
+        VALUES(?, ?, 0, (SELECT COUNT(*) FROM folders))
         """;
         int insertedId = await txn.rawInsert(query, [folderName, now]);
         return insertedId;
@@ -488,6 +488,20 @@ class DatabaseCounterRepository implements CounterRepository {
   }
 
   @override
+  Future<bool> deleteAllCounters() async {
+    if (_db != null) {
+      final bool updateDated = await _db!.transaction((txn) async {
+        final int count = await txn.rawUpdate(
+            'DELETE FROM counters WHERE folderId > 1');
+        return count > 0;
+      });
+      return updateDated;
+    } else {
+      return false;
+    }
+  }
+
+  @override
   Future<Settings> getSettings() async {
     if (_db != null) {
       const sql = 'SELECT * FROM settings';
@@ -504,12 +518,15 @@ class DatabaseCounterRepository implements CounterRepository {
     if (_db != null) {
       bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
-            """REPLACE INTO settings (id, counterCompactView, counterSorting, folderSorting, lastModificationTimeStamp)
+            """REPLACE INTO settings (id, counterCompactView, counterSorting, folderSorting, activateSounds, activateVibrator, keepScreenOn, lastModificationTimeStamp)
             VALUES(
             1,
             ${settings.counterCompactView == true ? 1 : 0},
             ${settings.counterSorting?.index},
             ${settings.folderSorting?.index}, 
+            ${settings.activateSounds == true ? 1 : 0},
+            ${settings.activateVibrator == true ? 1 : 0},
+            ${settings.keepScreenOn == true ? 1 : 0},
             $lastModificationTimeStamp)""");
         return count > 0;
       });
@@ -558,6 +575,19 @@ class DatabaseCounterRepository implements CounterRepository {
         where: 'counterId = ? AND (dateTimeStamp BETWEEN ? AND ?)',
         whereArgs: [counterId, start.millisecondsSinceEpoch, end.millisecondsSinceEpoch],
       );
+      List<Statistics> statistics = maps
+          .map((Map<String, dynamic> json) => Statistics.fromJson(json))
+          .toList();
+      statistics.sort((a, b) => a.dateTimeStamp!.compareTo(b.dateTimeStamp!));
+      return statistics;
+    }
+    return List.empty();
+  }
+
+  @override
+  Future<List<Statistics>> getAllStatistics() async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> maps = await _db!.query('statistics');
       List<Statistics> statistics = maps
           .map((Map<String, dynamic> json) => Statistics.fromJson(json))
           .toList();

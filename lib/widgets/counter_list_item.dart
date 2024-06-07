@@ -1,4 +1,6 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:counterpp/models/counter.dart';
+import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/providers/last_modified_counter_provider.dart';
 import 'package:counterpp/repository/counter_repository.dart';
@@ -7,14 +9,16 @@ import 'package:counterpp/utils/utils.dart';
 import 'package:counterpp/widgets/counter_bottom_sheet.dart';
 import 'package:counterpp/widgets/counter_progress.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CounterListItem extends ConsumerStatefulWidget {
   final Counter counter;
   final bool active;
+  final Settings? settings;
 
-  const CounterListItem({super.key, required this.counter, this.active = true});
+  const CounterListItem({super.key, required this.counter, this.active = true, this.settings});
 
   @override
   ConsumerState<CounterListItem> createState() => _CounterListItemState();
@@ -60,6 +64,8 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
 
     final double infinityContainerSize = Theme.of(context).textTheme.titleLarge!.fontSize! + 8;
     const double size = 55; // can not be too big
+    final bool activateVibrator = widget.settings?.activateVibrator ?? false;
+    final bool activateSounds = widget.settings?.activateSounds ?? false;
 
     return Card(
       child: ListTile(
@@ -70,6 +76,12 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
             IconButton(
               icon: const Icon(FontAwesomeIcons.minus),
               onPressed: _count <= 0 || !widget.active ? null : () {
+                if (activateSounds) {
+                  AudioPlayer().play(AssetSource('audio/decrease.mp3'));
+                }
+                if (activateVibrator) {
+                  HapticFeedback.mediumImpact();
+                }
                 setState(() {
                   _count = _count - getStep();
                   final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
@@ -82,6 +94,12 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
             IconButton(
               icon: const Icon(FontAwesomeIcons.plus),
               onPressed: !widget.active ? null : () {
+                if (activateSounds) {
+                  AudioPlayer().play(AssetSource('audio/increase.mp3'));
+                }
+                if (activateVibrator) {
+                  HapticFeedback.mediumImpact();
+                }
                 setState(() {
                   _count = _count + getStep();
                   final CounterRepository counterRepository = ref.read(counterRepositoryProvider);

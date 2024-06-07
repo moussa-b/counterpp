@@ -388,5 +388,147 @@
   "noStatistics": "No statistics",
   "@noStatistics": {
     "description": "No statistics label"
+  },
+  "activateSounds": "Activate sounds",
+  "@activateSounds": {
+    "description": "Activate sounds label"
+  },
+  "activateSoundsSummary": "Play sounds on increment, decrement and reset",
+  "@activateSoundsSummary": {
+    "description": "Activate sounds summary"
+  },
+  "activateVibrator": "Activate vibrator",
+  "@activateVibrator": {
+    "description": "ctivate vibrator label"
+  },
+  "activateVibratorSummary": "Vibrate on increment, decrement and reset",
+  "@activateVibratorSummary": {
+    "description": "Activate vibrator summary"
+  },
+  "display": "Display",
+  "@display": {
+    "description": "Display label"
+  },
+  "keepScreenOn": "Keep screen on",
+  "@keepScreenOn": {
+    "description": "Keep screen on label"
+  },
+  "keepScreenOnSummary": "Prevent device from sleeping while running in the foreground",
+  "@keepScreenOnSummary": {
+    "description": "Keep screen on summary"
+  },
+  "advanced": "Advanced",
+  "@advanced": {
+    "description": "Advanced label"
+  },
+  "deleteAllCountersSummary": "Delete all counters, folders and statistics",
+  "@deleteAllCountersSummary": {
+    "description": "Delete all counters summary"
+  },
+  "exportData": "Export data",
+  "@exportData": {
+    "description": "Export data label"
+  },
+  "exportDataSummary": "Export your data to a file. Requires storage permission on Android 6+.",
+  "@exportDataSummary": {
+    "description": "Export data summary"
+  },
+  "importData": "Import data",
+  "@importData": {
+    "description": "Import data label"
+  },
+  "importDataSummary": "Reset the app with data from exported file. Requires storage permission on Android 6+.",
+  "@importDataSummary": {
+    "description": "Import data summary"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About label"
+  },
+  "aboutSummary": "This free app is a non private, non-commercial and leisure project",
+  "@aboutSummary": {
+    "description": "About summary"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "Version label"
+  },
+  "tutorial": "Tutorial",
+  "@tutorial": {
+    "description": "Tutorial label"
+  },
+  "tutorialSummary": "See all app's features in a quick tutorial",
+  "@tutorialSummary": {
+    "description": "Tutorial summary"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Share label"
+  },
+  "shareSummary": "Share this app with your friends!",
+  "@shareSummary": {
+    "description": "Share summary"
+  },
+  "rate": "Rate",
+  "@rate": {
+    "description": "Rate label"
+  },
+  "rateSummary": "Give us your feedback to help improve this app",
+  "@rateSummary": {
+    "description": "Rate summary"
+  },
+  "contactUs": "Contact us",
+  "@contactUs": {
+    "description": "Contact us label"
+  },
+  "contactUsSummary": "Any suggestion or bug? Please, let us know!",
+  "@contactUsSummary": {
+    "description": "Contact us summary"
+  },
+  "privacyPolicy": "Privacy policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy label"
+  },
+  "controls": "Controls",
+  "@controls": {
+    "description": "Controls us label"
+  },
+  "warningMsgDeleteAllCounters": "This action will delete all data. Are you sure?",
+  "@warningMsgDeleteAllCounters": {
+    "description": "Controls us label"
+  },
+  "warningMsgExportData": "To export data, permission to write in external storage is required. Please go to settings and enable write in external storage.",
+  "@warningMsgExportData": {
+    "description": "Message to show if storage permission is not granted when exporting data"
+  },
+  "resetCompleted": "Reset completed",
+  "@resetCompleted": {
+    "description": "label to show when reset is completed"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK label"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error label"
+  },
+  "errorMsgGeneric": "An error occurred, please contact support.",
+  "@errorMsgGeneric": {
+    "description": "Generic error message"
+  },
+  "notSupportedMsgExportData": "Data export is not supported",
+  "@notSupportedMsgExportData": {
+    "description": "Message to show when data export is not supported"
+  },
+  "successfulMsgExportData": "Export successful: your data is in {filepath}",
+  "@successfulMsgExportData": {
+    "description": "Message to show when data has been successfully exported",
+    "placeholders": {
+      "filepath": {
+        "type": "String",
+        "example": "/downloads/export.json"
+      }
+    }
   }
 }

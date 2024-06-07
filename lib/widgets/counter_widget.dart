@@ -1,12 +1,16 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:counterpp/models/counter.dart';
+import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/repository/counter_repository.dart';
 import 'package:counterpp/utils/utils.dart';
 import 'package:counterpp/widgets/counter_progress.dart';
 import 'package:counterpp/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:wakelock/wakelock.dart';
 
 class CounterWidget extends ConsumerStatefulWidget {
   final int counterId;
@@ -25,11 +29,14 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
   String? _name;
   int? _limit;
   int? _id = 0;
+  Settings? _settings;
 
   @override
   void initState() {
     super.initState();
-    getCounter();
+    getSettings().then((Settings settings) {
+      getCounter(settings);
+    });
     widget.builder.call(context, () {
       ref.read(counterRepositoryProvider).resetCounterById(_id!).then((bool result) {
         if (result) {
@@ -41,7 +48,7 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
     });
   }
 
-  void getCounter() async {
+  void getCounter(Settings settings) async {
     final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
     final Counter counter = await counterRepository.getCounterById(widget.counterId);
     setState(() {
@@ -50,7 +57,18 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
       _limit = counter.counterLimit;
       _name = counter.name;
       _id = counter.id;
+      _settings = settings;
     });
+  }
+
+  Future<Settings> getSettings() async {
+    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final Settings settings = await counterRepository.getSettings();
+    final bool wakelockEnabled = await Wakelock.enabled;
+    if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
+      Wakelock.toggle(enable: settings.keepScreenOn!);
+    }
+    return settings;
   }
 
   @override
@@ -72,6 +90,8 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
     }
     Widget separator = SizedBox(height: MediaQuery.of(context).size.width * 0.05);
     String? color = _id == 1 ? '#${Theme.of(context).primaryColor.value.toRadixString(16)}' : _color ;
+    final bool activateVibrator = _settings?.activateVibrator ?? false;
+    final bool activateSounds = _settings?.activateSounds ?? false;
     return _count == null
         ? const LoadingIndicator()
         : Center(
@@ -100,6 +120,12 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
                   progress: progress,
                   isInfinite: isInfinite,
                   onTap: () {
+                    if (activateSounds) {
+                      AudioPlayer().play(AssetSource('audio/increase.mp3'));
+                    }
+                    if (activateVibrator) {
+                      HapticFeedback.mediumImpact();
+                    }
                     setState(() {
                       _count = _count! + 1;
                       counterRepository.incrementCounterById(widget.counterId);
@@ -116,6 +142,12 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
                 separator,
                 ElevatedButton(
                   onPressed: _count == 0 ? null : () {
+                    if (activateSounds) {
+                      AudioPlayer().play(AssetSource('audio/decrease.mp3'));
+                    }
+                    if (activateVibrator) {
+                      HapticFeedback.mediumImpact();
+                    }
                     setState(() {
                       _count = _count! - 1;
                       counterRepository.decrementCounterById(widget.counterId);
