@@ -14,7 +14,6 @@ abstract interface class CounterRepository {
   Future<bool> incrementCounterById(int counterId, {value = 1});
   Future<bool> decrementCounterById(int counterId, {value = 1});
   Future<Counter> createCounter(Counter counter);
-  Future<Counter> insertCounter(Counter counter); // full insert of all column including id
   Future<Counter> updateCounter(Counter counter);
   Future<bool> deleteCounterById(int counterId);
   Future<Counter> getCounterById(int counterId);
@@ -41,4 +40,8 @@ abstract interface class CounterRepository {
   Future<void> addStatisticsForFolder(int folderId, StatisticsType statisticsType);
   Future<List<Statistics>> getCounterStatistics(int counterId, DateTime start, DateTime end);
   Future<List<Statistics>> getAllStatistics();
+  Future<bool> deleteAllStatistics();
+  Future<int> batchInsertFolders(List<Map<String, Object?>> jsonList);
+  Future<int> batchInsertCounters(List<Map<String, Object?>> jsonList);
+  Future<int> batchInsertStatistics(List<Map<String, Object?>> jsonList);
 }

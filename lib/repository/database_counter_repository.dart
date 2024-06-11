@@ -76,6 +76,7 @@ class DatabaseCounterRepository implements CounterRepository {
           await db.execute(sql);
         },
       );
+      print('db path : ${path.join(dbPath, 'counter.db')}');
       return _db != null;
     }
   }
@@ -164,49 +165,6 @@ class DatabaseCounterRepository implements CounterRepository {
   }
 
   @override
-  Future<Counter> insertCounter(Counter counter) async {
-    if (_db != null) {
-      final id = await _db!.transaction((txn) async {
-        const String query = """
-        INSERT INTO counters (
-        id,
-        name,
-        counterCount,
-        creationTimeStamp,
-        lastModificationTimeStamp,
-        counterLimit,
-        folderId,
-        color,
-        counterOrder,
-        orderInFolder,
-        step,
-        note
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
-        int insertedId = await txn.rawInsert(query, [
-          counter.id,
-          counter.name,
-          counter.counterCount,
-          counter.creationTimeStamp,
-          counter.lastModificationTimeStamp,
-          counter.counterLimit,
-          counter.folder?.id,
-          counter.color,
-          counter.counterOrder,
-          counter.orderInFolder,
-          counter.step ?? 1,
-          counter.note]);
-        return insertedId;
-      });
-      if (id > 0) {
-        return getCounterById(id);
-      }
-    }
-    return Counter();
-  }
-
-  @override
   Future<bool> deleteCounterById(int counterId) async {
     int deleted = 0;
     if (_db != null) {
@@ -223,7 +181,7 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<List<Counter>> getAllCounters() async {
     if (_db != null) {
-      final List<Map<String, Object?>> countersMap = await _db!.rawQuery(_selectCounterSql);
+      final List<Map<String, Object?>> countersMap = await _db!.rawQuery('$_selectCounterSql WHERE c.id > 1');
       return countersMap
           .map((Map<String, Object?> folderMap) => Counter.fromJson(folderMap))
           .toList();
@@ -520,11 +478,15 @@ class DatabaseCounterRepository implements CounterRepository {
 
   @override
   Future<bool> deleteAllFolders() async {
-    int deleted = 0;
     if (_db != null) {
-      deleted = await _db!.delete('folders');
+      final bool updateDated = await _db!.transaction((txn) async {
+        final int count = await txn.rawUpdate('DELETE FROM folders WHERE id > 1');
+        return count > 0;
+      });
+      return updateDated;
+    } else {
+      return false;
     }
-    return deleted > 0;
   }
 
   @override
@@ -664,5 +626,74 @@ class DatabaseCounterRepository implements CounterRepository {
       return statistics;
     }
     return List.empty();
+  }
+
+  @override
+  Future<bool> deleteAllStatistics() async {
+    if (_db != null) {
+      final bool updateDated = await _db!.transaction((txn) async {
+        final int count = await txn.delete('statistics');
+        return count > 0;
+      });
+      return updateDated;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<int> batchInsertCounters(List<Map<String, Object?>> jsonList) async {
+    if (_db != null) {
+      sql.Batch batch = _db!.batch();
+      for (var i = 0; i < jsonList.length; i++)
+      {
+        Map<String, Object?> json = jsonList[i];
+        if (json['folderId'] == null && json['folder'] != null && json['folder'] is Map && (json['folder'] as Map)['id'] != null) {
+          json['folderId'] = (json['folder'] as Map)['id'];
+        }
+        if (json['folder'] != null) {
+          json.remove('folder');
+        }
+        batch.insert('counters', json);
+      }
+      List<dynamic> inserted = await batch.commit(continueOnError: true);
+      return inserted.length;
+    } else {
+      return 0;
+    }
+  }
+
+  @override
+  Future<int> batchInsertFolders(List<Map<String, Object?>> jsonList) async {
+    if (_db != null) {
+      sql.Batch batch = _db!.batch();
+      for (var i = 0; i < jsonList.length; i++)
+      {
+        Map<String, Object?> json = jsonList[i];
+        if (json.keys.contains('counterNumber')) {
+          json.remove('counterNumber');
+        }
+        batch.insert('folders', json);
+      }
+      List<dynamic> inserted = await batch.commit(continueOnError: true);
+      return inserted.length;
+    } else {
+      return 0;
+    }
+  }
+
+  @override
+  Future<int> batchInsertStatistics(List<Map<String, Object?>> jsonList)async {
+    if (_db != null) {
+      sql.Batch batch = _db!.batch();
+      for (var i = 0; i < jsonList.length; i++)
+      {
+        batch.insert('statistics', jsonList[i]);
+      }
+      List<dynamic> inserted = await batch.commit(continueOnError: true);
+      return inserted.length;
+    } else {
+      return 0;
+    }
   }
 }

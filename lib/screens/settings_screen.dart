@@ -6,6 +6,7 @@ import 'package:counterpp/models/folder.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/models/statistics.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
+import 'package:counterpp/providers/folders_provider.dart';
 import 'package:counterpp/providers/settings_provider.dart';
 import 'package:counterpp/utils/permission-utils.dart';
 import 'package:file_picker/file_picker.dart';
@@ -152,21 +153,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             await ref.read(counterRepositoryProvider).updateSettings(settings);
           }
           if (data['folders'] != null) {
-            List<Folder> folders = data['folders'].map<Folder>((json) => Folder.fromJson(json)).toList();
             await ref.read(counterRepositoryProvider).deleteAllFolders();
-            for (int i = 0; i < folders.length; i++) {
-              Folder folder = folders[i];
-              await ref.read(counterRepositoryProvider).insertFolder(folder);
-            }
+            await ref.read(counterRepositoryProvider).batchInsertFolders(List<Map<String, Object?>>.from(data['folders']));
           }
           if (data['counters'] != null) {
-            List<Counter> counters = data['counters'].map<Counter>((json) => Counter.fromJson(json)).toList();
             await ref.read(counterRepositoryProvider).deleteAllCounters();
-            for (int i = 0; i < counters.length; i++) {
-              Counter counter = counters[i];
-              await ref.read(counterRepositoryProvider).createCounter(counter);
-            }
+            await ref.read(counterRepositoryProvider).batchInsertCounters(List<Map<String, Object?>>.from(data['counters']));
           }
+          if (data['statistics'] != null) {
+            await ref.read(counterRepositoryProvider).deleteAllStatistics();
+            await ref.read(counterRepositoryProvider).batchInsertStatistics(List<Map<String, Object?>>.from(data['statistics']));
+          }
+          ref.read(foldersProvider.notifier).refresh();
           if (!ctx.mounted) {
             return;
           }
@@ -260,15 +258,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       context,
                       Text(AppLocalizations.of(context)!.warning),
                       Text(AppLocalizations.of(context)!.warningMsgDeleteAllCounters),
-                      () {
-                        ref.read(counterRepositoryProvider).deleteAllCounters()
-                            .then((bool result) {
-                          if (result) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(AppLocalizations.of(context)!.warning))
-                            );
+                      () async {
+                        await ref.read(counterRepositoryProvider).deleteAllFolders();
+                        await ref.read(counterRepositoryProvider).deleteAllCounters();
+                        bool result = await ref.read(counterRepositoryProvider).deleteAllStatistics();
+                        if (result) {
+                          ref.read(foldersProvider.notifier).refresh();
+                          if (!context.mounted) {
+                            return;
                           }
-                        });
+                          final SnackBar snackBar = SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check_circle_outline, color: Colors.white),
+                                const SizedBox(width: 10),
+                                Flexible(child: Text(AppLocalizations.of(context)!.successfulMsgDeleteAllData)),
+                              ],
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
                       },
                     );
                   },
@@ -283,7 +292,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.importData),
                   subtitle: Text(AppLocalizations.of(context)!.importDataSummary),
-                  onTap: importData(context),
+                  onTap: () => importData(context),
                 ),
               ],
             ),

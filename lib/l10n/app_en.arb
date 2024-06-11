@@ -529,6 +529,10 @@
   "@successfulMsgImportData": {
     "description": "Message to show when importing a file succeed"
   },
+  "successfulMsgDeleteAllData": "All data successfully deleted",
+  "@successfulMsgDeleteAllData": {
+    "description": "Message to show when all data have been deleted with success"
+  },
   "successfulMsgExportData": "Export successful: your data is in {filepath}",
   "@successfulMsgExportData": {
     "description": "Message to show when data has been successfully exported",
