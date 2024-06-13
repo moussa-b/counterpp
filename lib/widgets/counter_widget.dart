@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-// import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CounterWidget extends ConsumerStatefulWidget {
   final int counterId;
@@ -64,10 +64,10 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
   Future<Settings> getSettings() async {
     final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
     final Settings settings = await counterRepository.getSettings();
-    // final bool wakelockEnabled = await Wakelock.enabled;
-    // if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
-    //   Wakelock.toggle(enable: settings.keepScreenOn!);
-    // }
+    final bool wakelockEnabled = await WakelockPlus.enabled;
+    if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
+      WakelockPlus.toggle(enable: settings.keepScreenOn!);
+    }
     return settings;
   }
 
