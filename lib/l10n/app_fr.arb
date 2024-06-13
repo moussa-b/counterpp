@@ -121,5 +121,6 @@
   "notSupportedMsgExportData": "L'export de données n'est supporté",
   "errorMsgImportData": "The file is invalid",
   "successfulMsgImportData": "Données importées avec succès",
-  "successfulMsgDeleteAllData": "Toutes les données supprimées avec succès"
+  "successfulMsgDeleteAllData": "Toutes les données supprimées avec succès",
+  "thankYouForSharing": "Merci d'avoir partagé notre application !"
 }

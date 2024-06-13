@@ -542,5 +542,9 @@
         "example": "/downloads/export.json"
       }
     }
+  },
+  "thankYouForSharing": "Thank you for sharing our application!",
+  "@thankYouForSharing": {
+    "description": "Message to show after application has been shared"
   }
 }

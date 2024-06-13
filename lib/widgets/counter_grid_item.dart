@@ -4,9 +4,7 @@ import 'package:counterpp/providers/last_modified_counter_provider.dart';
 import 'package:counterpp/repository/counter_repository.dart';
 import 'package:counterpp/utils/utils.dart';
 import 'package:counterpp/widgets/counter_bottom_sheet.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

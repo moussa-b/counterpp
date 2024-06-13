@@ -67,7 +67,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         });
   }
 
-  exportData(BuildContext ctx) async {
+  void _exportData(BuildContext ctx) async {
     Directory? downloadDirectory;
     if (Platform.isAndroid) {
       bool? hasStoragePermission = await PermissionUtils.storagePermission();
@@ -140,7 +140,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  importData(BuildContext ctx) async {
+  void _importData(BuildContext ctx) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       final File file = File(result.files.single.path!);
@@ -193,6 +193,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           validateLabel: AppLocalizations.of(ctx)!.ok
       );
     }
+  }
+
+  void _resetData(BuildContext context) {
+    _showDialog(
+      context,
+      Text(AppLocalizations.of(context)!.warning),
+      Text(AppLocalizations.of(context)!.warningMsgDeleteAllCounters),
+          () async {
+        await ref.read(counterRepositoryProvider).deleteAllFolders();
+        await ref.read(counterRepositoryProvider).deleteAllCounters();
+        bool result = await ref.read(counterRepositoryProvider).deleteAllStatistics();
+        if (result) {
+          ref.read(foldersProvider.notifier).refresh();
+          if (!context.mounted) {
+            return;
+          }
+          final SnackBar snackBar = SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.white),
+                const SizedBox(width: 10),
+                Flexible(child: Text(AppLocalizations.of(context)!.successfulMsgDeleteAllData)),
+              ],
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
+      },
+    );
   }
 
   @override
@@ -253,46 +282,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: Text(AppLocalizations.of(context)!.deleteAllCounters),
                   subtitle: Text(
                       AppLocalizations.of(context)!.deleteAllCountersSummary),
-                  onTap: () {
-                    _showDialog(
-                      context,
-                      Text(AppLocalizations.of(context)!.warning),
-                      Text(AppLocalizations.of(context)!.warningMsgDeleteAllCounters),
-                      () async {
-                        await ref.read(counterRepositoryProvider).deleteAllFolders();
-                        await ref.read(counterRepositoryProvider).deleteAllCounters();
-                        bool result = await ref.read(counterRepositoryProvider).deleteAllStatistics();
-                        if (result) {
-                          ref.read(foldersProvider.notifier).refresh();
-                          if (!context.mounted) {
-                            return;
-                          }
-                          final SnackBar snackBar = SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(Icons.check_circle_outline, color: Colors.white),
-                                const SizedBox(width: 10),
-                                Flexible(child: Text(AppLocalizations.of(context)!.successfulMsgDeleteAllData)),
-                              ],
-                            ),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                      },
-                    );
-                  },
+                  onTap: () => _resetData(context),
                 ),
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.exportData),
                   subtitle: Text(AppLocalizations.of(context)!.exportDataSummary),
-                  onTap: () => exportData(context),
+                  onTap: () => _exportData(context),
                 ),
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.importData),
                   subtitle: Text(AppLocalizations.of(context)!.importDataSummary),
-                  onTap: () => importData(context),
+                  onTap: () => _importData(context),
                 ),
               ],
             ),
