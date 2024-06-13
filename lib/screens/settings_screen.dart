@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -24,6 +26,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Settings settings = Settings();
+  String? version;
 
   @override
   void initState() {
@@ -33,8 +36,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void getSettings() async {
     final Settings settingsFromDb = await ref.read(counterRepositoryProvider).getSettings();
+    final packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       settings = settingsFromDb;
+      version = packageInfo.version;
     });
   }
 
@@ -224,6 +229,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  void _shareApplication(BuildContext context) async {
+    final result = await Share.share('https://example.com', subject: AppLocalizations.of(context)!.shareSummary);
+    if (!context.mounted) {
+      return;
+    }
+    if (result.status == ShareResultStatus.success) {
+      final SnackBar snackBar = SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_outline, color: Colors.white),
+            const SizedBox(width: 10),
+            Flexible(child: Text(AppLocalizations.of(context)!.thankYouForSharing)),
+          ],
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -307,7 +331,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.version),
-                  subtitle: Text('1.0.0'),
+                  subtitle: Text(version != null ? version! : ''),
                   onTap: () {},
                 ),
                 const Divider(),
@@ -320,7 +344,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.share),
                   subtitle: Text(AppLocalizations.of(context)!.shareSummary),
-                  onTap: () {},
+                  onTap: () => _shareApplication(context),
                 ),
                 const Divider(),
                 ListTile(
