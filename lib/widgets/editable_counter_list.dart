@@ -18,7 +18,7 @@ class EditableCounterList extends ConsumerWidget {
 
     return ReorderableListView(
       children: counters.map((Counter counter) {
-        final String keyValue = '${counter.id!}-${counter.lastModificationTimeStamp!}';
+        final String keyValue = '${counter.id!}-${counter.lastModificationTimeStamp ?? counter.creationTimeStamp!}';
         return CounterListItem(
             key: ValueKey<String>(keyValue),
             counter: counter,

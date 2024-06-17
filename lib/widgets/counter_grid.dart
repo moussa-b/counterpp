@@ -14,7 +14,7 @@ class CounterGrid extends StatelessWidget {
       itemBuilder: (ctx, index) {
         final Counter counter = counters[index];
         final String keyValue =
-            '${counter.id!}-${counter.lastModificationTimeStamp!}';
+            '${counter.id!}-${counter.lastModificationTimeStamp ?? counter.creationTimeStamp!}';
         return CounterGridItem(
           key: ValueKey<String>(keyValue),
           counter: counter,
