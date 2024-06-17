@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:counterpp/models/bottom_sheet_result.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
@@ -141,13 +142,18 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
         ),
         trailing: IconButton(
           icon: const Icon(Icons.more_vert),
-          onPressed: !widget.active ? null : () {
-            showModalBottomSheet<void>(
+          onPressed: !widget.active ? null : () async {
+            BottomSheetAction? value = await showModalBottomSheet<BottomSheetAction?>(
               context: context,
               builder: (BuildContext context) {
                 return CounterBottomSheet(counter: widget.counter);
               },
             );
+            if (value == BottomSheetAction.reset) {
+              setState(() {
+                _count = 0;
+              });
+            }
           },
         ),
       ),

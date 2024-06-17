@@ -1,3 +1,4 @@
+import 'package:counterpp/models/bottom_sheet_result.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/providers/last_modified_counter_provider.dart';
@@ -73,16 +74,21 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                       alignment: Alignment.centerRight,
                       child: MaterialButton(
                         minWidth: 0,
-                        onPressed: () {
+                        onPressed: () async {
                           if (!widget.active) {
                             return;
                           }
-                          showModalBottomSheet<void>(
+                          BottomSheetAction? value = await showModalBottomSheet<BottomSheetAction?>(
                             context: context,
                             builder: (BuildContext context) {
                               return CounterBottomSheet(counter: widget.counter);
                             },
                           );
+                          if (value == BottomSheetAction.reset) {
+                            setState(() {
+                              _count = 0;
+                            });
+                          }
                         },
                         color: Colors.white,
                         textColor: color,

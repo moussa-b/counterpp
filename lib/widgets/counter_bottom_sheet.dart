@@ -1,3 +1,4 @@
+import 'package:counterpp/models/bottom_sheet_result.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/providers/counters_provider.dart';
 import 'package:counterpp/providers/last_modified_counter_provider.dart';
@@ -72,6 +73,7 @@ class CounterBottomSheet extends ConsumerWidget {
           label: AppLocalizations.of(context)!.reset,
           closeOnTap: false,
           showConfirmationDialog: true,
+          result: BottomSheetAction.reset,
           dialogTitle: Text(AppLocalizations.of(context)!.warning),
           dialogContent: Text(AppLocalizations.of(context)!.warningMsgResetCounter),
           onTap: () {

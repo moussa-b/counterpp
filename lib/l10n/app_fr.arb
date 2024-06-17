@@ -122,5 +122,8 @@
   "errorMsgImportData": "The file is invalid",
   "successfulMsgImportData": "Données importées avec succès",
   "successfulMsgDeleteAllData": "Toutes les données supprimées avec succès",
-  "thankYouForSharing": "Merci d'avoir partagé notre application !"
+  "thankYouForSharing": "Merci d'avoir partagé notre application !",
+  "errorWhenRatingTheApp": "Une erreur s'est produite lors de l'évaluation de l'application. Veuillez contacter le support.",
+  "errorWhenSendingEmail": "Une erreur s'est produite lors de l'envoi de l'email",
+  "error": "Erreur"
 }

@@ -1,16 +1,18 @@
+import 'package:counterpp/models/bottom_sheet_result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BottomSheetItem extends StatelessWidget {
   final Icon icon;
   final String label;
+  final BottomSheetAction? result; // result to send back to Widget that opened the BottomSheet
   final void Function() onTap;
   final bool closeOnTap;
   final bool showConfirmationDialog;
   final Widget? dialogTitle;
   final Widget? dialogContent;
 
-  void _showDialog(BuildContext context, void Function() confirmCallback, Widget title, Widget content) {
+  void _showDialog(BuildContext context, void Function() confirmCallback, Widget title, Widget content, BottomSheetAction? result) {
     showDialog(
         context: context,
         builder: (ctx) {
@@ -20,16 +22,16 @@ class BottomSheetItem extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(ctx).pop();
+                  Navigator.pop(ctx);
                 },
-                child: Text(AppLocalizations.of(context)!.cancel),
+                child: Text(AppLocalizations.of(ctx)!.cancel),
               ),
               TextButton(
                 onPressed: () {
                   confirmCallback();
-                  Navigator.of(ctx).pop();
+                  Navigator.pop(ctx, result);
                 },
-                child: Text(AppLocalizations.of(context)!.validate),
+                child: Text(AppLocalizations.of(ctx)!.validate),
               ),
             ],
           );
@@ -45,6 +47,7 @@ class BottomSheetItem extends StatelessWidget {
     this.showConfirmationDialog = false,
     this.dialogTitle,
     this.dialogContent,
+    this.result,
   });
 
   @override
@@ -55,7 +58,7 @@ class BottomSheetItem extends StatelessWidget {
           Navigator.pop(context);
         }
         if (showConfirmationDialog && dialogContent != null && dialogTitle != null) {
-          _showDialog(context, onTap, dialogTitle!, dialogContent!);
+          _showDialog(context, onTap, dialogTitle!, dialogContent!, result);
         } else {
           onTap();
         }

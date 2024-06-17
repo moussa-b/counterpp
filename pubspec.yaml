@@ -52,6 +52,8 @@ dependencies:
   package_info_plus: ^8.0.0
   share_plus: ^9.0.0
   wakelock_plus: ^1.2.5
+  in_app_review: ^2.0.9
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

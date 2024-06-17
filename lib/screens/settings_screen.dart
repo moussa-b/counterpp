@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:counterpp/models/app_config.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/folder.dart';
 import 'package:counterpp/models/settings.dart';
@@ -13,9 +14,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -27,6 +30,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Settings settings = Settings();
   String? version;
+  final InAppReview inAppReview = InAppReview.instance;
 
   @override
   void initState() {
@@ -230,7 +234,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _shareApplication(BuildContext context) async {
-    final result = await Share.share('https://example.com', subject: AppLocalizations.of(context)!.shareSummary);
+    final result = await Share.share(AppConfig.shareUrl, subject: AppLocalizations.of(context)!.shareSummary);
     if (!context.mounted) {
       return;
     }
@@ -246,6 +250,62 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  void _rateApplication(BuildContext context) async {
+    if (await inAppReview.isAvailable()) {
+      inAppReview.requestReview();
+    } else {
+      if (!context.mounted) {
+        return;
+      }
+      final SnackBar snackBar = SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 10),
+            Flexible(child: Text(AppLocalizations.of(context)!.errorWhenRatingTheApp)),
+          ],
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  void _contactUs(BuildContext context) async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: AppConfig.developerEmail,
+      query: _encodeQueryParameters(<String, String>{
+        'subject': AppConfig.appName,
+        'body': 'Hello',
+      }),
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      if (!context.mounted) {
+        return;
+      }
+      final SnackBar snackBar = SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 10),
+            Flexible(child: Text(AppLocalizations.of(context)!.errorWhenSendingEmail)),
+          ],
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  String? _encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((MapEntry<String, String> e) =>
+    '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
   }
 
   @override
@@ -350,13 +410,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.rate),
                   subtitle: Text(AppLocalizations.of(context)!.rateSummary),
-                  onTap: () {},
+                  onTap: () => _rateApplication(context),
                 ),
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.contactUs),
                   subtitle: Text(AppLocalizations.of(context)!.contactUsSummary),
-                  onTap: () {},
+                  onTap: () => _contactUs(context),
                 ),
                 const Divider(),
                 ListTile(

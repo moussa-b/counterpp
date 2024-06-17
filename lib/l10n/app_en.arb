@@ -546,5 +546,13 @@
   "thankYouForSharing": "Thank you for sharing our application!",
   "@thankYouForSharing": {
     "description": "Message to show after application has been shared"
+  },
+  "errorWhenRatingTheApp": "An error occurred when rating the app. Please contact support.",
+  "@errorWhenRatingTheApp": {
+    "description": "Message to show when rating is not available"
+  },
+  "errorWhenSendingEmail": "An error occurred when sending email",
+  "@errorWhenSendingEmail": {
+    "description": "Message to show when sending email is not available"
   }
 }
