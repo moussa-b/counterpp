@@ -1,11 +1,20 @@
 import 'package:counterpp/models/counter.dart';
+import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/widgets/counter_grid_item.dart';
 import 'package:flutter/material.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CounterGrid extends StatelessWidget {
   final List<Counter> counters;
+  final Settings settings;
 
-  const CounterGrid({super.key, required this.counters});
+  CounterGrid({super.key, required this.counters, required this.settings}) {
+    WakelockPlus.enabled.then((bool wakelockEnabled) {
+          if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
+            WakelockPlus.toggle(enable: settings.keepScreenOn!);
+          }
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +27,7 @@ class CounterGrid extends StatelessWidget {
         return CounterGridItem(
           key: ValueKey<String>(keyValue),
           counter: counter,
+          settings: settings
         );
       },
       itemCount: counters.length,

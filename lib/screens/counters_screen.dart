@@ -57,7 +57,7 @@ class _CountersScreenState extends ConsumerState<CountersScreen>{
           if (!_editMode)
             Expanded(
               child: showCounterGrid
-                  ? CounterGrid(counters: counters.value!)
+                  ? CounterGrid(counters: counters.value!, settings: settings.value!)
                   : CounterList(counters: counters.value!, settings: settings.value!),
             ),
           if (_editMode)

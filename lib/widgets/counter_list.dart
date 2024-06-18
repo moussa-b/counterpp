@@ -2,12 +2,19 @@ import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/widgets/counter_list_item.dart';
 import 'package:flutter/material.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CounterList extends StatelessWidget {
   final List<Counter> counters;
   final Settings settings;
 
-  const CounterList({super.key, required this.counters, required this.settings});
+  CounterList({super.key, required this.counters, required this.settings}) {
+    WakelockPlus.enabled.then((bool wakelockEnabled) {
+      if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
+        WakelockPlus.toggle(enable: settings.keepScreenOn!);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

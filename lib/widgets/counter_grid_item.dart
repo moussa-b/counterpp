@@ -1,19 +1,23 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:counterpp/models/bottom_sheet_result.dart';
 import 'package:counterpp/models/counter.dart';
+import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/providers/last_modified_counter_provider.dart';
 import 'package:counterpp/repository/counter_repository.dart';
 import 'package:counterpp/utils/utils.dart';
 import 'package:counterpp/widgets/counter_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CounterGridItem extends ConsumerStatefulWidget {
   final Counter counter;
   final bool active;
+  final Settings? settings;
 
-  const CounterGridItem({super.key, required this.counter, this.active = true});
+  const CounterGridItem({super.key, required this.counter, this.active = true, this.settings});
 
   @override
   ConsumerState<CounterGridItem> createState() => _CounterGridItemState();
@@ -34,10 +38,19 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
 
   @override
   Widget build(BuildContext context) {
+    final bool activateVibrator = widget.settings?.activateVibrator ?? false;
+    final bool activateSounds = widget.settings?.activateSounds ?? false;
+
     final Color color = Utils.hexToColor(widget.counter.color!);
     return Material(
       child: InkWell(
         onTap: !widget.active ? null : () {
+          if (activateSounds) {
+            AudioPlayer().play(AssetSource('audio/decrease.mp3'));
+          }
+          if (activateVibrator) {
+            HapticFeedback.mediumImpact();
+          }
           setState(() {
             _count = _count + getStep();
             final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
