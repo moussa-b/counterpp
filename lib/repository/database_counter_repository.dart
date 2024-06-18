@@ -76,7 +76,6 @@ class DatabaseCounterRepository implements CounterRepository {
           await db.execute(sql);
         },
       );
-      print('db path : ${path.join(dbPath, 'counter.db')}');
       return _db != null;
     }
   }
