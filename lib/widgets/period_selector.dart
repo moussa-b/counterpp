@@ -20,22 +20,34 @@ class _PeriodSelectorState extends State<PeriodSelector> {
       segments: <ButtonSegment<CalendarPeriod>>[
         ButtonSegment<CalendarPeriod>(
           value: CalendarPeriod.day,
-          label: Text(AppLocalizations.of(context)!.day),
+          label: Text(
+            AppLocalizations.of(context)!.day,
+            overflow: TextOverflow.ellipsis,
+          ),
           icon: const Icon(Icons.calendar_view_day),
         ),
         ButtonSegment<CalendarPeriod>(
           value: CalendarPeriod.week,
-          label: Text(AppLocalizations.of(context)!.week),
+          label: Text(
+            AppLocalizations.of(context)!.week,
+            overflow: TextOverflow.ellipsis,
+          ),
           icon: const Icon(Icons.calendar_view_week),
         ),
         ButtonSegment<CalendarPeriod>(
           value: CalendarPeriod.month,
-          label: Text(AppLocalizations.of(context)!.month),
+          label: Text(
+            AppLocalizations.of(context)!.month,
+            overflow: TextOverflow.ellipsis,
+          ),
           icon: const Icon(Icons.calendar_view_month),
         ),
         ButtonSegment<CalendarPeriod>(
           value: CalendarPeriod.year,
-          label: Text(AppLocalizations.of(context)!.year),
+          label: Text(
+            AppLocalizations.of(context)!.year,
+            overflow: TextOverflow.ellipsis,
+          ),
           icon: const Icon(Icons.calendar_today),
         ),
       ],

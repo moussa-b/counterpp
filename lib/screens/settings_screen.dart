@@ -9,6 +9,7 @@ import 'package:counterpp/models/statistics.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/providers/folders_provider.dart';
 import 'package:counterpp/providers/settings_provider.dart';
+import 'package:counterpp/screens/tutorial_screen.dart';
 import 'package:counterpp/utils/permission-utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -398,7 +399,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.tutorial),
                   subtitle: Text(AppLocalizations.of(context)!.tutorialSummary),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ctx) {
+                          return const TutorialScreen();
+                        },
+                      ),
+                    );
+                  },
                 ),
                 const Divider(),
                 ListTile(

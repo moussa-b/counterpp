@@ -125,5 +125,12 @@
   "thankYouForSharing": "Merci d'avoir partagé notre application !",
   "errorWhenRatingTheApp": "Une erreur s'est produite lors de l'évaluation de l'application. Veuillez contacter le support.",
   "errorWhenSendingEmail": "Une erreur s'est produite lors de l'envoi de l'email",
-  "error": "Erreur"
+  "error": "Erreur",
+  "tutorialMsg1": "Utiliser un simple compteur infini depuis de l'écran d'accueil",
+  "tutorialMsg2": "Créez des dossiers pour organiser vos compteurs à partir de l'écran de la liste des dossiers",
+  "tutorialMsg3": "Créez vos propres compteurs à partir de l'écran de liste des compteurs",
+  "tutorialMsg4": "Suivez vos activités grâce à des statistiques avancées",
+  "next": "Suivant",
+  "start": "Commencer",
+  "skip": "Passer"
 }

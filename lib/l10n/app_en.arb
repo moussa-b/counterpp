@@ -554,5 +554,33 @@
   "errorWhenSendingEmail": "An error occurred when sending email",
   "@errorWhenSendingEmail": {
     "description": "Message to show when sending email is not available"
+  },
+  "tutorialMsg1": "Use simple infinite counter from home screen",
+  "@tutorialMsg1": {
+    "description": "Message to show in the 1st page of the tutorial"
+  },
+  "tutorialMsg2": "Create folders to organize your counters from folder list screen",
+  "@tutorialMsg2": {
+    "description": "Message to show in the 2nd page of the tutorial"
+  },
+  "tutorialMsg3": "Create your own counters from counter list screen",
+  "@tutorialMsg3": {
+    "description": "Message to show in the 3rd page of the tutorial"
+  },
+  "tutorialMsg4": "Keep track of your activities with advanced statistics",
+  "@tutorialMsg4": {
+    "description": "Message to show in the 4th page of the tutorial"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next label"
+  },
+  "start": "Start",
+  "@start": {
+    "description": "Start label"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip label"
   }
 }
