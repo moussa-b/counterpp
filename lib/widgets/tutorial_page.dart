@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// inspired from https://medium.com/@mobileatexxeta/onboarding-flow-with-flutter-80e7cbddcff4
+
 class TutorialPage extends StatelessWidget {
   final Color color;
   final String image;

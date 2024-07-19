@@ -548,7 +548,7 @@ class DatabaseCounterRepository implements CounterRepository {
     if (_db != null) {
       bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
-            """REPLACE INTO settings (id, counterCompactView, counterSorting, folderSorting, activateSounds, activateVibrator, keepScreenOn, lastModificationTimeStamp)
+            """REPLACE INTO settings (id, counterCompactView, counterSorting, folderSorting, activateSounds, activateVibrator, keepScreenOn, showTutorial, onlineSynchronizationId, lastModificationTimeStamp)
             VALUES(
             1,
             ${settings.counterCompactView == true ? 1 : 0},
@@ -557,6 +557,8 @@ class DatabaseCounterRepository implements CounterRepository {
             ${settings.activateSounds == true ? 1 : 0},
             ${settings.activateVibrator == true ? 1 : 0},
             ${settings.keepScreenOn == true ? 1 : 0},
+            ${settings.showTutorial == true ? 1 : 0},
+            ${settings.onlineSynchronizationId},
             $lastModificationTimeStamp)""");
         return count > 0;
       });

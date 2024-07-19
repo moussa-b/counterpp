@@ -160,6 +160,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         if (data['settings'] != null || data['folders'] != null || data['counters'] != null) {
           if (data['settings'] != null) {
             Settings settings = Settings.fromJson(data['settings']);
+            settings.showTutorial = false;
             await ref.read(counterRepositoryProvider).updateSettings(settings);
           }
           if (data['folders'] != null) {

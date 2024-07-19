@@ -7,7 +7,9 @@ class Settings {
   bool? activateSounds;
   bool? activateVibrator;
   bool? keepScreenOn;
+  bool? showTutorial;
   int? lastModificationTimeStamp;
+  String? onlineSynchronizationId;
 
   Settings({this.folderSorting, this.counterSorting, this.counterCompactView = false, this.lastModificationTimeStamp});
 
@@ -19,6 +21,8 @@ class Settings {
     folderSorting = json['folderSorting'] != null ? SortingOptions.values[json['folderSorting']] : null;
     keepScreenOn = json['keepScreenOn'] == 1;
     lastModificationTimeStamp = json['lastModificationTimeStamp'];
+    onlineSynchronizationId = json['onlineSynchronizationId'];
+    showTutorial = json['showTutorial'] != null ? (json['showTutorial'] == 1) : true;
   }
 
   Settings.copy(Settings toCopy) {
@@ -29,14 +33,21 @@ class Settings {
     folderSorting = toCopy.folderSorting;
     keepScreenOn = toCopy.keepScreenOn;
     lastModificationTimeStamp = toCopy.lastModificationTimeStamp;
+    onlineSynchronizationId = toCopy.onlineSynchronizationId;
+    showTutorial = toCopy.showTutorial;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['activateSounds'] = (activateSounds == true ? 1 : 0);
+    data['activateVibrator'] = (activateVibrator == true ? 1 : 0);
     data['counterCompactView'] = (counterCompactView == true ? 1 : 0);
     data['counterSorting'] = counterSorting;
     data['folderSorting'] = folderSorting;
+    data['keepScreenOn'] = (keepScreenOn == true ? 1 : 0);
     data['lastModificationTimeStamp'] = lastModificationTimeStamp;
+    data['onlineSynchronizationId'] = onlineSynchronizationId;
+    data['showTutorial'] = (showTutorial == true ? 1 : 0);
     return data;
   }
 }

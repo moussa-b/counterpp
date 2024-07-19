@@ -1,5 +1,3 @@
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/repository/counter_repository.dart';
 import 'package:counterpp/screens/folders_screen.dart';
 import 'package:counterpp/screens/settings_screen.dart';
 import 'package:counterpp/widgets/counter_widget.dart';
@@ -8,21 +6,22 @@ import 'package:counterpp/widgets/folders_app_bar.dart';
 import 'package:counterpp/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 const HOME_TAB_INDEX = 0;
 const FOLDER_TAB_INDEX = 1;
 const SETTINGS_TAB_INDEX = 2;
+
 typedef resetCounterBuilder = void Function(BuildContext context, void Function() resetCounter);
-class TabsScreen extends ConsumerStatefulWidget {
+
+class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
 
   @override
-  ConsumerState<TabsScreen> createState() => _TabsScreenState();
+  State<TabsScreen> createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends ConsumerState<TabsScreen> {
+class _TabsScreenState extends State<TabsScreen> {
   void Function()? _resetCounter;
   int _selectedIndex = 0;
   bool _editMode = false;
@@ -86,12 +85,10 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
       body = const LoadingIndicator();
     }
 
-    final AsyncValue<CounterRepository> counterRepository = ref.watch(asyncCounterRepositoryProvider);
-    final bool isCounterRepositoryInitialized = counterRepository.hasValue && counterRepository.value != null && counterRepository.value!.isInitialized();
 
     return Scaffold(
       appBar: appBar,
-      body: SafeArea(child: isCounterRepositoryInitialized ? body : const LoadingIndicator()),
+      body: SafeArea(child: body),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(

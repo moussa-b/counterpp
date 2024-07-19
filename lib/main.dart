@@ -1,4 +1,9 @@
+import 'package:counterpp/models/settings.dart';
+import 'package:counterpp/providers/counter_repository_provider.dart';
+import 'package:counterpp/repository/counter_repository.dart';
 import 'package:counterpp/screens/tab_screen.dart';
+import 'package:counterpp/screens/tutorial_screen.dart';
+import 'package:counterpp/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -17,26 +22,69 @@ void main() {
   ));
 }
 
-class App extends StatelessWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
-  // This widget is the root of your application.
+  @override
+  ConsumerState createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  bool showTutorial = true;
+
+  Future<Settings> getSettings() {
+    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    return counterRepository.getSettings();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final asyncValue = ref.watch(asyncCounterRepositoryProvider);
     return MaterialApp(
-      // debugShowCheckedModeBanner: false,
-      theme: theme,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+        // debugShowCheckedModeBanner: false,
+        theme: theme,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('fr'),
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('fr'),
-      ],
-      home: const TabsScreen(),
+      home: asyncValue.when(
+        data: (data) => FutureBuilder<Settings>(
+          future: getSettings(),
+          builder: (BuildContext ctx, AsyncSnapshot<Settings> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // While the future is running, show a loading indicator
+              return const LoadingIndicator();
+            } else if (snapshot.hasError) {
+              print(snapshot.error);
+              return const LoadingIndicator();
+            } else {
+              if (showTutorial && snapshot.data!.showTutorial != false) {
+                final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+                final Settings settings = Settings.copy(snapshot.data!);
+                settings.showTutorial = false;
+                counterRepository.updateSettings(settings);
+                return TutorialScreen(continueCallback: () => setState(() {
+                  showTutorial = false;
+                }));
+              } else {
+                return const TabsScreen();
+              }
+            }
+          },
+        ),
+        loading: () => const LoadingIndicator(),
+        error: (err, stack) {
+          print(err.toString());
+          print(stack.toString());
+          return const LoadingIndicator();
+        },
+      ),
     );
   }
 }

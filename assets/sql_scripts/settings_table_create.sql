@@ -7,5 +7,7 @@ CREATE TABLE settings
     activateSounds            INTEGER,
     activateVibrator          INTEGER,
     keepScreenOn              INTEGER,
+    showTutorial              INTEGER,
+    onlineSynchronizationId   TEXT,
     lastModificationTimeStamp INTEGER
 );

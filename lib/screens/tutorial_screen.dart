@@ -160,8 +160,8 @@ class _TutorialScreenState extends State<TutorialScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.tutorial),
-        scrolledUnderElevation: 0.0,
+        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+        toolbarHeight: 0,
       ),
       body: SafeArea(
         child: Stack(
