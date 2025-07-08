@@ -41,7 +41,7 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
     final bool activateVibrator = widget.settings?.activateVibrator ?? false;
     final bool activateSounds = widget.settings?.activateSounds ?? false;
 
-    final Color color = Utils.hexToColor(widget.counter.color!);
+    final Color color = Utils.hexToColor(widget.counter.color);
     return Material(
       child: InkWell(
         onTap: !widget.active ? null : () {
@@ -119,7 +119,7 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${_count}',
+                      '$_count',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

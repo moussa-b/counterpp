@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:counterpp/models/count.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/folder.dart';
 import 'package:counterpp/models/reorder_item.dart';
@@ -21,10 +22,20 @@ abstract interface class CounterRepository {
   Future<List<Counter>> getCountersByFolderId(int folderId);
   Future<List<Counter>> getCountersByFolderIdSorted(int folderId, SortingOptions? counterSorting);
   Future<List<Counter>> getAllCounters();
+  Future<List<Counter>> getAllCountersToSynchronize();
+  Future<List<int>> getAllDeletedCounterIdsToSynchronize();
+  Future<bool> updateCountersSynchronizationTimestamp(List<int> counterIds);
+  Future<bool> updateCountersSynchronizationTimestampByFolderId(int folderId);
+  Future<bool> updateDeletedCountersSynchronizationTimestamp(List<int> counterIds);
+  Future<bool> synchronizeCountersCount(int folderId);
+  Future<List<Count>> getCountsByFolderId(int folderId);
   Future<List<Folder>> getAllFolders();
+  Future<List<Folder>> getAllFoldersToSynchronize();
+  Future<List<int>> getAllDeletedFolderIdsToSynchronize();
+  Future<bool> updateFoldersSynchronizationTimestamp(List<int> folderIds);
+  Future<bool> updateDeletedFoldersSynchronizationTimestamp(List<int> folderIds);
   Future<List<Folder>> getAllFoldersSorted(SortingOptions? sortingOptions);
   Future<Folder> createFolder(String folderName);
-  Future<Folder> insertFolder(Folder folder); // full insert of all column including id
   Future<Folder> renameFolder(int folderId, String folderName);
   Future<Folder> getFolderById(int folderId);
   Future<bool> deleteFolderById(int folderId);
@@ -44,4 +55,5 @@ abstract interface class CounterRepository {
   Future<int> batchInsertFolders(List<Map<String, Object?>> jsonList);
   Future<int> batchInsertCounters(List<Map<String, Object?>> jsonList);
   Future<int> batchInsertStatistics(List<Map<String, Object?>> jsonList);
+  Future<void> synchronizeAll();
 }

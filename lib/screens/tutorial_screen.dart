@@ -1,6 +1,6 @@
 import 'package:counterpp/widgets/tutorial_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:counterpp/l10n/app_localizations.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class TutorialScreen extends StatefulWidget {

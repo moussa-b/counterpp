@@ -13,6 +13,7 @@ class Counter {
   int? orderInFolder;
   int? step;
   String? note;
+  int? synchronizationTimeStamp;
 
   Counter(
       {this.color,
@@ -26,7 +27,8 @@ class Counter {
         this.counterOrder,
         this.orderInFolder,
         this.step,
-        this.note});
+        this.note,
+        this.synchronizationTimeStamp});
 
   Counter.fromJson(Map<String, dynamic> json) {
     color = json['color'];
@@ -50,6 +52,7 @@ class Counter {
     orderInFolder = json['orderInFolder'];
     step = json['step'];
     note = json['note'];
+    synchronizationTimeStamp = json['synchronizationTimeStamp'];
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +71,7 @@ class Counter {
     data['orderInFolder'] = orderInFolder;
     data['step'] = step;
     data['note'] = note;
+    data['synchronizationTimeStamp'] = synchronizationTimeStamp;
     return data;
   }
 }

@@ -4,6 +4,7 @@ CREATE TABLE [counters] (
   [counterCount] INTEGER,
   [creationTimeStamp] INTEGER,
   [lastModificationTimeStamp] INTEGER,
+  [synchronizationTimeStamp] INTEGER,
   [counterLimit] INTEGER,
   [folderId] INTEGER,
   [color] TEXT,

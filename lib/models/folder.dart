@@ -5,6 +5,7 @@ class Folder {
   String? name;
   int? folderOrder;
   int? counterNumber;
+  int? synchronizationTimeStamp;
 
   Folder(
       {this.creationTimeStamp,
@@ -12,7 +13,8 @@ class Folder {
       this.lastModificationTimeStamp,
       this.name,
       this.folderOrder,
-      this.counterNumber});
+      this.counterNumber,
+      this.synchronizationTimeStamp});
 
   Folder.fromJson(Map<String, dynamic> json) {
     creationTimeStamp = json['creationTimeStamp'];
@@ -21,6 +23,7 @@ class Folder {
     name = json['name'];
     folderOrder = json['folderOrder'];
     counterNumber = json['counterNumber'] ?? 0;
+    synchronizationTimeStamp = json['synchronizationTimeStamp'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +34,7 @@ class Folder {
     data['name'] = name;
     data['folderOrder'] = folderOrder;
     data['counterNumber'] = counterNumber;
+    data['synchronizationTimeStamp'] = synchronizationTimeStamp;
     return data;
   }
 }

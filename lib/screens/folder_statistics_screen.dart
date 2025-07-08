@@ -5,7 +5,7 @@ import 'package:counterpp/widgets/folder_statistics_chart.dart';
 import 'package:counterpp/widgets/folder_statistics_data_table.dart';
 import 'package:counterpp/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:counterpp/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FolderStatisticsScreen extends ConsumerStatefulWidget {

@@ -3,5 +3,6 @@ CREATE TABLE [folders] (
   [name] TEXT,
   [creationTimeStamp] INTEGER,
   [lastModificationTimeStamp] INTEGER,
+  [synchronizationTimeStamp] INTEGER,
   [folderOrder] INTEGER
 );

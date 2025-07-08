@@ -33,7 +33,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_localizations:
     sdk: flutter
-  intl: ^0.18.1
+  intl: ^0.20.2
   sqflite: ^2.3.2
   flutter_riverpod: ^2.4.10
   flex_color_picker: ^3.4.1
@@ -55,6 +55,7 @@ dependencies:
   in_app_review: ^2.0.9
   url_launcher: ^6.3.0
   smooth_page_indicator: ^1.1.0
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:

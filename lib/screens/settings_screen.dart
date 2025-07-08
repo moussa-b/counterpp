@@ -9,11 +9,13 @@ import 'package:counterpp/models/statistics.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/providers/folders_provider.dart';
 import 'package:counterpp/providers/settings_provider.dart';
+import 'package:counterpp/screens/synchronization_screen.dart';
 import 'package:counterpp/screens/tutorial_screen.dart';
-import 'package:counterpp/utils/permission-utils.dart';
+import 'package:counterpp/utils/permission_utils.dart';
+import 'package:counterpp/utils/synchronization_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:counterpp/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
@@ -303,6 +305,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  void _openSynchronizationScreen(BuildContext context) async {
+    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
+      return const SynchronizationScreen();
+    }));
+  }
+
   String? _encodeQueryParameters(Map<String, String> params) {
     return params.entries
         .map((MapEntry<String, String> e) =>
@@ -382,6 +390,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   subtitle: Text(AppLocalizations.of(context)!.importDataSummary),
                   onTap: () => _importData(context),
                 ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.synchronizeData),
+                  subtitle: Text(AppLocalizations.of(context)!.synchronizeDataSummary),
+                  onTap: () async {
+                    if (SynchronizationService().isInitialized) {
+                      ref.read(counterRepositoryProvider).synchronizeAll();
+                    } else {
+                      _openSynchronizationScreen(context);
+                    }
+                  },
+                ),
               ],
             ),
             _SettingsSection(
@@ -446,7 +466,6 @@ class _SettingsSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
   const _SettingsSection({
-    super.key,
     required this.title,
     required this.children,
   });

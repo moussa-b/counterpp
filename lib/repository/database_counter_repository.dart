@@ -1,10 +1,14 @@
+import 'package:counterpp/models/count.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/folder.dart';
 import 'package:counterpp/models/reorder_item.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/models/sorting_options.dart';
 import 'package:counterpp/models/statistics.dart';
+import 'package:counterpp/utils/synchronization_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart' as sql;
 
@@ -24,8 +28,24 @@ class DatabaseCounterRepository implements CounterRepository {
       LEFT JOIN folders f
       ON c.folderId = f.id
       """;
+  static const _selectFolderSql = """
+          SELECT f.*, COUNT(*) AS counterNumber
+          FROM folders f 
+          INNER JOIN counters c ON f.id = c.folderId 
+          WHERE f.id > 1
+          GROUP BY f.id
+          UNION ALL
+          SELECT f.*, 0 AS counterNumber
+          FROM folders f 
+          LEFT JOIN counters c ON f.id = c.folderId 
+          WHERE f.id > 1 AND c.id IS NULL
+      """;
 
   get lastModificationTimeStamp {
+    return DateTime.now().millisecondsSinceEpoch;
+  }
+
+  get lastSynchronizationTimeStamp {
     return DateTime.now().millisecondsSinceEpoch;
   }
 
@@ -47,37 +67,47 @@ class DatabaseCounterRepository implements CounterRepository {
           await db.execute('PRAGMA foreign_keys = ON');
         },
         onCreate: (db, version) async {
-          String sql = await rootBundle
-              .loadString('assets/sql_scripts/folder_table_create.sql');
-          await db.execute(sql);
-          sql = await rootBundle
-              .loadString('assets/sql_scripts/counter_table_create.sql');
-          await db.execute(sql);
-          sql = await rootBundle
-              .loadString('assets/sql_scripts/statistics_table_create.sql');
-          await db.execute(sql);
-          sql = await rootBundle
-              .loadString('assets/sql_scripts/settings_table_create.sql');
-          await db.execute(sql);
-          // sql = await rootBundle.loadString(
-          //     'assets/sql_scripts/folder_table_sample.sql'); // TODO replace by folder_table_populate.sql
-          // await db.execute(sql);
-          // sql = await rootBundle.loadString(
-          //     'assets/sql_scripts/counter_table_sample.sql'); // TODO replace by counter_table_populate.sql
-          // await db.execute(sql);
-          // sql = await rootBundle.loadString(
-          //     'assets/sql_scripts/statistics_table_sample.sql'); // TODO remove
-          // await db.execute(sql);
-          sql = await rootBundle.loadString(
-              'assets/sql_scripts/folder_table_populate.sql');
-          await db.execute(sql);
-          sql = await rootBundle.loadString(
-              'assets/sql_scripts/counter_table_populate.sql');
-          await db.execute(sql);
+          await db.transaction((txn) async {
+            await _executeSqlScript(txn, 'assets/sql_scripts/folder_table_create.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/folder_table_create_history.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/folder_table_create_trigger_delete.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/folder_table_create_trigger_insert.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/folder_table_create_trigger_update.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_create.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_create_history.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_create_trigger_delete.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_create_trigger_insert.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_create_trigger_update.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/statistics_table_create.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/settings_table_create.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/folder_table_populate.sql');
+            await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_populate.sql');
+            // await _executeSqlScript(txn, 'assets/sql_scripts/folder_table_sample.sql'); // TODO replace by folder_table_populate.sql
+            // await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_sample.sql'); // TODO replace by counter_table_populate.sql
+            // await _executeSqlScript(txn, 'assets/sql_scripts/statistics_table_sample.sql'); // TODO remove
+          });
+        },
+        onOpen: (db) async {
+          if (kDebugMode) {
+            debugPrint('Database path : ${path.join(dbPath, 'counter.db')}');
+          }
+          const sql = 'SELECT * FROM settings';
+          final List<Map<String, Object?>> settingsMap = await db.rawQuery(sql);
+          if (settingsMap.length == 1) {
+            Settings settings = Settings.fromJson(settingsMap[0]);
+            if (settings.synchronizationApiUrl != null && settings.synchronizationAccessToken != null) {
+              SynchronizationService().setApiUrl(apiUrl: settings.synchronizationApiUrl!, apiAccessToken: settings.synchronizationAccessToken!);
+            }
+          }
         },
       );
       return _db != null;
     }
+  }
+
+  Future<void> _executeSqlScript(sql.Transaction txn, String assetPath) async {
+    final String sql = await rootBundle.loadString(assetPath);
+    await txn.execute(sql);
   }
 
   @override
@@ -157,7 +187,13 @@ class DatabaseCounterRepository implements CounterRepository {
         return insertedId;
       });
       if (id > 0) {
-        return getCounterById(id);
+        final Counter createdCounter = await getCounterById(id);
+        SynchronizationService().synchronizeCounters([createdCounter]).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateCountersSynchronizationTimestamp([id]);
+          }
+        });
+        return createdCounter;
       }
     }
     return Counter();
@@ -172,8 +208,14 @@ class DatabaseCounterRepository implements CounterRepository {
         where: 'id = ?',
         whereArgs: [counterId],
       );
+      if (deleted == 1) {
+        SynchronizationService().synchronizeDeletedCounters([counterId]).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateDeletedCountersSynchronizationTimestamp([counterId]);
+          }
+        });
+      }
     }
-
     return deleted == 1;
   }
 
@@ -208,7 +250,7 @@ class DatabaseCounterRepository implements CounterRepository {
           case SortingOptions.creationDateAsc:
             return (folder1.creationTimeStamp ?? 0) - (folder2.creationTimeStamp ??  0);
           case SortingOptions.creationDateDesc:
-            return (folder2.creationTimeStamp ?? 0) - (folder1.creationTimeStamp ??  0);;
+            return (folder2.creationTimeStamp ?? 0) - (folder1.creationTimeStamp ??  0);
         }
       });
     }
@@ -258,19 +300,7 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<List<Folder>> getAllFolders() async {
     if (_db != null) {
-      const String sql = """
-          SELECT f.*, COUNT(*) AS counterNumber
-          FROM folders f 
-          INNER JOIN counters c ON f.id = c.folderId 
-          WHERE f.id > 1
-          GROUP BY f.id
-          UNION ALL
-          SELECT f.*, 0 AS counterNumber
-          FROM folders f 
-          LEFT JOIN counters c ON f.id = c.folderId 
-          WHERE f.id > 1 AND c.id IS NULL
-      """;
-      final List<Map<String, Object?>> foldersMap = await _db!.rawQuery(sql);
+      final List<Map<String, Object?>> foldersMap = await _db!.rawQuery(_selectFolderSql);
       return foldersMap
           .map((Map<String, Object?> folderMap) => Folder.fromJson(folderMap))
           .toList();
@@ -346,7 +376,7 @@ class DatabaseCounterRepository implements CounterRepository {
           case SortingOptions.creationDateAsc:
             return (counter1.creationTimeStamp ?? 0) - (counter2.creationTimeStamp ??  0);
           case SortingOptions.creationDateDesc:
-            return (counter2.creationTimeStamp ?? 0) - (counter1.creationTimeStamp ??  0);;
+            return (counter2.creationTimeStamp ?? 0) - (counter1.creationTimeStamp ??  0);
         }
       });
     }
@@ -388,7 +418,13 @@ class DatabaseCounterRepository implements CounterRepository {
         return count > 0;
       });
       if (updated) {
-        return getCounterById(counter.id!);
+        final Counter updatedCounter = await getCounterById(counter.id!);
+        SynchronizationService().synchronizeCounters([updatedCounter]).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateCountersSynchronizationTimestamp([counter.id!]);
+          }
+        });
+        return updatedCounter;
       }
     }
     return Counter();
@@ -407,25 +443,13 @@ class DatabaseCounterRepository implements CounterRepository {
         return insertedId;
       });
       if (id > 0) {
-        return getFolderById(id);
-      }
-    }
-    return Folder();
-  }
-
-  @override
-  Future<Folder> insertFolder(Folder folder) async {
-    if (_db != null) {
-      final id = await _db!.transaction((txn) async {
-        const String query = """
-        INSERT INTO folders(id, name, creationTimeStamp, lastModificationTimeStamp, folderOrder)
-        VALUES(?, ?, ?, ?, ?)
-        """;
-        int insertedId = await txn.rawInsert(query, [folder.id, folder.name, folder.creationTimeStamp, folder.lastModificationTimeStamp, folder.folderOrder]);
-        return insertedId;
-      });
-      if (id > 0) {
-        return getFolderById(id);
+        final Folder createdFolder = await getFolderById(id);
+        SynchronizationService().synchronizeFolders([createdFolder]).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateFoldersSynchronizationTimestamp([id]);
+          }
+        });
+        return createdFolder;
       }
     }
     return Folder();
@@ -440,7 +464,13 @@ class DatabaseCounterRepository implements CounterRepository {
         return count > 0;
       });
       if (updated) {
-        return getFolderById(folderId);
+        final Folder updatedFolder = await getFolderById(folderId);
+        SynchronizationService().synchronizeFolders([updatedFolder]).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateFoldersSynchronizationTimestamp([folderId]);
+          }
+        });
+        return updatedFolder;
       }
     }
     return Folder();
@@ -471,6 +501,13 @@ class DatabaseCounterRepository implements CounterRepository {
         where: 'id = ?',
         whereArgs: [folderId],
       );
+      if (deleted == 1) {
+        SynchronizationService().synchronizeDeletedFolders([folderId]).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateDeletedFoldersSynchronizationTimestamp([folderId]);
+          }
+        });
+      }
     }
     return deleted == 1;
   }
@@ -478,11 +515,31 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> deleteAllFolders() async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
-        final int count = await txn.rawUpdate('DELETE FROM folders WHERE id > 1');
-        return count > 0;
+      final List<int> ids = await _db!.transaction((txn) async {
+        final List<Map<String, dynamic>> result = await txn.query(
+          'folders',
+          columns: ['id'],
+          where: 'id > ?',
+          whereArgs: [1],
+        );
+        final List<int> ids = result.map((row) => row['id'] as int).toList();
+        if (ids.isEmpty) {
+          return [];
+        }
+        final int count = await txn.rawDelete(
+          'DELETE FROM folders WHERE id IN (${List.filled(ids.length, '?').join(',')})',
+          ids,
+        );
+        return count > 0 ? ids : [];
       });
-      return updateDated;
+      if (ids.isNotEmpty) {
+        SynchronizationService().synchronizeDeletedFolders(ids).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateDeletedFoldersSynchronizationTimestamp(ids);
+          }
+        });
+      }
+      return ids.isNotEmpty;
     } else {
       return false;
     }
@@ -506,12 +563,31 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> deleteAllCountersForFolderId(int folderId) async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
-        final int count = await txn.rawUpdate(
-            'DELETE FROM counters WHERE folderId = ?', [folderId]);
-        return count > 0;
+      final List<int> ids = await _db!.transaction((txn) async {
+        final List<Map<String, dynamic>> result = await txn.query(
+          'counters',
+          columns: ['id'],
+          where: 'folderId = ?',
+          whereArgs: [folderId],
+        );
+        final List<int> ids = result.map((row) => row['id'] as int).toList();
+        if (ids.isEmpty) {
+          return [];
+        }
+        final int count = await txn.rawDelete(
+          'DELETE FROM counters WHERE id IN (${List.filled(ids.length, '?').join(',')})',
+          ids,
+        );
+        return count > 0 ? ids : [];
       });
-      return updateDated;
+      if (ids.isNotEmpty) {
+        SynchronizationService().synchronizeDeletedCounters(ids).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateDeletedCountersSynchronizationTimestamp(ids);
+          }
+        });
+      }
+      return ids.isNotEmpty;
     } else {
       return false;
     }
@@ -520,12 +596,31 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> deleteAllCounters() async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
-        final int count = await txn.rawUpdate(
-            'DELETE FROM counters WHERE folderId > 1');
-        return count > 0;
+      final List<int> ids = await _db!.transaction((txn) async {
+        final List<Map<String, dynamic>> result = await txn.query(
+          'counters',
+          columns: ['id'],
+          where: 'folderId > ?',
+          whereArgs: [1],
+        );
+        final List<int> ids = result.map((row) => row['id'] as int).toList();
+        if (ids.isEmpty) {
+          return [];
+        }
+        final int count = await txn.rawDelete(
+          'DELETE FROM counters WHERE id IN (${List.filled(ids.length, '?').join(',')})',
+          ids,
+        );
+        return count > 0 ? ids : [];
       });
-      return updateDated;
+      if (ids.isNotEmpty) {
+        SynchronizationService().synchronizeDeletedCounters(ids).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateDeletedCountersSynchronizationTimestamp(ids);
+          }
+        });
+      }
+      return ids.isNotEmpty;
     } else {
       return false;
     }
@@ -548,18 +643,34 @@ class DatabaseCounterRepository implements CounterRepository {
     if (_db != null) {
       bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
-            """REPLACE INTO settings (id, counterCompactView, counterSorting, folderSorting, activateSounds, activateVibrator, keepScreenOn, showTutorial, onlineSynchronizationId, lastModificationTimeStamp)
-            VALUES(
+          """REPLACE INTO settings (
+             id,
+             counterCompactView,
+             counterSorting,
+             folderSorting,
+             activateSounds,
+             activateVibrator,
+             keepScreenOn,
+             showTutorial,
+             synchronizationAccessToken,
+             synchronizationApiUrl,
+             lastModificationTimeStamp
+           )
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+          [
             1,
-            ${settings.counterCompactView == true ? 1 : 0},
-            ${settings.counterSorting?.index},
-            ${settings.folderSorting?.index}, 
-            ${settings.activateSounds == true ? 1 : 0},
-            ${settings.activateVibrator == true ? 1 : 0},
-            ${settings.keepScreenOn == true ? 1 : 0},
-            ${settings.showTutorial == true ? 1 : 0},
-            ${settings.onlineSynchronizationId},
-            $lastModificationTimeStamp)""");
+            settings.counterCompactView == true ? 1 : 0,
+            settings.counterSorting?.index,
+            settings.folderSorting?.index,
+            settings.activateSounds == true ? 1 : 0,
+            settings.activateVibrator == true ? 1 : 0,
+            settings.keepScreenOn == true ? 1 : 0,
+            settings.showTutorial == true ? 1 : 0,
+            settings.synchronizationAccessToken,
+            settings.synchronizationApiUrl,
+            lastModificationTimeStamp,
+          ],
+        );
         return count > 0;
       });
       if (updated) {
@@ -695,6 +806,213 @@ class DatabaseCounterRepository implements CounterRepository {
       return inserted.length;
     } else {
       return 0;
+    }
+  }
+
+  @override
+  Future<List<Counter>> getAllCountersToSynchronize() async {
+    if (_db != null) {
+      final List<Map<String, Object?>> countersMap = await _db!.rawQuery('$_selectCounterSql WHERE c.id > 1 AND c.synchronizationTimeStamp IS NULL OR c.synchronizationTimeStamp < c.lastModificationTimeStamp');
+      return countersMap
+          .map((Map<String, Object?> folderMap) => Counter.fromJson(folderMap))
+          .toList();
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<Folder>> getAllFoldersToSynchronize() async {
+    if (_db != null) {
+      final List<Map<String, Object?>> foldersMap = await _db!.rawQuery('SELECT f.* FROM folders f WHERE f.id > 1 AND (f.synchronizationTimeStamp IS NULL OR f.synchronizationTimeStamp < f.lastModificationTimeStamp)');
+      return foldersMap
+          .map((Map<String, Object?> folderMap) => Folder.fromJson(folderMap))
+          .toList();
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  Future<bool> updateCountersSynchronizationTimestamp(List<int> counterIds) async {
+    if (_db != null) {
+      return await _db!.transaction((txn) async {
+        final batch = txn.batch();
+        for (final id in counterIds) {
+          batch.rawUpdate(
+            'UPDATE counters SET synchronizationTimeStamp = ? WHERE id = ?',
+            [lastSynchronizationTimeStamp, id],
+          );
+        }
+        final results = await batch.commit(noResult: false);
+        return results.every((result) => (result as int?) != null && result! > 0);
+      });
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateCountersSynchronizationTimestampByFolderId(int folderId) async {
+    if (_db != null) {
+      final bool updateDated = await _db!.transaction((txn) async {
+        final int count = await txn.rawUpdate(
+            'UPDATE counters SET synchronizationTimeStamp = ? WHERE folderId = ?', [lastSynchronizationTimeStamp, folderId]);
+        return count > 0;
+      });
+      return updateDated;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateDeletedCountersSynchronizationTimestamp(List<int> counterIds) async {
+    if (_db != null) {
+      return await _db!.transaction((txn) async {
+        final batch = txn.batch();
+        for (final id in counterIds) {
+          batch.rawUpdate(
+            'UPDATE counters_history SET synchronizationTimeStamp = ? WHERE originalId = ?',
+            [lastSynchronizationTimeStamp, id],
+          );
+        }
+        final results = await batch.commit(noResult: false);
+        return results.every((result) => (result as int?) != null && result! > 0);
+      });
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateFoldersSynchronizationTimestamp(List<int> folderIds) async {
+    if (_db != null) {
+      return await _db!.transaction((txn) async {
+        final batch = txn.batch();
+        for (final id in folderIds) {
+          batch.rawUpdate(
+            'UPDATE folders SET synchronizationTimeStamp = ? WHERE id = ?',
+            [lastSynchronizationTimeStamp, id],
+          );
+        }
+        final results = await batch.commit(noResult: false);
+        return results.every((result) => (result as int?) != null && result! > 0);
+      });
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateDeletedFoldersSynchronizationTimestamp(List<int> folderIds) async {
+    if (_db != null) {
+      return await _db!.transaction((txn) async {
+        final batch = txn.batch();
+        for (final id in folderIds) {
+          batch.rawUpdate(
+            'UPDATE folders_history SET synchronizationTimeStamp = ? WHERE originalId = ?',
+            [lastSynchronizationTimeStamp, id],
+          );
+        }
+        final results = await batch.commit(noResult: false);
+        return results.every((result) => (result as int?) != null && result! > 0);
+      });
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<List<int>> getAllDeletedCounterIdsToSynchronize() async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> maps = await _db!.query(
+        'counters_history',
+        columns: ['originalId'],
+        where: 'operationType = ? AND synchronizationTimeStamp IS NULL',
+        whereArgs: ['DELETE'],
+      );
+      return List<int>.from(maps.map((map) => map['originalId']));
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<int>> getAllDeletedFolderIdsToSynchronize() async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> maps = await _db!.query(
+        'folders_history',
+        columns: ['originalId'],
+        where: 'operationType = ? AND synchronizationTimeStamp IS NULL',
+        whereArgs: ['DELETE'],
+      );
+      return List<int>.from(maps.map((map) => map['originalId']));
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<Count>> getCountsByFolderId(int folderId) async {
+    if (_db != null) {
+      final sql = 'SELECT c.id as counterId, c.counterCount as count FROM counters c WHERE c.folderId = $folderId';
+      final List<Map<String, Object?>> countersMap = await _db!.rawQuery(sql);
+      return countersMap
+          .map((Map<String, Object?> counterMap) => Count.fromJson(counterMap))
+          .toList();
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  Future<bool> synchronizeCountersCount(int folderId) async {
+    final List<Count> counts = await getCountsByFolderId(folderId);
+    if (counts.isNotEmpty) {
+      Response? response = await SynchronizationService().synchronizeCountersCount(counts);
+      if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+        return updateCountersSynchronizationTimestampByFolderId(folderId);
+      }
+    }
+    return false;
+  }
+
+  @override
+  Future<void> synchronizeAll() async{
+    if (SynchronizationService().isInitialized) {
+      final List<Folder> folders = await getAllFoldersToSynchronize();
+      if (folders.isNotEmpty) {
+        SynchronizationService().synchronizeFolders(folders).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateFoldersSynchronizationTimestamp(folders.map((folder) => folder.id!).toList());
+          }
+        });
+      }
+      final List<Counter> counters = await getAllCountersToSynchronize();
+      if (counters.isNotEmpty) {
+        SynchronizationService().synchronizeCounters(counters).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateCountersSynchronizationTimestamp(counters.map((counter) => counter.id!).toList());
+          }
+        });
+      }
+      final List<int> folderIds = await getAllDeletedFolderIdsToSynchronize();
+      if (folderIds.isNotEmpty) {
+        SynchronizationService().synchronizeDeletedFolders(folderIds).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateDeletedFoldersSynchronizationTimestamp(folderIds);
+          }
+        });
+      }
+      final List<int> counterIds = await getAllDeletedCounterIdsToSynchronize();
+      if (counterIds.isNotEmpty) {
+        SynchronizationService().synchronizeDeletedCounters(counterIds).then((Response? response) {
+          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+            updateDeletedCountersSynchronizationTimestamp(counterIds);
+          }
+        });
+      }
     }
   }
 }

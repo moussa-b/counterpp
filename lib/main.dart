@@ -1,11 +1,12 @@
+import 'package:counterpp/l10n/app_localizations.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/repository/counter_repository.dart';
 import 'package:counterpp/screens/tab_screen.dart';
 import 'package:counterpp/screens/tutorial_screen.dart';
 import 'package:counterpp/widgets/loading_indicator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -61,7 +62,9 @@ class _AppState extends ConsumerState<App> {
               // While the future is running, show a loading indicator
               return const LoadingIndicator();
             } else if (snapshot.hasError) {
-              print(snapshot.error);
+              if (!kReleaseMode) {
+                debugPrint(snapshot.error.toString());
+              }
               return const LoadingIndicator();
             } else {
               if (showTutorial && snapshot.data!.showTutorial != false) {
@@ -80,8 +83,9 @@ class _AppState extends ConsumerState<App> {
         ),
         loading: () => const LoadingIndicator(),
         error: (err, stack) {
-          print(err.toString());
-          print(stack.toString());
+          if (!kReleaseMode) {
+            debugPrint(stack.toString());
+          }
           return const LoadingIndicator();
         },
       ),

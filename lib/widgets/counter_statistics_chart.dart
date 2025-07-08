@@ -3,7 +3,7 @@ import 'package:counterpp/models/statistics.dart';
 import 'package:counterpp/utils/utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:counterpp/l10n/app_localizations.dart';
 
 class CounterStatisticsChart extends StatelessWidget {
   final List<Statistics> statistics;

@@ -9,12 +9,12 @@ class TestUtils {
 
   void generateRandomStatistics(CounterRepository counterRepository, int folderId, DateTime selectedDate) async {
     List<Counter> counters = await counterRepository.getCountersByFolderId(folderId);
-    counters.forEach((counter) {
+    for (var counter in counters) {
       // generateRandomStatisticsForDay(counter.id!, widget.selectedDate, 10);
       // generateRandomStatisticsForWeek(counter.id!, widget.selectedDate);
       generateRandomStatisticsForMonth(counterRepository, counter.id!, selectedDate);
       // generateRandomStatisticsForYear(counter.id!, widget.selectedDate);
-    });
+    }
   }
 
   void generateRandomStatisticsForDay(CounterRepository counterRepository, int counterId, DateTime selectedDate, int nbStats) async {

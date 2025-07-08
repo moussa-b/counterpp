@@ -1,6 +1,8 @@
+import 'package:counterpp/l10n/app_localizations.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/folder.dart';
 import 'package:counterpp/models/settings.dart';
+import 'package:counterpp/providers/counter_repository_provider.dart';
 import 'package:counterpp/providers/counters_provider.dart';
 import 'package:counterpp/providers/settings_provider.dart';
 import 'package:counterpp/screens/counter_form_screen.dart';
@@ -12,7 +14,6 @@ import 'package:counterpp/widgets/editable_counter_list.dart';
 import 'package:counterpp/widgets/last_modified_counter.dart';
 import 'package:counterpp/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -27,6 +28,12 @@ class CountersScreen extends ConsumerStatefulWidget {
 
 class _CountersScreenState extends ConsumerState<CountersScreen>{
   bool _editMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _synchronizeCountersCount();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,5 +121,10 @@ class _CountersScreenState extends ConsumerState<CountersScreen>{
     Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
       return CounterFormScreen(currentFolder: widget.folder);
     }));
+  }
+
+  void _synchronizeCountersCount() {
+    final int folderId = widget.folder.id!;
+    ref.read(counterRepositoryProvider).synchronizeCountersCount(folderId);
   }
 }

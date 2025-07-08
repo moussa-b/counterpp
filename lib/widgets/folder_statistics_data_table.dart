@@ -1,6 +1,6 @@
 import 'package:counterpp/models/counter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:counterpp/l10n/app_localizations.dart';
 
 class FolderStatisticsDataTable extends StatelessWidget {
   const FolderStatisticsDataTable({
@@ -13,7 +13,7 @@ class FolderStatisticsDataTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DataTable(
-      headingRowColor: MaterialStateColor.resolveWith((states) => Theme.of(context).primaryColor),
+      headingRowColor: WidgetStateColor.resolveWith((states) => Theme.of(context).primaryColor),
       columns: <DataColumn>[
         DataColumn(
           label: Text(

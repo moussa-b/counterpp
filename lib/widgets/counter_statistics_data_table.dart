@@ -2,7 +2,7 @@ import 'package:counterpp/models/calendar_period.dart';
 import 'package:counterpp/models/statistics.dart';
 import 'package:counterpp/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:counterpp/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -46,7 +46,7 @@ class CounterStatisticsDataTable extends ConsumerWidget {
     }
 
     return DataTable(
-      headingRowColor: MaterialStateColor.resolveWith((states) => Theme.of(context).primaryColor),
+      headingRowColor: WidgetStateColor.resolveWith((states) => Theme.of(context).primaryColor),
       columns: <DataColumn>[
         DataColumn(
           label: Text(

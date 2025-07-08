@@ -8,7 +8,7 @@ import 'package:counterpp/widgets/counter_statistics_data_table.dart';
 import 'package:counterpp/widgets/loading_indicator.dart';
 import 'package:counterpp/widgets/period_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:counterpp/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 

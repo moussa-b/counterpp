@@ -9,7 +9,8 @@ class Settings {
   bool? keepScreenOn;
   bool? showTutorial;
   int? lastModificationTimeStamp;
-  String? onlineSynchronizationId;
+  String? synchronizationAccessToken;
+  String? synchronizationApiUrl;
 
   Settings({this.folderSorting, this.counterSorting, this.counterCompactView = false, this.lastModificationTimeStamp});
 
@@ -21,7 +22,8 @@ class Settings {
     folderSorting = json['folderSorting'] != null ? SortingOptions.values[json['folderSorting']] : null;
     keepScreenOn = json['keepScreenOn'] == 1;
     lastModificationTimeStamp = json['lastModificationTimeStamp'];
-    onlineSynchronizationId = json['onlineSynchronizationId'];
+    synchronizationAccessToken = json['synchronizationAccessToken'];
+    synchronizationApiUrl = json['synchronizationApiUrl'];
     showTutorial = json['showTutorial'] != null ? (json['showTutorial'] == 1) : true;
   }
 
@@ -33,7 +35,8 @@ class Settings {
     folderSorting = toCopy.folderSorting;
     keepScreenOn = toCopy.keepScreenOn;
     lastModificationTimeStamp = toCopy.lastModificationTimeStamp;
-    onlineSynchronizationId = toCopy.onlineSynchronizationId;
+    synchronizationAccessToken = toCopy.synchronizationAccessToken;
+    synchronizationApiUrl = toCopy.synchronizationApiUrl;
     showTutorial = toCopy.showTutorial;
   }
 
@@ -46,7 +49,8 @@ class Settings {
     data['folderSorting'] = folderSorting;
     data['keepScreenOn'] = (keepScreenOn == true ? 1 : 0);
     data['lastModificationTimeStamp'] = lastModificationTimeStamp;
-    data['onlineSynchronizationId'] = onlineSynchronizationId;
+    data['synchronizationAccessToken'] = synchronizationAccessToken;
+    data['synchronizationApiUrl'] = synchronizationApiUrl;
     data['showTutorial'] = (showTutorial == true ? 1 : 0);
     return data;
   }
