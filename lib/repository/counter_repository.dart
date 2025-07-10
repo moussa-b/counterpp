@@ -40,9 +40,11 @@ abstract interface class CounterRepository {
   Future<Folder> getFolderById(int folderId);
   Future<bool> deleteFolderById(int folderId);
   Future<bool> deleteAllFolders();
+  Future<bool> deleteAllFoldersHistory();
   Future<bool> resetAllCountersForFolderId(int folderId);
   Future<bool> deleteAllCountersForFolderId(int folderId);
   Future<bool> deleteAllCounters();
+  Future<bool> deleteAllCountersHistory();
   Future<Settings> getSettings();
   Future<Settings> updateSettings(Settings settings);
   Future<bool> reorderFolders(List<ReorderItem> reorderItems);

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:counterpp/models/count.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/folder.dart';
+import 'package:counterpp/models/recover-data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -18,7 +19,7 @@ class SynchronizationService {
   String? _apiUrl;
   String? _apiAccessToken;
 
-  get isInitialized {
+  bool get isInitialized {
     return _apiUrl != null && isValidUrl(_apiUrl!) && _apiAccessToken != null && _apiAccessToken!.isNotEmpty;
   }
 
@@ -29,6 +30,11 @@ class SynchronizationService {
       _apiUrl = apiUrl;
       _apiAccessToken = apiAccessToken;
     }
+  }
+
+  void resetApiUrl() {
+    _apiAccessToken = null;
+    _apiUrl = null;
   }
 
   static bool isValidUrl(String url) {
@@ -114,6 +120,42 @@ class SynchronizationService {
     return null;
   }
 
+  Future<http.Response?> get(
+      String endpoint, {
+        Map<String, String>? headers,
+        bool ignoreErrors = false,
+      }) async {
+    final url = Uri.parse('$endpoint');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          if (headers != null) ...headers,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
+      } else {
+        if (!ignoreErrors) {
+          throw Exception('Error HTTP ${response.statusCode} : ${response.body}');
+        }
+        if (kDebugMode) {
+          debugPrint('Ignored error (code ${response.statusCode})');
+        }
+      }
+    } catch (e) {
+      if (!ignoreErrors) rethrow;
+      if (kDebugMode) {
+        debugPrint('Ignored network error : $e');
+      }
+    }
+
+    return null;
+  }
+
   void requestInBackground(
     Future<http.Response?> Function(String endpoint, {
       Map<String, String>? headers,
@@ -180,5 +222,20 @@ class SynchronizationService {
       debugPrint('Synchronize counter counts : $_apiUrl/counters/count/synchronize');
     }
     return await post('$_apiUrl/counters/count/synchronize', body: counts, headers: autorizationHeaders);
+  }
+
+  Future<RecoverData?> recoverData() async {
+    if (!isInitialized) {
+      return null;
+    }
+    if (kDebugMode) {
+      debugPrint('Recover counter data : $_apiUrl/users/recover');
+    }
+    final response = await get('$_apiUrl/users/recover', headers: autorizationHeaders);
+    if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      return RecoverData.fromJson(jsonData);
+    }
+    return null;
   }
 }

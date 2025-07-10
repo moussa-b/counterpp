@@ -532,14 +532,28 @@ class DatabaseCounterRepository implements CounterRepository {
         );
         return count > 0 ? ids : [];
       });
-      if (ids.isNotEmpty) {
-        SynchronizationService().synchronizeDeletedFolders(ids).then((Response? response) {
-          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
-            updateDeletedFoldersSynchronizationTimestamp(ids);
-          }
-        });
-      }
+      // if (ids.isNotEmpty) {
+      //   SynchronizationService().synchronizeDeletedFolders(ids).then((Response? response) {
+      //     if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+      //       updateDeletedFoldersSynchronizationTimestamp(ids);
+      //     }
+      //   });
+      // }
       return ids.isNotEmpty;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> deleteAllFoldersHistory() async {
+    if (_db != null) {
+      await _db!.transaction((txn) async {
+        await txn.delete('folders_history');
+        await txn.delete('sqlite_sequence',
+            where: 'name = ?', whereArgs: ['folders_history']);
+      });
+      return true;
     } else {
       return false;
     }
@@ -600,7 +614,7 @@ class DatabaseCounterRepository implements CounterRepository {
         final List<Map<String, dynamic>> result = await txn.query(
           'counters',
           columns: ['id'],
-          where: 'folderId > ?',
+          where: 'folderId IS NULL OR folderId <> ?',
           whereArgs: [1],
         );
         final List<int> ids = result.map((row) => row['id'] as int).toList();
@@ -613,14 +627,27 @@ class DatabaseCounterRepository implements CounterRepository {
         );
         return count > 0 ? ids : [];
       });
-      if (ids.isNotEmpty) {
-        SynchronizationService().synchronizeDeletedCounters(ids).then((Response? response) {
-          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
-            updateDeletedCountersSynchronizationTimestamp(ids);
-          }
-        });
-      }
+      // if (ids.isNotEmpty) {
+      //   SynchronizationService().synchronizeDeletedCounters(ids).then((Response? response) {
+      //     if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+      //       updateDeletedCountersSynchronizationTimestamp(ids);
+      //     }
+      //   });
+      // }
       return ids.isNotEmpty;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> deleteAllCountersHistory() async {
+    if (_db != null) {
+      await _db!.transaction((txn) async {
+        await txn.delete('counters_history');
+        await txn.delete('sqlite_sequence', where: 'name = ?', whereArgs: ['counters_history']);
+      });
+      return true;
     } else {
       return false;
     }

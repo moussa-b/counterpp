@@ -43,6 +43,15 @@ class Counter {
         lastModificationTimeStamp: json['folder.lastModificationTimeStamp'],
         counterNumber: json['folder.counterNumber'],
       );
+    } else if (json['folder'] != null) {
+      folder = Folder(
+        id: json['folder']['id'],
+        name: json['folder']['name'],
+        folderOrder: json['folder']['folderOrder'],
+        creationTimeStamp: json['folder']['creationTimeStamp'],
+        lastModificationTimeStamp: json['folder']['lastModificationTimeStamp'],
+        counterNumber: json['folder']['counterNumber'],
+      );
     }
     id = json['id'];
     lastModificationTimeStamp = json['lastModificationTimeStamp'];

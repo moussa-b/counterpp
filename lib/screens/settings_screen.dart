@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:counterpp/models/app_config.dart';
 import 'package:counterpp/models/counter.dart';
 import 'package:counterpp/models/folder.dart';
+import 'package:counterpp/models/recover-data.dart';
 import 'package:counterpp/models/settings.dart';
 import 'package:counterpp/models/statistics.dart';
 import 'package:counterpp/providers/counter_repository_provider.dart';
@@ -33,21 +34,191 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Settings settings = Settings();
   String? version;
+  bool synchronisationEnabled = SynchronizationService().isInitialized;
   final InAppReview inAppReview = InAppReview.instance;
 
   @override
   void initState() {
     super.initState();
-    getSettings();
+    _getSettings();
   }
 
-  void getSettings() async {
+  void _getSettings() async {
     final Settings settingsFromDb = await ref.read(counterRepositoryProvider).getSettings();
     final packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       settings = settingsFromDb;
       version = packageInfo.version;
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: ListView(
+          children: [
+            _SettingsSection(
+              title: AppLocalizations.of(context)!.controls,
+              children: [
+                CheckboxListTile(
+                  title: Text(AppLocalizations.of(context)!.activateSounds),
+                  subtitle: Text(AppLocalizations.of(context)!.activateSoundsSummary),
+                  value: settings.activateSounds ?? false,
+                  onChanged: (value) {
+                    setState(() {
+                      settings.activateSounds = value;
+                      ref.read(settingsProvider.notifier).updateSettings(settings);
+                    });
+                  },
+                ),
+                const Divider(),
+                CheckboxListTile(
+                  title: Text(AppLocalizations.of(context)!.activateVibrator),
+                  subtitle: Text(AppLocalizations.of(context)!.activateVibratorSummary),
+                  value: settings.activateVibrator ?? false,
+                  onChanged: (value) {
+                    setState(() {
+                      settings.activateVibrator = value;
+                      ref.read(settingsProvider.notifier).updateSettings(settings);
+                    });
+                  },
+                ),
+              ],
+            ),
+            _SettingsSection(
+              title: AppLocalizations.of(context)!.display,
+              children: [
+                CheckboxListTile(
+                  title: Text(AppLocalizations.of(context)!.keepScreenOn),
+                  subtitle: Text(AppLocalizations.of(context)!.keepScreenOnSummary),
+                  value: settings.keepScreenOn ?? false,
+                  onChanged: (value) {
+                    setState(() {
+                      settings.keepScreenOn = value;
+                      ref.read(settingsProvider.notifier).updateSettings(settings);
+                    });
+                  },
+                ),
+              ],
+            ),
+            _SettingsSection(
+              title: AppLocalizations.of(context)!.advanced,
+              children: [
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.deleteAllCounters),
+                  subtitle: Text(
+                      AppLocalizations.of(context)!.deleteAllCountersSummary),
+                  onTap: () => _resetData(context),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.exportData),
+                  subtitle: Text(AppLocalizations.of(context)!.exportDataSummary),
+                  onTap: () => _exportData(context),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.importData),
+                  subtitle: Text(AppLocalizations.of(context)!.importDataSummary),
+                  onTap: () => _importData(context),
+                ),
+                if (synchronisationEnabled)
+                  ...[
+                    const Divider(),
+                    ListTile(
+                      title: Text(AppLocalizations.of(context)!.synchronizeData),
+                      subtitle: Text(AppLocalizations.of(context)!.synchronizeDataSummary),
+                      onTap: () async {
+                        ref.read(counterRepositoryProvider).synchronizeAll();
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      title: Text(AppLocalizations.of(context)!.recoverData),
+                      subtitle: Text(AppLocalizations.of(context)!.recoverDataSummary),
+                      onTap: () {
+                        _recoverData(context);
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      title: Text(AppLocalizations.of(context)!.disableSynchronization),
+                      subtitle: Text(AppLocalizations.of(context)!.disableSynchronizationSummary),
+                      onTap: () {
+                        _disableSynchronization(context);
+                      },
+                    ),
+                  ],
+                if (!synchronisationEnabled)
+                  ...[
+                    const Divider(),
+                    ListTile(
+                      title: Text(AppLocalizations.of(context)!.enableSynchronization),
+                      subtitle: Text(AppLocalizations.of(context)!.enableSynchronizationSummary),
+                      onTap: () async {
+                        _openSynchronizationScreen(context);
+                      },
+                    ),
+                  ]
+              ],
+            ),
+            _SettingsSection(
+              title: AppLocalizations.of(context)!.about,
+              children: [
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.aboutSummary),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.version),
+                  subtitle: Text(version != null ? version! : ''),
+                  onTap: () {},
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.tutorial),
+                  subtitle: Text(AppLocalizations.of(context)!.tutorialSummary),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ctx) {
+                          return const TutorialScreen();
+                        },
+                      ),
+                    );
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.share),
+                  subtitle: Text(AppLocalizations.of(context)!.shareSummary),
+                  onTap: () => _shareApplication(context),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.rate),
+                  subtitle: Text(AppLocalizations.of(context)!.rateSummary),
+                  onTap: () => _rateApplication(context),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.contactUs),
+                  subtitle: Text(AppLocalizations.of(context)!.contactUsSummary),
+                  onTap: () => _contactUs(context),
+                ),
+                const Divider(),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.privacyPolicy),
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showDialog(BuildContext context, Widget title, Widget content, void Function()? confirmCallback, {bool showCancel = true, String? validateLabel}) {
@@ -214,11 +385,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       Text(AppLocalizations.of(context)!.warning),
       Text(AppLocalizations.of(context)!.warningMsgDeleteAllCounters),
           () async {
-        await ref.read(counterRepositoryProvider).deleteAllFolders();
+        final bool result = await ref.read(counterRepositoryProvider).deleteAllFolders();
+        ref.read(foldersProvider.notifier).refresh();
         await ref.read(counterRepositoryProvider).deleteAllCounters();
-        bool result = await ref.read(counterRepositoryProvider).deleteAllStatistics();
+        await ref.read(counterRepositoryProvider).deleteAllStatistics();
+        await ref.read(counterRepositoryProvider).deleteAllFoldersHistory();
+        await ref.read(counterRepositoryProvider).deleteAllCountersHistory();
         if (result) {
-          ref.read(foldersProvider.notifier).refresh();
           if (!context.mounted) {
             return;
           }
@@ -308,7 +481,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   void _openSynchronizationScreen(BuildContext context) async {
     Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
       return const SynchronizationScreen();
-    }));
+    })).then((result) {
+      if (result != null && result == true) {
+        if (synchronisationEnabled != SynchronizationService().isInitialized) {
+          setState(() {
+            synchronisationEnabled = SynchronizationService().isInitialized;
+          });
+        }
+      }
+    });
   }
 
   String? _encodeQueryParameters(Map<String, String> params) {
@@ -318,146 +499,60 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         .join('&');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        child: ListView(
-          children: [
-            _SettingsSection(
-              title: AppLocalizations.of(context)!.controls,
-              children: [
-                CheckboxListTile(
-                  title: Text(AppLocalizations.of(context)!.activateSounds),
-                  subtitle: Text(AppLocalizations.of(context)!.activateSoundsSummary),
-                  value: settings.activateSounds ?? false,
-                  onChanged: (value) {
-                    setState(() {
-                      settings.activateSounds = value;
-                      ref.read(settingsProvider.notifier).updateSettings(settings);
-                    });
-                  },
-                ),
-                const Divider(),
-                CheckboxListTile(
-                  title: Text(AppLocalizations.of(context)!.activateVibrator),
-                  subtitle: Text(AppLocalizations.of(context)!.activateVibratorSummary),
-                  value: settings.activateVibrator ?? false,
-                  onChanged: (value) {
-                    setState(() {
-                      settings.activateVibrator = value;
-                      ref.read(settingsProvider.notifier).updateSettings(settings);
-                    });
-                  },
-                ),
-              ],
-            ),
-            _SettingsSection(
-              title: AppLocalizations.of(context)!.display,
-              children: [
-                CheckboxListTile(
-                  title: Text(AppLocalizations.of(context)!.keepScreenOn),
-                  subtitle: Text(AppLocalizations.of(context)!.keepScreenOnSummary),
-                  value: settings.keepScreenOn ?? false,
-                  onChanged: (value) {
-                    setState(() {
-                      settings.keepScreenOn = value;
-                      ref.read(settingsProvider.notifier).updateSettings(settings);
-                    });
-                  },
-                ),
-              ],
-            ),
-            _SettingsSection(
-              title: AppLocalizations.of(context)!.advanced,
-              children: [
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.deleteAllCounters),
-                  subtitle: Text(
-                      AppLocalizations.of(context)!.deleteAllCountersSummary),
-                  onTap: () => _resetData(context),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.exportData),
-                  subtitle: Text(AppLocalizations.of(context)!.exportDataSummary),
-                  onTap: () => _exportData(context),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.importData),
-                  subtitle: Text(AppLocalizations.of(context)!.importDataSummary),
-                  onTap: () => _importData(context),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.synchronizeData),
-                  subtitle: Text(AppLocalizations.of(context)!.synchronizeDataSummary),
-                  onTap: () async {
-                    if (SynchronizationService().isInitialized) {
-                      ref.read(counterRepositoryProvider).synchronizeAll();
-                    } else {
-                      _openSynchronizationScreen(context);
-                    }
-                  },
-                ),
-              ],
-            ),
-            _SettingsSection(
-              title: AppLocalizations.of(context)!.about,
-              children: [
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.aboutSummary),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.version),
-                  subtitle: Text(version != null ? version! : ''),
-                  onTap: () {},
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.tutorial),
-                  subtitle: Text(AppLocalizations.of(context)!.tutorialSummary),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ctx) {
-                          return const TutorialScreen();
-                        },
-                      ),
-                    );
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.share),
-                  subtitle: Text(AppLocalizations.of(context)!.shareSummary),
-                  onTap: () => _shareApplication(context),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.rate),
-                  subtitle: Text(AppLocalizations.of(context)!.rateSummary),
-                  onTap: () => _rateApplication(context),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.contactUs),
-                  subtitle: Text(AppLocalizations.of(context)!.contactUsSummary),
-                  onTap: () => _contactUs(context),
-                ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.privacyPolicy),
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+  void _disableSynchronization(BuildContext context) {
+    _showDialog(
+        context,
+        Text(AppLocalizations.of(context)!.warning),
+        Text(AppLocalizations.of(context)!.warningMsgDisableSynchronization),
+        () {
+          setState(() {
+            SynchronizationService().resetApiUrl();
+            settings.synchronizationAccessToken = null;
+            settings.synchronizationApiUrl = null;
+            synchronisationEnabled = false;
+            ref.read(settingsProvider.notifier).updateSettings(settings);
+          });
+        },
+        showCancel: true,
+        validateLabel: AppLocalizations.of(context)!.ok
+    );
+  }
+
+  void _recoverData(BuildContext ctx) {
+    _showDialog(
+        context,
+        Text(AppLocalizations.of(context)!.warning),
+        Text(AppLocalizations.of(context)!.warningMsgRecover),
+            () async {
+          final RecoverData? recoverData = await SynchronizationService().recoverData();
+          if (recoverData != null && recoverData.folders != null && recoverData.folders!.isNotEmpty) {
+            await ref.read(counterRepositoryProvider).deleteAllStatistics();
+            await ref.read(counterRepositoryProvider).deleteAllFolders();
+            await ref.read(counterRepositoryProvider).deleteAllFoldersHistory();
+            await ref.read(counterRepositoryProvider).batchInsertFolders(recoverData.folders!.map((folder) => folder.toJson()).toList());
+            if (recoverData.counters != null && recoverData.counters!.isNotEmpty) {
+              await ref.read(counterRepositoryProvider).deleteAllCounters();
+              await ref.read(counterRepositoryProvider).deleteAllCountersHistory();
+              await ref.read(counterRepositoryProvider).batchInsertCounters(recoverData.counters!.map((counter) => counter.toJson()).toList());
+            }
+            ref.read(foldersProvider.notifier).refresh();
+            if (!ctx.mounted) {
+              return;
+            }
+            final SnackBar snackBar = SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Flexible(child: Text(AppLocalizations.of(ctx)!.successfulMsgImportData)),
+                ],
+              ),
+            );
+            ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+          }
+        },
+        showCancel: true,
+        validateLabel: AppLocalizations.of(context)!.ok
     );
   }
 }

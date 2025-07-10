@@ -14,7 +14,7 @@ class LastModifiedCounter extends ConsumerWidget {
         ref.watch(lastModifiedCounterProvider);
     if (lastModifiedCounter.hasValue) {
       final String lastModificationLabel;
-      if (lastModifiedCounter.value != null) {
+      if (lastModifiedCounter.value != null && lastModifiedCounter.value!.lastModificationTimeStamp != null) {
         lastModificationLabel = '${lastModifiedCounter.value!.name} - ${DateFormat('dd/MM/yy').format(DateTime.fromMillisecondsSinceEpoch(lastModifiedCounter.value!.lastModificationTimeStamp!))}';
       } else {
         lastModificationLabel = AppLocalizations.of(context)!.none;

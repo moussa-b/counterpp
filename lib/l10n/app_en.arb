@@ -662,5 +662,37 @@
   "testSuccessfulMessage": "Test successful - You can now validate",
   "@testSuccessfulMessage": {
     "description": "Success message displayed when the test is successful and the user can proceed"
+  },
+  "disableSynchronization": "Disable online synchronization",
+  "@disableSynchronization": {
+    "description": "Disable online label"
+  },
+  "disableSynchronizationSummary": "If disabled, you will not be able to recover your data after new installation",
+  "@disableSynchronizationSummary": {
+    "description": "Disable online synchronization data summary"
+  },
+  "enableSynchronization": "Enable online synchronization",
+  "@enableSynchronization": {
+    "description": "Enable online label"
+  },
+  "enableSynchronizationSummary": "If enabled, you will be able to recover your data after new installation",
+  "@enableSynchronizationSummary": {
+    "description": "Disable online synchronization data summary"
+  },
+  "recoverData": "Recover your data",
+  "@recoverData": {
+    "description": "Button label for recovering user data"
+  },
+  "recoverDataSummary": "Recover your saved data from online synchronization",
+  "@recoverDataSummary": {
+    "description": "Summary text explaining that the user can recover their data via synchronization"
+  },
+  "warningMsgDisableSynchronization": "This action will prevent you from recovering your data. Are you sure?",
+  "@warningMsgDisableSynchronization": {
+    "description": "Summary text explaining that the user will not be able to recover data"
+  },
+  "warningMsgRecover": "Continuing will erase all current data and replace it with the backup. Are you sure?",
+  "@warningMsgRecover": {
+    "description": "Summary text explaining that the user will lose all his data after recovering backup"
   }
 }
