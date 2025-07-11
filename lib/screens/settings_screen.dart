@@ -14,6 +14,7 @@ import 'package:counterpp/screens/synchronization_screen.dart';
 import 'package:counterpp/screens/tutorial_screen.dart';
 import 'package:counterpp/utils/permission_utils.dart';
 import 'package:counterpp/utils/synchronization_service.dart';
+import 'package:counterpp/widgets/sync_progress_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:counterpp/l10n/app_localizations.dart';
@@ -131,7 +132,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       title: Text(AppLocalizations.of(context)!.synchronizeData),
                       subtitle: Text(AppLocalizations.of(context)!.synchronizeDataSummary),
                       onTap: () async {
-                        ref.read(counterRepositoryProvider).synchronizeAll();
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return const SyncProgressDialog();
+                          },
+                        );
                       },
                     ),
                     const Divider(),
@@ -511,6 +518,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             settings.synchronizationApiUrl = null;
             synchronisationEnabled = false;
             ref.read(settingsProvider.notifier).updateSettings(settings);
+            ref.read(counterRepositoryProvider).resetCountersSynchronizationTimeStamp();
+            ref.read(counterRepositoryProvider).resetFoldersSynchronizationTimeStamp();
           });
         },
         showCancel: true,

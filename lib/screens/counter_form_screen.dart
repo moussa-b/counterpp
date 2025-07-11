@@ -20,7 +20,7 @@ class CounterFormScreen extends ConsumerStatefulWidget {
   const CounterFormScreen({super.key, this.counterId, this.currentFolder});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
+  ConsumerState<CounterFormScreen> createState() =>
       _CounterFormScreenState();
 }
 

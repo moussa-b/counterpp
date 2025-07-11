@@ -1006,40 +1006,28 @@ class DatabaseCounterRepository implements CounterRepository {
   }
 
   @override
-  Future<void> synchronizeAll() async{
-    if (SynchronizationService().isInitialized) {
-      final List<Folder> folders = await getAllFoldersToSynchronize();
-      if (folders.isNotEmpty) {
-        SynchronizationService().synchronizeFolders(folders).then((Response? response) {
-          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
-            updateFoldersSynchronizationTimestamp(folders.map((folder) => folder.id!).toList());
-          }
-        });
-      }
-      final List<Counter> counters = await getAllCountersToSynchronize();
-      if (counters.isNotEmpty) {
-        SynchronizationService().synchronizeCounters(counters).then((Response? response) {
-          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
-            updateCountersSynchronizationTimestamp(counters.map((counter) => counter.id!).toList());
-          }
-        });
-      }
-      final List<int> folderIds = await getAllDeletedFolderIdsToSynchronize();
-      if (folderIds.isNotEmpty) {
-        SynchronizationService().synchronizeDeletedFolders(folderIds).then((Response? response) {
-          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
-            updateDeletedFoldersSynchronizationTimestamp(folderIds);
-          }
-        });
-      }
-      final List<int> counterIds = await getAllDeletedCounterIdsToSynchronize();
-      if (counterIds.isNotEmpty) {
-        SynchronizationService().synchronizeDeletedCounters(counterIds).then((Response? response) {
-          if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
-            updateDeletedCountersSynchronizationTimestamp(counterIds);
-          }
-        });
-      }
+  Future<bool> resetCountersSynchronizationTimeStamp() async {
+    if (_db != null) {
+      final bool updateDated = await _db!.transaction((txn) async {
+        final int count = await txn.rawUpdate('UPDATE counters SET synchronizationTimeStamp = NULL');
+        return count > 0;
+      });
+      return updateDated;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> resetFoldersSynchronizationTimeStamp() async {
+    if (_db != null) {
+      final bool updateDated = await _db!.transaction((txn) async {
+        final int count = await txn.rawUpdate('UPDATE folders SET synchronizationTimeStamp = NULL');
+        return count > 0;
+      });
+      return updateDated;
+    } else {
+      return false;
     }
   }
 }

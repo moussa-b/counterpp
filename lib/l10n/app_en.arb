@@ -101,6 +101,10 @@
   "@close": {
     "description": "Close label"
   },
+  "tryAgain": "Try again",
+  "@close": {
+    "description": "Try again label"
+  },
   "renameFolder": "Rename folder",
   "@renameFolder": {
     "description": "Rename folder label"
@@ -694,5 +698,65 @@
   "warningMsgRecover": "Continuing will erase all current data and replace it with the backup. Are you sure?",
   "@warningMsgRecover": {
     "description": "Summary text explaining that the user will lose all his data after recovering backup"
+  },
+  "syncFolders": "Folder synchronization",
+  "@syncFolders": {
+    "description": "Label for the step that synchronizes folders"
+  },
+  "syncDeletedFolders": "Deleted folders synchronization",
+  "@syncDeletedFolders": {
+    "description": "Label for the step that synchronizes deleted folders"
+  },
+  "syncCounters": "Counters synchronization",
+  "@syncCounters": {
+    "description": "Label for the step that synchronizes counters"
+  },
+  "syncDeletedCounters": "Deleted counters synchronization",
+  "@syncDeletedCounters": {
+    "description": "Label for the step that synchronizes deleted counters"
+  },
+  "syncErrorTitle": "Synchronization error",
+  "@syncErrorTitle": {
+    "description": "Title displayed when a synchronization error occurs"
+  },
+  "syncErrorMessage": "An error has occurred",
+  "@syncErrorMessage": {
+    "description": "Error message displayed when no specific error message is provided during synchronization"
+  },
+  "syncCompletedTitle": "Synchronization completed",
+  "@syncCompletedTitle": {
+    "description": "Title displayed when the synchronization process is successfully completed"
+  },
+  "syncCompletedMessage": "All data has been successfully synchronized",
+  "@syncCompletedMessage": {
+    "description": "Message displayed after successful data synchronization"
+  },
+  "syncInProgressTitle": "Synchronization in progress...",
+  "@syncInProgressTitle": {
+    "description": "Title displayed while data synchronization is in progress"
+  },
+  "syncInProgressMessage": "Please wait while the data is being synchronized",
+  "@syncInProgressMessage": {
+    "description": "Message displayed to inform the user to wait during synchronization"
+  },
+  "syncSuccess": "Synchronization successful",
+  "@syncSuccess": {
+    "description": "Message displayed when synchronization is successful"
+  },
+  "httpError": "HTTP Error",
+  "@httpError": {
+    "description": "Error message displayed on HTTP error with the status code"
+  },
+  "connectionError": "Connection error",
+  "@connectionError": {
+    "description": "Generic connection error message"
+  },
+  "timeoutError": "Timeout exceeded",
+  "@timeoutError": {
+    "description": "Message displayed when a connection timeout occurs"
+  },
+  "synchronizationServerNotReachable": "Synchronization server not reachable",
+  "@no_internet_error": {
+    "description": "Message displayed when there is no internet connection"
   }
 }

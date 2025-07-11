@@ -16,7 +16,7 @@ class FoldersPopupMenu extends ConsumerStatefulWidget {
   const FoldersPopupMenu({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
+  ConsumerState<FoldersPopupMenu> createState() =>
       _FoldersPopupMenuState();
 }
 

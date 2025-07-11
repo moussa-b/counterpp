@@ -41,10 +41,12 @@ abstract interface class CounterRepository {
   Future<bool> deleteFolderById(int folderId);
   Future<bool> deleteAllFolders();
   Future<bool> deleteAllFoldersHistory();
+  Future<bool> resetFoldersSynchronizationTimeStamp();
   Future<bool> resetAllCountersForFolderId(int folderId);
   Future<bool> deleteAllCountersForFolderId(int folderId);
   Future<bool> deleteAllCounters();
   Future<bool> deleteAllCountersHistory();
+  Future<bool> resetCountersSynchronizationTimeStamp();
   Future<Settings> getSettings();
   Future<Settings> updateSettings(Settings settings);
   Future<bool> reorderFolders(List<ReorderItem> reorderItems);
@@ -57,5 +59,4 @@ abstract interface class CounterRepository {
   Future<int> batchInsertFolders(List<Map<String, Object?>> jsonList);
   Future<int> batchInsertCounters(List<Map<String, Object?>> jsonList);
   Future<int> batchInsertStatistics(List<Map<String, Object?>> jsonList);
-  Future<void> synchronizeAll();
 }

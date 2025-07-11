@@ -13,7 +13,7 @@ class SynchronizationScreen extends ConsumerStatefulWidget {
   const SynchronizationScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _SynchronizationScreenState();
+  ConsumerState<SynchronizationScreen> createState() => _SynchronizationScreenState();
 }
 
 class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {

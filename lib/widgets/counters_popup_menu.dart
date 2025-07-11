@@ -16,7 +16,7 @@ class CountersPopupMenu extends ConsumerStatefulWidget {
   const CountersPopupMenu({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
+  ConsumerState<CountersPopupMenu> createState() =>
       _CountersPopupMenuState();
 }
 
