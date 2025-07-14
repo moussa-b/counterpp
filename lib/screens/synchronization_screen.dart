@@ -73,7 +73,13 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.successfulMsgTestSynchronization),
+            content: Center(
+              child: Text(
+                AppLocalizations.of(context)!.successfulMsgTestSynchronization,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -125,15 +131,13 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 16),
-
-                // Message informatif
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -157,10 +161,7 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // Champ URL de synchronisation
                 TextFormField(
                   controller: _urlController,
                   decoration: InputDecoration(
@@ -181,10 +182,7 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                   },
                   onChanged: (_) => setState(() => _isTestSuccessful = false),
                 ),
-
                 const SizedBox(height: 16),
-
-                // Champ utilisateur
                 TextFormField(
                   controller: _userController,
                   decoration: InputDecoration(
@@ -201,10 +199,7 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                   },
                   onChanged: (_) => setState(() => _isTestSuccessful = false),
                 ),
-
                 const SizedBox(height: 16),
-
-                // Champ mot de passe
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
@@ -222,10 +217,7 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                   },
                   onChanged: (_) => setState(() => _isTestSuccessful = false),
                 ),
-
                 const SizedBox(height: 32),
-
-                // Bouton Tester
                 ElevatedButton.icon(
                   onPressed: _isTesting ? null : _testConnection,
                   icon: _isTesting
@@ -242,10 +234,7 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                     foregroundColor: Colors.white,
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
-                // Bouton Valider
                 ElevatedButton.icon(
                   onPressed: _isTestSuccessful ? _validate : null,
                   icon: const Icon(Icons.check),
@@ -256,7 +245,6 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                     foregroundColor: Colors.white,
                   ),
                 ),
-
                 if (_isTestSuccessful) ...[
                   const SizedBox(height: 16),
                   Container(
@@ -270,9 +258,13 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                       children: [
                         const Icon(Icons.check_circle, color: Colors.green),
                         const SizedBox(width: 8),
-                        Text(
-                          AppLocalizations.of(context)!.testSuccessfulMessage,
-                          style: const TextStyle(color: Colors.green),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)!.testSuccessfulMessage,
+                            style: const TextStyle(color: Colors.green),
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                          ),
                         ),
                       ],
                     ),
