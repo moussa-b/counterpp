@@ -32,7 +32,12 @@ class TutorialPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Image
-          Image.asset(image, height: 500,),
+          Expanded(
+            child: Image.asset(
+              image,
+              fit: BoxFit.contain,
+            ),
+          ),
           const SizedBox(height: verticalSpacing),
           if (title != null)
             ...[

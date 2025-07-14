@@ -31,7 +31,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
       if (currentLocale != 'en' && currentLocale != 'fr') {
         currentLocale = 'en';
       }
-      final Color color = Theme.of(context).primaryColor.withOpacity(0.5);
+      final Color color = Theme.of(context).primaryColor.withValues(alpha: 0.5);
       pages.addAll([
         TutorialPage(
           subtitle: AppLocalizations.of(context)!.tutorialMsg1,
@@ -158,46 +158,58 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Color color = Theme.of(context).primaryColor.withValues(alpha: 0.5);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+        backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.5),
         toolbarHeight: 0,
       ),
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            PageView(
-              onPageChanged: (index) {
-                setState(() {
-                  _isLastPage = index == pages.length - 1;
-                });
-              },
-              controller: _controller,
-              children: pages,
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: topPadding),
-              child: Align(
-                alignment: Alignment.topCenter,
-                //Stepper
-                child: SmoothPageIndicator(
-                  controller: _controller,
-                  count: pages.length,
-                  effect: SlideEffect(
-                    dotColor: Colors.white.withOpacity(0.3),
-                    activeDotColor: Colors.white,
-                  ),
-                  onDotClicked: (index) => _controller.animateToPage(
-                    index,
-                    duration: const Duration(microseconds: 350),
-                    curve: Curves.easeIn,
+            Container(
+              width: double.infinity,
+              color: color,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: topPadding,
+                  bottom: bottomPadding,
+                ),
+                child: Center(
+                  child: SmoothPageIndicator(
+                    controller: _controller,
+                    count: pages.length,
+                    effect: SlideEffect(
+                      dotColor: Colors.white.withAlpha(77),
+                      activeDotColor: Colors.white,
+                    ),
+                    onDotClicked: (index) => _controller.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeIn,
+                    ),
                   ),
                 ),
               ),
             ),
-            _isLastPage
-                ? _getLastPageButtons()
-                : _getPageButtons()
+            Expanded(
+              child: PageView(
+                onPageChanged: (index) {
+                  setState(() {
+                    _isLastPage = index == pages.length - 1;
+                  });
+                },
+                controller: _controller,
+                children: pages,
+              ),
+            ),
+            Container(
+              color: color,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: _isLastPage ? _getLastPageButtons() : _getPageButtons(),
+              ),
+            ),
           ],
         ),
       ),
