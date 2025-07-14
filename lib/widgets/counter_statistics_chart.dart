@@ -182,7 +182,7 @@ class CounterStatisticsChart extends StatelessWidget {
 
   SideTitleWidget getTitlesWidgetForDay(double value, TitleMeta meta) {
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 4,
       child: Text('${(value.toInt() * 2).toString()}h'),
     );
@@ -217,7 +217,7 @@ class CounterStatisticsChart extends StatelessWidget {
         break;
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 4,
       child: Text(text),
     );
@@ -225,7 +225,7 @@ class CounterStatisticsChart extends StatelessWidget {
 
   SideTitleWidget getTitlesWidgetForMonth(double value, TitleMeta meta) {
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 4,
       child: Text((1 + 3 * value.toInt()).toString()),
     );
@@ -275,7 +275,7 @@ class CounterStatisticsChart extends StatelessWidget {
         break;
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 4,
       child: Text(text),
     );
