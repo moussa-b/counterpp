@@ -28,7 +28,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+  final ScrollController _scrollController = ScrollController();
+
   SyncStep? _currentStep;
   bool _isCompleted = false;
   bool _hasError = false;
@@ -60,6 +61,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
   @override
   void dispose() {
     _animationController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -169,6 +171,12 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         _errorMessage = e.toString();
       });
     }
+
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -202,17 +210,21 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
           borderRadius: BorderRadius.circular(16),
         ),
         child: Container(
-          padding: const EdgeInsets.all(24),
-          width: MediaQuery.of(context).size.width * 0.8,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 24),
-              _buildStepsList(),
-              const SizedBox(height: 24),
-              _buildFooter(),
-            ],
+          padding : const EdgeInsets.symmetric(horizontal: 24.0),
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16),
+                _buildHeader(),
+                const SizedBox(height: 16),
+                _buildStepsList(),
+                const SizedBox(height: 16),
+                _buildFooter(),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
@@ -236,6 +248,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
               fontWeight: FontWeight.bold,
               color: Colors.red,
             ),
+            textAlign: TextAlign.center,
+            softWrap: true,
           ),
           const SizedBox(height: 8),
           Text(
@@ -263,6 +277,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
               fontWeight: FontWeight.bold,
               color: Colors.green,
             ),
+            textAlign: TextAlign.center,
+            softWrap: true,
           ),
           const SizedBox(height: 8),
           Text(
@@ -284,6 +300,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
+          textAlign: TextAlign.center,
+          softWrap: true,
         ),
         const SizedBox(height: 8),
         Text(
