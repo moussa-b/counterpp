@@ -168,7 +168,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     } catch (e) {
       setState(() {
         _hasError = true;
-        _errorMessage = e.toString();
+        _errorMessage = e.toString().replaceFirst(RegExp(r'^[a-zA-Z]+:\s*'), '').trim(); // remove "Exception:"
       });
     }
 
