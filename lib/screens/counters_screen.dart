@@ -96,7 +96,7 @@ class _CountersScreenState extends ConsumerState<CountersScreen>{
             ),
           if (!_editMode)
             IconButton(
-              icon: const Icon(FontAwesomeIcons.penToSquare),
+              icon: const Icon(Icons.swap_vert),
               onPressed: () {
                 setState(() {
                   _editMode = true;

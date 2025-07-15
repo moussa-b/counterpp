@@ -100,9 +100,13 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
               children: [
                 if (_name != null && _name!.isNotEmpty && _id != null && _id! > 1)
                   ...[
-                    Text(
-                    _name!,
-                    style: Theme.of(context).textTheme.titleLarge,
+                    Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(
+                      _name!,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   separator
                 ],

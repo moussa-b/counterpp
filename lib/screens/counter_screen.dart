@@ -22,7 +22,7 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: true,
-      onPopInvoked: (bool value) {
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
         ref.read(countersProvider.notifier).refresh();
       },
       child: Scaffold(
