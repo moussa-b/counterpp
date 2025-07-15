@@ -113,13 +113,19 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> resetCounterById(int counterId) async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = 0, lastModificationTimeStamp = ? WHERE id = ?', [lastModificationTimeStamp, counterId]);
         addStatistics(Statistics.fromJson({'counterId': counterId, 'type': StatisticsType.RESET.name}));
         return count > 0;
       });
-      return updateDated;
+      if (updated) {
+        Response? response = await SynchronizationService().synchronizeCountersCount([Count(counterId: counterId, count: 0)]);
+        if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+          return updateCountersSynchronizationTimestamp([counterId]);
+        }
+      }
+      return updated;
     } else {
       return false;
     }
@@ -128,7 +134,7 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> decrementCounterById(int counterId, {value = 1}) async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = (IFNULL(counterCount, 0) - ?), lastModificationTimeStamp = ? WHERE id = ?',
             [value, lastModificationTimeStamp, counterId]);
@@ -137,7 +143,7 @@ class DatabaseCounterRepository implements CounterRepository {
         }
         return count > 0;
       });
-      return updateDated;
+      return updated;
     } else {
       return false;
     }
@@ -146,7 +152,7 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> incrementCounterById(int counterId, {value = 1}) async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = (IFNULL(counterCount, 0) + ?), lastModificationTimeStamp = ? WHERE id = ?',
             [value, lastModificationTimeStamp, counterId]);
@@ -155,7 +161,7 @@ class DatabaseCounterRepository implements CounterRepository {
         }
         return count > 0;
       });
-      return updateDated;
+      return updated;
     } else {
       return false;
     }
@@ -562,13 +568,16 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> resetAllCountersForFolderId(int folderId) async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET counterCount = 0, lastModificationTimeStamp = ? WHERE folderId = ?', [lastModificationTimeStamp, folderId]);
         addStatisticsForFolder(folderId, StatisticsType.RESET);
         return count > 0;
       });
-      return updateDated;
+      if (updated) {
+        synchronizeCountersCount(folderId);
+      }
+      return updated;
     } else {
       return false;
     }
@@ -770,11 +779,11 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> deleteAllStatistics() async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.delete('statistics');
         return count > 0;
       });
-      return updateDated;
+      return updated;
     } else {
       return false;
     }
@@ -882,12 +891,12 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> updateCountersSynchronizationTimestampByFolderId(int folderId) async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate(
             'UPDATE counters SET synchronizationTimeStamp = ? WHERE folderId = ?', [lastSynchronizationTimeStamp, folderId]);
         return count > 0;
       });
-      return updateDated;
+      return updated;
     } else {
       return false;
     }
@@ -1008,11 +1017,11 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> resetCountersSynchronizationTimeStamp() async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate('UPDATE counters SET synchronizationTimeStamp = NULL');
         return count > 0;
       });
-      return updateDated;
+      return updated;
     } else {
       return false;
     }
@@ -1021,11 +1030,11 @@ class DatabaseCounterRepository implements CounterRepository {
   @override
   Future<bool> resetFoldersSynchronizationTimeStamp() async {
     if (_db != null) {
-      final bool updateDated = await _db!.transaction((txn) async {
+      final bool updated = await _db!.transaction((txn) async {
         final int count = await txn.rawUpdate('UPDATE folders SET synchronizationTimeStamp = NULL');
         return count > 0;
       });
-      return updateDated;
+      return updated;
     } else {
       return false;
     }
