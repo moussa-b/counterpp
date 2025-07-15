@@ -117,6 +117,7 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
                   ),
                   separator
                   ],
+                SizedBox(height: MediaQuery.of(context).size.width * 0.15),
                 CounterProgress(
                   color: color,
                   size: MediaQuery.of(context).size.width * 0.6,
