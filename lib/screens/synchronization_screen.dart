@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:counterpp/l10n/app_localizations.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/providers/settings_provider.dart';
-import 'package:counterpp/utils/synchronization_service.dart';
+import 'package:counter/l10n/app_localizations.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/providers/settings_provider.dart';
+import 'package:counter/utils/synchronization_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

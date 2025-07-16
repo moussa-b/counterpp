@@ -1,10 +1,10 @@
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/models/sorting_options.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/providers/counters_provider.dart';
-import 'package:counterpp/providers/settings_provider.dart';
-import 'package:counterpp/widgets/counter_list_item.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/models/sorting_options.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/providers/counters_provider.dart';
+import 'package:counter/providers/settings_provider.dart';
+import 'package:counter/widgets/counter_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

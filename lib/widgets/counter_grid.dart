@@ -1,6 +1,6 @@
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/widgets/counter_grid_item.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/widgets/counter_grid_item.dart';
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 

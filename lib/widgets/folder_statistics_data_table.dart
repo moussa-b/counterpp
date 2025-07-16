@@ -1,6 +1,6 @@
-import 'package:counterpp/models/counter.dart';
+import 'package:counter/models/counter.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 
 class FolderStatisticsDataTable extends StatelessWidget {
   const FolderStatisticsDataTable({

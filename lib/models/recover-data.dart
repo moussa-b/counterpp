@@ -1,5 +1,5 @@
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/folder.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/folder.dart';
 
 class RecoverData {
   List<Folder>? folders;

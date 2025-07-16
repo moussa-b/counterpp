@@ -1,5 +1,5 @@
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/widgets/folder_list_item.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/widgets/folder_list_item.dart';
 import 'package:flutter/material.dart';
 
 class FolderList extends StatelessWidget {

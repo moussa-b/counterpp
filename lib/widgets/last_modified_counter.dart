@@ -1,7 +1,7 @@
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/providers/last_modified_counter_provider.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/providers/last_modified_counter_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 

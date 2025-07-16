@@ -1,6 +1,6 @@
-import 'package:counterpp/models/calendar_period.dart';
+import 'package:counter/models/calendar_period.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 
 class PeriodSelector extends StatefulWidget {
   final void Function(CalendarPeriod calendarPeriod)? onPeriodChange;

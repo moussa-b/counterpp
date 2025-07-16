@@ -1,14 +1,14 @@
 import 'dart:math';
 
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/models/sorting_options.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/providers/folders_provider.dart';
-import 'package:counterpp/providers/settings_provider.dart';
-import 'package:counterpp/repository/counter_repository.dart';
-import 'package:counterpp/widgets/non_dismissible_popup_menu_item.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/models/sorting_options.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/providers/folders_provider.dart';
+import 'package:counter/providers/settings_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
+import 'package:counter/widgets/non_dismissible_popup_menu_item.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

@@ -1,13 +1,13 @@
-import 'package:counterpp/models/bottom_sheet_result.dart';
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/providers/counters_provider.dart';
-import 'package:counterpp/providers/last_modified_counter_provider.dart';
-import 'package:counterpp/screens/counter_form_screen.dart';
-import 'package:counterpp/screens/counter_screen.dart';
-import 'package:counterpp/screens/counter_statistics_screen.dart';
-import 'package:counterpp/widgets/bottom_sheet_item.dart';
+import 'package:counter/models/bottom_sheet_result.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/providers/counters_provider.dart';
+import 'package:counter/providers/last_modified_counter_provider.dart';
+import 'package:counter/screens/counter_form_screen.dart';
+import 'package:counter/screens/counter_screen.dart';
+import 'package:counter/screens/counter_statistics_screen.dart';
+import 'package:counter/widgets/bottom_sheet_item.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

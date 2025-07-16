@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SettingsNotifier extends AsyncNotifier<Settings> {

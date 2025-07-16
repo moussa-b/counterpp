@@ -1,15 +1,15 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/repository/counter_repository.dart';
-import 'package:counterpp/utils/utils.dart';
-import 'package:counterpp/widgets/counter_progress.dart';
-import 'package:counterpp/widgets/loading_indicator.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
+import 'package:counter/utils/utils.dart';
+import 'package:counter/widgets/counter_progress.dart';
+import 'package:counter/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CounterWidget extends ConsumerStatefulWidget {

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LastModifiedCounterNotifier extends AsyncNotifier<Counter?> {

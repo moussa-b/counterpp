@@ -1,6 +1,6 @@
-import 'package:counterpp/widgets/folders_popup_menu.dart';
+import 'package:counter/widgets/folders_popup_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FoldersAppBar extends StatefulWidget implements PreferredSizeWidget {

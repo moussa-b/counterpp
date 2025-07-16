@@ -1,16 +1,16 @@
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/providers/counters_provider.dart';
-import 'package:counterpp/providers/folders_provider.dart';
-import 'package:counterpp/repository/counter_repository.dart';
-import 'package:counterpp/utils/utils.dart';
-import 'package:counterpp/widgets/folder_dialog.dart';
-import 'package:counterpp/widgets/loading_indicator.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/providers/counters_provider.dart';
+import 'package:counter/providers/folders_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
+import 'package:counter/utils/utils.dart';
+import 'package:counter/widgets/folder_dialog.dart';
+import 'package:counter/widgets/loading_indicator.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CounterFormScreen extends ConsumerStatefulWidget {

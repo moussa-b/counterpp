@@ -1,10 +1,10 @@
-import 'package:counterpp/l10n/app_localizations.dart';
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/repository/counter_repository.dart';
-import 'package:counterpp/screens/tab_screen.dart';
-import 'package:counterpp/screens/tutorial_screen.dart';
-import 'package:counterpp/widgets/loading_indicator.dart';
+import 'package:counter/l10n/app_localizations.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
+import 'package:counter/screens/tab_screen.dart';
+import 'package:counter/screens/tutorial_screen.dart';
+import 'package:counter/widgets/loading_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

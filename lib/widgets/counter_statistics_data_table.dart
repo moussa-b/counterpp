@@ -1,8 +1,8 @@
-import 'package:counterpp/models/calendar_period.dart';
-import 'package:counterpp/models/statistics.dart';
-import 'package:counterpp/utils/utils.dart';
+import 'package:counter/models/calendar_period.dart';
+import 'package:counter/models/statistics.dart';
+import 'package:counter/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 

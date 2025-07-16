@@ -1,5 +1,5 @@
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/utils/utils.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/utils/utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:counterpp/utils/utils.dart';
+import 'package:counter/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class CounterProgress extends StatelessWidget {

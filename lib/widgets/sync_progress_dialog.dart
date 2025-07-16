@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:counterpp/l10n/app_localizations.dart';
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/models/sync_result.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/utils/synchronization_service.dart';
+import 'package:counter/l10n/app_localizations.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/models/sync_result.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/utils/synchronization_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';

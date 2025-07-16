@@ -1,11 +1,11 @@
-import 'package:counterpp/screens/folders_screen.dart';
-import 'package:counterpp/screens/settings_screen.dart';
-import 'package:counterpp/widgets/counter_widget.dart';
-import 'package:counterpp/widgets/folder_dialog.dart';
-import 'package:counterpp/widgets/folders_app_bar.dart';
-import 'package:counterpp/widgets/loading_indicator.dart';
+import 'package:counter/screens/folders_screen.dart';
+import 'package:counter/screens/settings_screen.dart';
+import 'package:counter/widgets/counter_widget.dart';
+import 'package:counter/widgets/folder_dialog.dart';
+import 'package:counter/widgets/folders_app_bar.dart';
+import 'package:counter/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 const HOME_TAB_INDEX = 0;

@@ -1,4 +1,4 @@
-import 'package:counterpp/models/sorting_options.dart';
+import 'package:counter/models/sorting_options.dart';
 
 class Settings {
   SortingOptions? folderSorting;

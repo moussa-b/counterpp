@@ -1,14 +1,14 @@
-import 'package:counterpp/models/calendar_period.dart';
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/statistics.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/utils/utils.dart';
-import 'package:counterpp/widgets/counter_statistics_chart.dart';
-import 'package:counterpp/widgets/counter_statistics_data_table.dart';
-import 'package:counterpp/widgets/loading_indicator.dart';
-import 'package:counterpp/widgets/period_selector.dart';
+import 'package:counter/models/calendar_period.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/statistics.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/utils/utils.dart';
+import 'package:counter/widgets/counter_statistics_chart.dart';
+import 'package:counter/widgets/counter_statistics_data_table.dart';
+import 'package:counter/widgets/loading_indicator.dart';
+import 'package:counter/widgets/period_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 

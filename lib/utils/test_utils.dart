@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/statistics.dart';
-import 'package:counterpp/repository/counter_repository.dart';
-import 'package:counterpp/utils/utils.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/statistics.dart';
+import 'package:counter/repository/counter_repository.dart';
+import 'package:counter/utils/utils.dart';
 
 class TestUtils {
 

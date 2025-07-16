@@ -1,11 +1,11 @@
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/providers/counters_provider.dart';
-import 'package:counterpp/providers/folders_provider.dart';
-import 'package:counterpp/screens/folder_statistics_screen.dart';
-import 'package:counterpp/widgets/bottom_sheet_item.dart';
-import 'package:counterpp/widgets/folder_dialog.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/providers/counters_provider.dart';
+import 'package:counter/providers/folders_provider.dart';
+import 'package:counter/screens/folder_statistics_screen.dart';
+import 'package:counter/widgets/bottom_sheet_item.dart';
+import 'package:counter/widgets/folder_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FolderBottomSheet extends ConsumerWidget {

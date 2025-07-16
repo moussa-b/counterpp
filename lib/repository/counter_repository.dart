@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:counterpp/models/count.dart';
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/models/reorder_item.dart';
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/models/sorting_options.dart';
-import 'package:counterpp/models/statistics.dart';
+import 'package:counter/models/count.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/models/reorder_item.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/models/sorting_options.dart';
+import 'package:counter/models/statistics.dart';
 
 abstract interface class CounterRepository {
   bool isInitialized();

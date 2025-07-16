@@ -1,4 +1,4 @@
-import 'package:counterpp/models/statistics.dart';
+import 'package:counter/models/statistics.dart';
 
 import 'counter.dart';
 import 'folder.dart';

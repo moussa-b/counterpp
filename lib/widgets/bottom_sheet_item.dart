@@ -1,6 +1,6 @@
-import 'package:counterpp/models/bottom_sheet_result.dart';
+import 'package:counter/models/bottom_sheet_result.dart';
 import 'package:flutter/material.dart';
-import 'package:counterpp/l10n/app_localizations.dart';
+import 'package:counter/l10n/app_localizations.dart';
 
 class BottomSheetItem extends StatelessWidget {
   final Icon icon;

@@ -1,5 +1,5 @@
-import 'package:counterpp/repository/counter_repository.dart';
-import 'package:counterpp/repository/database_counter_repository.dart';
+import 'package:counter/repository/counter_repository.dart';
+import 'package:counter/repository/database_counter_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final asyncCounterRepositoryProvider = FutureProvider<CounterRepository>((ref) async {

@@ -1,10 +1,10 @@
-import 'package:counterpp/l10n/app_localizations.dart';
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/providers/counters_provider.dart';
-import 'package:counterpp/providers/last_modified_counter_provider.dart';
-import 'package:counterpp/screens/counters_screen.dart';
-import 'package:counterpp/widgets/folder_bottom_sheet.dart';
+import 'package:counter/l10n/app_localizations.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/providers/counters_provider.dart';
+import 'package:counter/providers/last_modified_counter_provider.dart';
+import 'package:counter/screens/counters_screen.dart';
+import 'package:counter/widgets/folder_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

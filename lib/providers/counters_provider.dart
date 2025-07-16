@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/reorder_item.dart';
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/providers/folders_provider.dart';
-import 'package:counterpp/repository/counter_repository.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/reorder_item.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/providers/folders_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CountersNotifier extends AsyncNotifier<List<Counter>> {

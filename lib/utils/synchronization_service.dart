@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:counterpp/models/count.dart';
-import 'package:counterpp/models/counter.dart';
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/models/recover-data.dart';
+import 'package:counter/models/count.dart';
+import 'package:counter/models/counter.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/models/recover-data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';

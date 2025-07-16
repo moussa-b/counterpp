@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:counterpp/models/folder.dart';
-import 'package:counterpp/models/reorder_item.dart';
-import 'package:counterpp/models/settings.dart';
-import 'package:counterpp/providers/counter_repository_provider.dart';
-import 'package:counterpp/repository/counter_repository.dart';
+import 'package:counter/models/folder.dart';
+import 'package:counter/models/reorder_item.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FoldersNotifier extends AsyncNotifier<List<Folder>> {
