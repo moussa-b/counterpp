@@ -49,6 +49,7 @@ abstract interface class CounterRepository {
   Future<bool> resetCountersSynchronizationTimeStamp();
   Future<Settings> getSettings();
   Future<Settings> updateSettings(Settings settings);
+  Future<bool> updateLastOpenedTabIndex(int tabIndex);
   Future<bool> reorderFolders(List<ReorderItem> reorderItems);
   Future<bool> reorderCounters(List<ReorderItem> reorderItems);
   Future<Statistics> addStatistics(Statistics statistics);

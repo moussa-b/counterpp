@@ -10,5 +10,6 @@ CREATE TABLE settings
     showTutorial               INTEGER,
     synchronizationAccessToken TEXT,
     synchronizationApiUrl      TEXT,
-    lastModificationTimeStamp  INTEGER
+    lastModificationTimeStamp  INTEGER,
+    lastOpenedTabIndex         INTEGER
 );

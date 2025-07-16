@@ -94,7 +94,7 @@ class DatabaseCounterRepository implements CounterRepository {
           const sql = 'SELECT * FROM settings';
           final List<Map<String, Object?>> settingsMap = await db.rawQuery(sql);
           if (settingsMap.length == 1) {
-            Settings settings = Settings.fromJson(settingsMap[0]);
+            final Settings settings = Settings.fromJson(settingsMap[0]);
             if (settings.synchronizationApiUrl != null && settings.synchronizationAccessToken != null) {
               SynchronizationService().setApiUrl(apiUrl: settings.synchronizationApiUrl!, apiAccessToken: settings.synchronizationAccessToken!);
             }
@@ -690,9 +690,10 @@ class DatabaseCounterRepository implements CounterRepository {
              showTutorial,
              synchronizationAccessToken,
              synchronizationApiUrl,
-             lastModificationTimeStamp
+             lastModificationTimeStamp,
+             lastOpenedTabIndex
            )
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
           [
             1,
             settings.counterCompactView == true ? 1 : 0,
@@ -705,6 +706,7 @@ class DatabaseCounterRepository implements CounterRepository {
             settings.synchronizationAccessToken,
             settings.synchronizationApiUrl,
             lastModificationTimeStamp,
+            settings.lastOpenedTabIndex,
           ],
         );
         return count > 0;
@@ -714,6 +716,21 @@ class DatabaseCounterRepository implements CounterRepository {
       }
     }
     return Settings.copy(settings);
+  }
+
+  @override
+  Future<bool> updateLastOpenedTabIndex(int tabIndex) async {
+    if (_db != null) {
+      bool updated = await _db!.transaction((txn) async {
+        final int count = await txn.rawUpdate(
+          'UPDATE settings SET lastOpenedTabIndex = ?',
+          [tabIndex],
+        );
+        return count > 0;
+      });
+      return updated;
+    }
+    return false;
   }
 
   @override

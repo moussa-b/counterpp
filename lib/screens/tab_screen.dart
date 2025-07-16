@@ -1,3 +1,4 @@
+import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:counter/screens/folders_screen.dart';
 import 'package:counter/screens/settings_screen.dart';
 import 'package:counter/widgets/counter_widget.dart';
@@ -6,6 +7,7 @@ import 'package:counter/widgets/folders_app_bar.dart';
 import 'package:counter/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:counter/l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 const HOME_TAB_INDEX = 0;
@@ -14,19 +16,28 @@ const SETTINGS_TAB_INDEX = 2;
 
 // typedef resetCounterBuilder = void Function(BuildContext context, void Function() resetCounter);
 
-class TabsScreen extends StatefulWidget {
-  const TabsScreen({super.key});
+class TabsScreen extends ConsumerStatefulWidget {
+  final int selectedTabIndex;
+
+  const TabsScreen({super.key, this.selectedTabIndex = 0,});
 
   @override
-  State<TabsScreen> createState() => _TabsScreenState();
+  ConsumerState<TabsScreen> createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends ConsumerState<TabsScreen> {
   void Function()? _resetCounter;
-  int _selectedIndex = 0;
+  late int _selectedIndex;
   bool _editMode = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedTabIndex;
+  }
+
   void _onItemTapped(int index) {
+    ref.read(counterRepositoryProvider).updateLastOpenedTabIndex(index);
     setState(() {
       _selectedIndex = index;
     });

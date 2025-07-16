@@ -11,6 +11,7 @@ class Settings {
   int? lastModificationTimeStamp;
   String? synchronizationAccessToken;
   String? synchronizationApiUrl;
+  int lastOpenedTabIndex = 0;
 
   Settings({this.folderSorting, this.counterSorting, this.counterCompactView = false, this.lastModificationTimeStamp});
 
@@ -25,6 +26,7 @@ class Settings {
     synchronizationAccessToken = json['synchronizationAccessToken'];
     synchronizationApiUrl = json['synchronizationApiUrl'];
     showTutorial = json['showTutorial'] != null ? (json['showTutorial'] == 1) : true;
+    lastOpenedTabIndex = json['lastOpenedTabIndex'] ?? 0;
   }
 
   Settings.copy(Settings toCopy) {
@@ -38,6 +40,7 @@ class Settings {
     synchronizationAccessToken = toCopy.synchronizationAccessToken;
     synchronizationApiUrl = toCopy.synchronizationApiUrl;
     showTutorial = toCopy.showTutorial;
+    lastOpenedTabIndex = toCopy.lastOpenedTabIndex;
   }
 
   Map<String, dynamic> toJson() {
@@ -52,6 +55,7 @@ class Settings {
     data['synchronizationAccessToken'] = synchronizationAccessToken;
     data['synchronizationApiUrl'] = synchronizationApiUrl;
     data['showTutorial'] = (showTutorial == true ? 1 : 0);
+    data['lastOpenedTabIndex'] = lastOpenedTabIndex;
     return data;
   }
 }

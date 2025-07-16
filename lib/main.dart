@@ -76,7 +76,7 @@ class _AppState extends ConsumerState<App> {
                   showTutorial = false;
                 }));
               } else {
-                return const TabsScreen();
+                return TabsScreen(selectedTabIndex: snapshot.data != null ? snapshot.data!.lastOpenedTabIndex : 0);
               }
             }
           },
