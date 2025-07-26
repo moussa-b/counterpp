@@ -20,3 +20,13 @@ samples, guidance on mobile development, and a full API reference.
 ```bash
 flutter gen-l10n
 ```
+
+## Android version support 
+
+This app required SDK Api version 30+
+
+In android/app/build.gradle 
+
+```
+minSdkVersion 30
+```

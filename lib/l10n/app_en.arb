@@ -433,7 +433,7 @@
   "@exportData": {
     "description": "Export data label"
   },
-  "exportDataSummary": "Export your data to a file. Requires storage permission on Android 6+.",
+  "exportDataSummary": "Export your data to a file. Requires storage permission.",
   "@exportDataSummary": {
     "description": "Export data summary"
   },
@@ -441,7 +441,7 @@
   "@importData": {
     "description": "Import data label"
   },
-  "importDataSummary": "Reset the app with data from exported file. Requires storage permission on Android 6+.",
+  "importDataSummary": "Reset the app with data from exported file. Requires storage permission.",
   "@importDataSummary": {
     "description": "Import data summary"
   },

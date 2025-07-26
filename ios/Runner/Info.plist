@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Counterpp</string>
+	<string>Counter++</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -49,5 +49,7 @@
     <array>
       <string>mailto</string>
     </array>
+    <key>UISupportsDocumentBrowser</key>
+    <true/>
 </dict>
 </plist>

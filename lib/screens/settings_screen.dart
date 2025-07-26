@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:counter/l10n/app_localizations.dart';
 import 'package:counter/models/app_config.dart';
 import 'package:counter/models/counter.dart';
 import 'package:counter/models/folder.dart';
@@ -15,9 +16,10 @@ import 'package:counter/screens/tutorial_screen.dart';
 import 'package:counter/utils/permission_utils.dart';
 import 'package:counter/utils/synchronization_service.dart';
 import 'package:counter/widgets/sync_progress_dialog.dart';
+import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:counter/l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
@@ -37,11 +39,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String? version;
   bool synchronisationEnabled = SynchronizationService().isInitialized;
   final InAppReview inAppReview = InAppReview.instance;
+  Directory? _downloadsDirectory;
 
   @override
   void initState() {
     super.initState();
     _getSettings();
+    _getDownloadPath();
   }
 
   void _getSettings() async {
@@ -113,12 +117,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       AppLocalizations.of(context)!.deleteAllCountersSummary),
                   onTap: () => _resetData(context),
                 ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.exportData),
-                  subtitle: Text(AppLocalizations.of(context)!.exportDataSummary),
-                  onTap: () => _exportData(context),
-                ),
+                if (_downloadsDirectory != null)
+                  ...[
+                    const Divider(),
+                    ListTile(
+                      title: Text(AppLocalizations.of(context)!.exportData),
+                      subtitle: Text(
+                          AppLocalizations.of(context)!.exportDataSummary),
+                      onTap: () => _exportData(context),
+                    ),
+                  ],
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.importData),
@@ -228,6 +236,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  Future<void> _getDownloadPath() async {
+    Directory downloadsFolderPath;
+    try {
+      downloadsFolderPath = await getDownloadDirectory();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _downloadsDirectory = downloadsFolderPath;
+      });
+    } on PlatformException {
+      if (!mounted) {
+        return;
+      }
+    }
+  }
+
   void _showDialog(BuildContext context, Widget title, Widget content, void Function()? confirmCallback, {bool showCancel = true, String? validateLabel}) {
     showDialog(
         context: context,
@@ -258,31 +283,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _exportData(BuildContext ctx) async {
-    Directory? downloadDirectory;
-    if (Platform.isAndroid) {
-      bool? hasStoragePermission = await PermissionUtils.storagePermission();
-      if (!hasStoragePermission) {
-        if (!ctx.mounted) {
-          return null;
-        }
-        _showDialog(
-            ctx,
-            Text(AppLocalizations.of(ctx)!.warning),
-            Text(AppLocalizations.of(ctx)!.warningMsgExportData),
-            null,
-            showCancel: false,
-            validateLabel: AppLocalizations.of(ctx)!.ok
-        );
-      } else {
-        downloadDirectory = Directory('/storage/emulated/0/Download');
-      }
-    } else if (Platform.isIOS) {
-      downloadDirectory = null;
-    } else {
-      downloadDirectory = null;
-    }
-
-    if (downloadDirectory != null) {
+    if (_downloadsDirectory != null) {
       List<Folder> folders = await ref.read(counterRepositoryProvider).getAllFolders();
       List<Counter> counters = await ref.read(counterRepositoryProvider).getAllCounters();
       Settings settings = await ref.read(counterRepositoryProvider).getSettings();
@@ -297,7 +298,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (statistics.isNotEmpty) {
         json['statistics'] = statistics;
       }
-      final filePath = '${downloadDirectory.path}/export_counter_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.json';
+      final filePath = '${_downloadsDirectory!.path}/export_counter_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.json';
       final File file = File(filePath);
       final String jsonString = jsonEncode(json);
       final File writtenFile = await file.writeAsString(jsonString);
@@ -529,9 +530,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void _recoverData(BuildContext ctx) {
     _showDialog(
-        context,
-        Text(AppLocalizations.of(context)!.warning),
-        Text(AppLocalizations.of(context)!.warningMsgRecover),
+        ctx,
+        Text(AppLocalizations.of(ctx)!.warning),
+        Text(AppLocalizations.of(ctx)!.warningMsgRecover),
             () async {
           final RecoverData? recoverData = await SynchronizationService().recoverData();
           if (recoverData != null && recoverData.folders != null && recoverData.folders!.isNotEmpty) {
@@ -561,7 +562,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           }
         },
         showCancel: true,
-        validateLabel: AppLocalizations.of(context)!.ok
+        validateLabel: AppLocalizations.of(ctx)!.ok
     );
   }
 }
