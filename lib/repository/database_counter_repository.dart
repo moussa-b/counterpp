@@ -89,9 +89,10 @@ class DatabaseCounterRepository implements CounterRepository {
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           if (oldVersion < 2) {
-            // Migration from version 1 to 2: Add mailApiKey and mailApiDomain columns to settings table
+            // Migration from version 1 to 2: Add mailApiKey, mailApiDomain and mailSupport columns to settings table
             await db.execute('ALTER TABLE settings ADD COLUMN mailApiKey TEXT');
             await db.execute('ALTER TABLE settings ADD COLUMN mailApiDomain TEXT');
+            await db.execute('ALTER TABLE settings ADD COLUMN mailSupport TEXT');
             if (kDebugMode) {
               debugPrint('Database upgraded from version $oldVersion to $newVersion');
             }
@@ -702,10 +703,11 @@ class DatabaseCounterRepository implements CounterRepository {
              synchronizationApiUrl,
              mailApiKey,
              mailApiDomain,
+             mailSupport,
              lastModificationTimeStamp,
              lastOpenedTabIndex
            )
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
           [
             1,
             settings.counterCompactView == true ? 1 : 0,
@@ -719,6 +721,7 @@ class DatabaseCounterRepository implements CounterRepository {
             settings.synchronizationApiUrl,
             settings.mailApiKey,
             settings.mailApiDomain,
+            settings.mailSupport,
             lastModificationTimeStamp,
             settings.lastOpenedTabIndex,
           ],

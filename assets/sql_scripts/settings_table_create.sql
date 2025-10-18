@@ -12,6 +12,7 @@ CREATE TABLE settings
     synchronizationApiUrl      TEXT,
     mailApiKey                 TEXT,
     mailApiDomain              TEXT,
+    mailSupport                TEXT,
     lastModificationTimeStamp  INTEGER,
     lastOpenedTabIndex         INTEGER
 );

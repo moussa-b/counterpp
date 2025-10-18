@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:counter/l10n/app_localizations.dart';
+import 'package:counter/models/app_config.dart';
 import 'package:counter/models/counter.dart';
 import 'package:counter/models/folder.dart';
 import 'package:counter/models/settings.dart';
 import 'package:counter/models/sync_result.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/utils/mail_service.dart';
 import 'package:counter/utils/synchronization_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -142,13 +144,23 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     
     errorHandler(error) {
       if (kDebugMode) {
-        debugPrint('Catch error');
+        debugPrint('Catch error: $error');
       }
       if (settings.mailApiKey != null && settings.mailApiKey!.isNotEmpty &&
-          settings.mailApiDomain != null && settings.mailApiDomain!.isNotEmpty) {
+          settings.mailApiDomain != null && settings.mailApiDomain!.isNotEmpty &&
+          settings.mailSupport != null && settings.mailSupport!.isNotEmpty) {
         if (kDebugMode) {
-          debugPrint('Catch error should send email');
+          debugPrint('Sending error email to developer');
         }
+        
+        MailService.sendEmail(
+          apiKey: settings.mailApiKey!,
+          domain: settings.mailApiDomain!,
+          from: 'Counter++ Error <postmaster@${settings.mailApiDomain!}>',
+          to: [AppConfig.developerEmail, settings.mailSupport!],
+          subject: 'Counter++ - Synchronization Error',
+          text: 'An error occurred during synchronization:\n\nError: $error\n\nTimestamp: ${DateTime.now()}',
+        );
       }
     }
     
