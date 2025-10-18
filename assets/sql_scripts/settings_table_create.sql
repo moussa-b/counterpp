@@ -10,6 +10,8 @@ CREATE TABLE settings
     showTutorial               INTEGER,
     synchronizationAccessToken TEXT,
     synchronizationApiUrl      TEXT,
+    mailApiKey                 TEXT,
+    mailApiDomain              TEXT,
     lastModificationTimeStamp  INTEGER,
     lastOpenedTabIndex         INTEGER
 );

@@ -11,6 +11,8 @@ class Settings {
   int? lastModificationTimeStamp;
   String? synchronizationAccessToken;
   String? synchronizationApiUrl;
+  String? mailApiKey;
+  String? mailApiDomain;
   int lastOpenedTabIndex = 0;
 
   Settings({this.folderSorting, this.counterSorting, this.counterCompactView = false, this.lastModificationTimeStamp});
@@ -25,6 +27,8 @@ class Settings {
     lastModificationTimeStamp = json['lastModificationTimeStamp'];
     synchronizationAccessToken = json['synchronizationAccessToken'];
     synchronizationApiUrl = json['synchronizationApiUrl'];
+    mailApiKey = json['mailApiKey'];
+    mailApiDomain = json['mailApiDomain'];
     showTutorial = json['showTutorial'] != null ? (json['showTutorial'] == 1) : true;
     lastOpenedTabIndex = json['lastOpenedTabIndex'] ?? 0;
   }
@@ -39,6 +43,8 @@ class Settings {
     lastModificationTimeStamp = toCopy.lastModificationTimeStamp;
     synchronizationAccessToken = toCopy.synchronizationAccessToken;
     synchronizationApiUrl = toCopy.synchronizationApiUrl;
+    mailApiKey = toCopy.mailApiKey;
+    mailApiDomain = toCopy.mailApiDomain;
     showTutorial = toCopy.showTutorial;
     lastOpenedTabIndex = toCopy.lastOpenedTabIndex;
   }
@@ -54,6 +60,8 @@ class Settings {
     data['lastModificationTimeStamp'] = lastModificationTimeStamp;
     data['synchronizationAccessToken'] = synchronizationAccessToken;
     data['synchronizationApiUrl'] = synchronizationApiUrl;
+    data['mailApiKey'] = mailApiKey;
+    data['mailApiDomain'] = mailApiDomain;
     data['showTutorial'] = (showTutorial == true ? 1 : 0);
     data['lastOpenedTabIndex'] = lastOpenedTabIndex;
     return data;

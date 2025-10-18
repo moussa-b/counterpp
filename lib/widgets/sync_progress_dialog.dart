@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:counter/l10n/app_localizations.dart';
 import 'package:counter/models/counter.dart';
 import 'package:counter/models/folder.dart';
+import 'package:counter/models/settings.dart';
 import 'package:counter/models/sync_result.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:counter/utils/synchronization_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
@@ -70,6 +72,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     T param,
     String stepName, {
     required SyncLabels labels,
+    void Function(dynamic error)? onError,
   }) {
     return () async {
       try {
@@ -107,6 +110,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
           );
         }
       } catch (e) {
+        onError?.call(e);
         String errorMessage = labels.connectionError;
         if (e.toString().contains('timeout')) {
           errorMessage = labels.timeoutError;
@@ -134,11 +138,25 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     final List<Counter> counters = await ref.read(counterRepositoryProvider).getAllCountersToSynchronize();
     final List<int> folderIds = await ref.read(counterRepositoryProvider).getAllDeletedFolderIdsToSynchronize();
     final List<int> counterIds = await ref.read(counterRepositoryProvider).getAllDeletedCounterIdsToSynchronize();
+    final Settings settings = await ref.read(counterRepositoryProvider).getSettings();
+    
+    errorHandler(error) {
+      if (kDebugMode) {
+        debugPrint('Catch error');
+      }
+      if (settings.mailApiKey != null && settings.mailApiKey!.isNotEmpty &&
+          settings.mailApiDomain != null && settings.mailApiDomain!.isNotEmpty) {
+        if (kDebugMode) {
+          debugPrint('Catch error should send email');
+        }
+      }
+    }
+    
     final List<Future<SyncResult> Function()> syncFunctions = [
-      _convertToSyncResultFunction(SynchronizationService().synchronizeFolders, folders, _steps[0].title, labels: labels,),
-      _convertToSyncResultFunction(SynchronizationService().synchronizeDeletedFolders, folderIds, _steps[1].title, labels: labels,),
-      _convertToSyncResultFunction(SynchronizationService().synchronizeCounters, counters, _steps[2].title, labels: labels,),
-      _convertToSyncResultFunction(SynchronizationService().synchronizeDeletedFolders, counterIds, _steps[3].title, labels: labels,),
+      _convertToSyncResultFunction(SynchronizationService().synchronizeFolders, folders, _steps[0].title, labels: labels, onError: errorHandler),
+      _convertToSyncResultFunction(SynchronizationService().synchronizeDeletedFolders, folderIds, _steps[1].title, labels: labels, onError: errorHandler),
+      _convertToSyncResultFunction(SynchronizationService().synchronizeCounters, counters, _steps[2].title, labels: labels, onError: errorHandler),
+      _convertToSyncResultFunction(SynchronizationService().synchronizeDeletedCounters, counterIds, _steps[3].title, labels: labels, onError: errorHandler),
     ];
 
     try {

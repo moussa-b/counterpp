@@ -26,6 +26,8 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
   bool _isTesting = false;
   String? _accessToken;
   String? _apiUrl;
+  String? _mailApiKey;
+  String? _mailApiDomain;
 
   @override
   void dispose() {
@@ -68,6 +70,8 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
         setState(() {
           _accessToken = responseData['access_token'];
           _apiUrl = urlText;
+          _mailApiKey = responseData['mail_api_key'];
+          _mailApiDomain = responseData['mail_api_domain'];
           _isTestSuccessful = true;
           _isTesting = false;
         });
@@ -109,6 +113,8 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
       final settings = await ref.read(counterRepositoryProvider).getSettings();
       settings.synchronizationAccessToken = _accessToken;
       settings.synchronizationApiUrl = _apiUrl;
+      settings.mailApiKey = _mailApiKey;
+      settings.mailApiDomain = _mailApiDomain;
       SynchronizationService().setApiUrl(apiUrl: _apiUrl!, apiAccessToken: _accessToken!);
       await ref.read(settingsProvider.notifier).updateSettings(settings);
       var messenger = ScaffoldMessenger.of(context);

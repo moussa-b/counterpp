@@ -62,7 +62,7 @@ class DatabaseCounterRepository implements CounterRepository {
       final String dbPath = await sql.getDatabasesPath();
       _db = await sql.openDatabase(
         path.join(dbPath, 'counter.db'),
-        version: 1,
+        version: 2,
         onConfigure: (db) async {
           await db.execute('PRAGMA foreign_keys = ON');
         },
@@ -86,6 +86,16 @@ class DatabaseCounterRepository implements CounterRepository {
             // await _executeSqlScript(txn, 'assets/sql_scripts/counter_table_sample.sql'); // TODO replace by counter_table_populate.sql
             // await _executeSqlScript(txn, 'assets/sql_scripts/statistics_table_sample.sql'); // TODO remove
           });
+        },
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 2) {
+            // Migration from version 1 to 2: Add mailApiKey and mailApiDomain columns to settings table
+            await db.execute('ALTER TABLE settings ADD COLUMN mailApiKey TEXT');
+            await db.execute('ALTER TABLE settings ADD COLUMN mailApiDomain TEXT');
+            if (kDebugMode) {
+              debugPrint('Database upgraded from version $oldVersion to $newVersion');
+            }
+          }
         },
         onOpen: (db) async {
           if (kDebugMode) {
@@ -690,10 +700,12 @@ class DatabaseCounterRepository implements CounterRepository {
              showTutorial,
              synchronizationAccessToken,
              synchronizationApiUrl,
+             mailApiKey,
+             mailApiDomain,
              lastModificationTimeStamp,
              lastOpenedTabIndex
            )
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
           [
             1,
             settings.counterCompactView == true ? 1 : 0,
@@ -705,6 +717,8 @@ class DatabaseCounterRepository implements CounterRepository {
             settings.showTutorial == true ? 1 : 0,
             settings.synchronizationAccessToken,
             settings.synchronizationApiUrl,
+            settings.mailApiKey,
+            settings.mailApiDomain,
             lastModificationTimeStamp,
             settings.lastOpenedTabIndex,
           ],
