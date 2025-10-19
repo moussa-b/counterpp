@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 /// Service to send emails via Mailgun
 class MailService {
   // Mailgun configuration
-  static const String _baseUrl = 'https://api.mailgun.net';
+  static const String _baseUrl = 'https://api.eu.mailgun.net';
 
   // For EU domains, use: 'https://api.eu.mailgun.net'
   // static const String _baseUrl = 'https://api.eu.mailgun.net';
