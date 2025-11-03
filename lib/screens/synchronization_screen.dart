@@ -24,6 +24,7 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
   
   bool _isTestSuccessful = false;
   bool _isTesting = false;
+  bool _isPasswordVisible = false;
   String? _accessToken;
   String? _apiUrl;
   String? _mailApiKey;
@@ -211,11 +212,21 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.password,
                     hintText: AppLocalizations.of(context)!.passwordHint,
                     prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
                     border: const OutlineInputBorder(),
                   ),
                   validator: (value) {

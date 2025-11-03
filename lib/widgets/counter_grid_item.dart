@@ -73,13 +73,17 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    widget.counter.name!,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize:
-                          Theme.of(context).textTheme.titleLarge!.fontSize!,
+                  Expanded(
+                    child: Text(
+                      widget.counter.name!,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize:
+                            Theme.of(context).textTheme.titleLarge!.fontSize!,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                   Expanded(

@@ -20,11 +20,12 @@ class LastModifiedCounter extends ConsumerWidget {
         lastModificationLabel = AppLocalizations.of(context)!.none;
       }
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Text(
           AppLocalizations.of(context)!
               .lastCounterModified(lastModificationLabel),
           style: TextStyle(color: Theme.of(context).textTheme.titleMedium!.color),
+          textAlign: TextAlign.center,
         ),
       );
     } else {
