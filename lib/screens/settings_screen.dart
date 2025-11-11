@@ -14,6 +14,7 @@ import 'package:counter/providers/settings_provider.dart';
 import 'package:counter/screens/developer_logs_screen.dart';
 import 'package:counter/screens/synchronization_screen.dart';
 import 'package:counter/screens/tutorial_screen.dart';
+import 'package:counter/utils/logging_service.dart';
 import 'package:counter/utils/synchronization_service.dart';
 import 'package:counter/widgets/sync_progress_dialog.dart';
 import 'package:downloadsfolder/downloadsfolder.dart';
@@ -52,7 +53,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _getSettings() async {
-    final Settings settingsFromDb = await ref.read(counterRepositoryProvider).getSettings();
+    final Settings settingsFromDb = await ref
+        .read(counterRepositoryProvider)
+        .getSettings();
     final packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       settings = settingsFromDb;
@@ -338,46 +341,68 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void _exportData(BuildContext ctx) async {
     if (_downloadsDirectory != null) {
-      List<Folder> folders = await ref
-          .read(counterRepositoryProvider)
-          .getAllFolders();
-      List<Counter> counters = await ref
-          .read(counterRepositoryProvider)
-          .getAllCounters();
-      Settings settings = await ref
-          .read(counterRepositoryProvider)
-          .getSettings();
-      List<Statistics> statistics = await ref
-          .read(counterRepositoryProvider)
-          .getAllStatistics();
-      Map<String, dynamic> json = {'settings': settings};
-      if (folders.isNotEmpty) {
-        json['folders'] = folders;
-      }
-      if (counters.isNotEmpty) {
-        json['counters'] = counters;
-      }
-      if (statistics.isNotEmpty) {
-        json['statistics'] = statistics;
-      }
-      final filePath =
-          '${_downloadsDirectory!.path}/export_counter_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.json';
-      final File file = File(filePath);
-      final String jsonString = jsonEncode(json);
-      final File writtenFile = await file.writeAsString(jsonString);
-      if (await writtenFile.exists() && ctx.mounted) {
+      try {
+        List<Folder> folders = await ref
+            .read(counterRepositoryProvider)
+            .getAllFolders();
+        List<Counter> counters = await ref
+            .read(counterRepositoryProvider)
+            .getAllCounters();
+        Settings settings = await ref
+            .read(counterRepositoryProvider)
+            .getSettings();
+        List<Statistics> statistics = await ref
+            .read(counterRepositoryProvider)
+            .getAllStatistics();
+        Map<String, dynamic> json = {'settings': settings};
+        if (folders.isNotEmpty) {
+          json['folders'] = folders;
+        }
+        if (counters.isNotEmpty) {
+          json['counters'] = counters;
+        }
+        if (statistics.isNotEmpty) {
+          json['statistics'] = statistics;
+        }
+        final filePath =
+            '${_downloadsDirectory!.path}/export_counter_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.json';
+        final File file = File(filePath);
+        final String jsonString = jsonEncode(json);
+        final File writtenFile = await file.writeAsString(jsonString);
+        if (await writtenFile.exists() && ctx.mounted) {
+          final SnackBar snackBar = SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.white),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(
+                      ctx,
+                    )!.successfulMsgExportData(writtenFile.path),
+                  ),
+                ),
+              ],
+            ),
+          );
+          ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+        }
+      } catch (e, stackTrace) {
+        await LoggingService().logMessage(
+          'Data export failed',
+          details: {'targetDirectory': _downloadsDirectory?.path},
+          error: e,
+          stackTrace: stackTrace,
+        );
+        if (!ctx.mounted) {
+          return;
+        }
         final SnackBar snackBar = SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.check_circle_outline, color: Colors.white),
+              const Icon(Icons.error_outline, color: Colors.white),
               const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  AppLocalizations.of(
-                    ctx,
-                  )!.successfulMsgExportData(writtenFile.path),
-                ),
-              ),
+              Flexible(child: Text(AppLocalizations.of(ctx)!.errorMsgGeneric)),
             ],
           ),
         );
@@ -405,66 +430,118 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   void _importData(BuildContext ctx) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      final File file = File(result.files.single.path!);
-      final contents = await file.readAsString();
-      if (contents.isNotEmpty) {
-        var data = json.decode(contents);
-        if (data['settings'] != null ||
-            data['folders'] != null ||
-            data['counters'] != null) {
-          if (data['settings'] != null) {
-            Settings settings = Settings.fromJson(data['settings']);
-            settings.showTutorial = false;
-            await ref.read(counterRepositoryProvider).updateSettings(settings);
-          }
-          if (data['folders'] != null) {
-            await ref.read(counterRepositoryProvider).deleteAllFolders();
-            await ref
-                .read(counterRepositoryProvider)
-                .batchInsertFolders(
-                  List<Map<String, Object?>>.from(data['folders']),
-                );
-          }
-          if (data['counters'] != null) {
-            await ref.read(counterRepositoryProvider).deleteAllCounters();
-            await ref
-                .read(counterRepositoryProvider)
-                .batchInsertCounters(
-                  List<Map<String, Object?>>.from(data['counters']),
-                );
-          }
-          if (data['statistics'] != null) {
-            await ref.read(counterRepositoryProvider).deleteAllStatistics();
-            await ref
-                .read(counterRepositoryProvider)
-                .batchInsertStatistics(
-                  List<Map<String, Object?>>.from(data['statistics']),
-                );
-          }
-          ref.read(foldersProvider.notifier).refresh();
-          if (!ctx.mounted) {
-            return;
-          }
-          final SnackBar snackBar = SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_outline, color: Colors.white),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Text(
-                    AppLocalizations.of(ctx)!.successfulMsgImportData,
-                  ),
-                ),
-              ],
-            ),
-          );
-          ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+      final String? filePath = result.files.single.path;
+      if (filePath == null) {
+        await LoggingService().logMessage(
+          'Data import failed: missing file path',
+        );
+        if (!ctx.mounted) {
           return;
         }
+        _showDialog(
+          ctx,
+          Text(AppLocalizations.of(ctx)!.error),
+          Text(AppLocalizations.of(ctx)!.errorMsgImportData),
+          null,
+          showCancel: false,
+          validateLabel: AppLocalizations.of(ctx)!.ok,
+        );
+        return;
       }
+
+      final File file = File(filePath);
+      try {
+        final contents = await file.readAsString();
+        if (contents.isNotEmpty) {
+          var data = json.decode(contents);
+          if (data['settings'] != null ||
+              data['folders'] != null ||
+              data['counters'] != null) {
+            if (data['settings'] != null) {
+              Settings settings = Settings.fromJson(data['settings']);
+              settings.showTutorial = false;
+              await ref
+                  .read(counterRepositoryProvider)
+                  .updateSettings(settings);
+            }
+            if (data['folders'] != null) {
+              await ref.read(counterRepositoryProvider).deleteAllFolders();
+              await ref
+                  .read(counterRepositoryProvider)
+                  .batchInsertFolders(
+                    List<Map<String, Object?>>.from(data['folders']),
+                  );
+            }
+            if (data['counters'] != null) {
+              await ref.read(counterRepositoryProvider).deleteAllCounters();
+              await ref
+                  .read(counterRepositoryProvider)
+                  .batchInsertCounters(
+                    List<Map<String, Object?>>.from(data['counters']),
+                  );
+            }
+            if (data['statistics'] != null) {
+              await ref.read(counterRepositoryProvider).deleteAllStatistics();
+              await ref
+                  .read(counterRepositoryProvider)
+                  .batchInsertStatistics(
+                    List<Map<String, Object?>>.from(data['statistics']),
+                  );
+            }
+            ref.read(foldersProvider.notifier).refresh();
+            if (!ctx.mounted) {
+              return;
+            }
+            final SnackBar snackBar = SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      AppLocalizations.of(ctx)!.successfulMsgImportData,
+                    ),
+                  ),
+                ],
+              ),
+            );
+            ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+            return;
+          }
+        } else {
+          await LoggingService().logMessage(
+            'Data import failed: empty file',
+            details: {'filePath': filePath},
+          );
+        }
+      } catch (e, stackTrace) {
+        await LoggingService().logMessage(
+          'Data import failed',
+          details: {'filePath': filePath},
+          error: e,
+          stackTrace: stackTrace,
+        );
+        if (!ctx.mounted) {
+          return;
+        }
+        _showDialog(
+          ctx,
+          Text(AppLocalizations.of(ctx)!.error),
+          Text(AppLocalizations.of(ctx)!.errorMsgImportData),
+          null,
+          showCancel: false,
+          validateLabel: AppLocalizations.of(ctx)!.ok,
+        );
+        return;
+      }
+
       if (!ctx.mounted) {
         return null;
       }
+      await LoggingService().logMessage(
+        'Data import failed: invalid file content',
+        details: {'filePath': filePath},
+      );
       _showDialog(
         ctx,
         Text(AppLocalizations.of(ctx)!.error),

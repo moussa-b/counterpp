@@ -308,7 +308,7 @@ class SynchronizationService {
       );
     }
     return await post(
-      '$_apiUrl/counters/count/synchronize',
+      '$_apiUrl/counters/count/synchronized',
       body: counts,
       headers: autorizationHeaders,
     );

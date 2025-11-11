@@ -55,42 +55,59 @@ class LoggingService {
     String? responseBody,
     Object? error,
   }) async {
-    try {
-      final file = await _ensureLogFile();
-      final timestamp = DateTime.now().toUtc().toIso8601String();
-      final buffer = StringBuffer()
-        ..writeln('[$timestamp] HTTP $method ${url.toString()}')
-        ..writeln('Status: ${statusCode ?? 'N/A'}');
+    final timestamp = DateTime.now().toUtc().toIso8601String();
+    final buffer = StringBuffer()
+      ..writeln('[$timestamp] HTTP $method ${url.toString()}')
+      ..writeln('Status: ${statusCode ?? 'N/A'}');
 
-      if (requestHeaders != null && requestHeaders.isNotEmpty) {
-        buffer.writeln('Request headers: $requestHeaders');
-      }
-
-      if (requestBody != null && requestBody.isNotEmpty) {
-        buffer.writeln('Request body: $requestBody');
-      }
-
-      if (responseBody != null && responseBody.isNotEmpty) {
-        buffer.writeln('Response body: $responseBody');
-      }
-
-      if (error != null) {
-        buffer.writeln('Error: $error');
-      }
-
-      buffer.writeln('---');
-
-      await file.writeAsString(
-        buffer.toString(),
-        mode: FileMode.append,
-        flush: true,
-      );
-    } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Failed to write log entry: $e');
-        debugPrint('$stackTrace');
-      }
+    if (requestHeaders != null && requestHeaders.isNotEmpty) {
+      buffer.writeln('Request headers: $requestHeaders');
     }
+
+    if (requestBody != null && requestBody.isNotEmpty) {
+      buffer.writeln('Request body: $requestBody');
+    }
+
+    if (responseBody != null && responseBody.isNotEmpty) {
+      buffer.writeln('Response body: $responseBody');
+    }
+
+    if (error != null) {
+      buffer.writeln('Error: $error');
+    }
+
+    buffer.writeln('---');
+
+    await _appendBuffer(buffer);
+  }
+
+  Future<void> logMessage(
+    String message, {
+    Map<String, Object?>? details,
+    Object? error,
+    StackTrace? stackTrace,
+  }) async {
+    final timestamp = DateTime.now().toUtc().toIso8601String();
+    final buffer = StringBuffer()..writeln('[$timestamp] $message');
+
+    if (details != null && details.isNotEmpty) {
+      buffer.writeln('Details:');
+      details.forEach((key, value) {
+        buffer.writeln('  $key: $value');
+      });
+    }
+
+    if (error != null) {
+      buffer.writeln('Error: $error');
+    }
+
+    if (stackTrace != null) {
+      buffer.writeln('Stack trace: $stackTrace');
+    }
+
+    buffer.writeln('---');
+
+    await _appendBuffer(buffer);
   }
 
   Future<String> readLogs() async {
@@ -115,6 +132,22 @@ class LoggingService {
     } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint('Failed to clear log file: $e');
+        debugPrint('$stackTrace');
+      }
+    }
+  }
+
+  Future<void> _appendBuffer(StringBuffer buffer) async {
+    try {
+      final file = await _ensureLogFile();
+      await file.writeAsString(
+        buffer.toString(),
+        mode: FileMode.append,
+        flush: true,
+      );
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('Failed to write log entry: $e');
         debugPrint('$stackTrace');
       }
     }
