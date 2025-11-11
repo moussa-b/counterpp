@@ -758,5 +758,37 @@
   "synchronizationServerNotReachable": "Synchronization server not reachable",
   "@no_internet_error": {
     "description": "Message displayed when there is no internet connection"
+  },
+  "developerOptions": "Developer",
+  "@developerOptions": {
+    "description": "Title for the developer options tile"
+  },
+  "developerOptionsSummary": "See logs",
+  "@developerOptionsSummary": {
+    "description": "Summary for the developer options tile"
+  },
+  "developerModeEnabled": "Developer options unlocked.",
+  "@developerModeEnabled": {
+    "description": "Snack bar message when developer options are unlocked"
+  },
+  "developerLogsTitle": "Application logs",
+  "@developerLogsTitle": {
+    "description": "Title for the developer logs screen"
+  },
+  "developerLogsEmpty": "No logs recorded yet.",
+  "@developerLogsEmpty": {
+    "description": "Message displayed when the log file is empty"
+  },
+  "developerLogsRefresh": "Refresh",
+  "@developerLogsRefresh": {
+    "description": "Tooltip for refreshing the logs"
+  },
+  "developerLogsClear": "Clear logs",
+  "@developerLogsClear": {
+    "description": "Tooltip for clearing the log file"
+  },
+  "developerLogsCleared": "Logs cleared.",
+  "@developerLogsCleared": {
+    "description": "Snack bar message displayed after clearing logs"
   }
 }

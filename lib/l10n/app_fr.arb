@@ -177,5 +177,13 @@
   "httpError": "Erreur HTTP",
   "connectionError": "Erreur de connexion",
   "timeoutError": "Délai d'attente dépassé",
-  "synchronizationServerNotReachable": "Le serveur de synchronisation n'est pas accessible"
+  "synchronizationServerNotReachable": "Le serveur de synchronisation n'est pas accessible",
+  "developerOptions": "Développeur",
+  "developerOptionsSummary": "Voir les journaux",
+  "developerModeEnabled": "Options développeur déverrouillées.",
+  "developerLogsTitle": "Journaux de l'application",
+  "developerLogsEmpty": "Aucun journal enregistré pour le moment.",
+  "developerLogsRefresh": "Actualiser",
+  "developerLogsClear": "Effacer les journaux",
+  "developerLogsCleared": "Journaux effacés."
 }

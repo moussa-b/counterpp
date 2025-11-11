@@ -11,9 +11,9 @@ import 'package:counter/models/statistics.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:counter/providers/folders_provider.dart';
 import 'package:counter/providers/settings_provider.dart';
+import 'package:counter/screens/developer_logs_screen.dart';
 import 'package:counter/screens/synchronization_screen.dart';
 import 'package:counter/screens/tutorial_screen.dart';
-import 'package:counter/utils/permission_utils.dart';
 import 'package:counter/utils/synchronization_service.dart';
 import 'package:counter/widgets/sync_progress_dialog.dart';
 import 'package:downloadsfolder/downloadsfolder.dart';
@@ -40,6 +40,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool synchronisationEnabled = SynchronizationService().isInitialized;
   final InAppReview inAppReview = InAppReview.instance;
   Directory? _downloadsDirectory;
+  int _versionTapCount = 0;
+  DateTime? _firstVersionTap;
+  bool _developerTileVisible = false;
 
   @override
   void initState() {
@@ -69,24 +72,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 CheckboxListTile(
                   title: Text(AppLocalizations.of(context)!.activateSounds),
-                  subtitle: Text(AppLocalizations.of(context)!.activateSoundsSummary),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.activateSoundsSummary,
+                  ),
                   value: settings.activateSounds ?? false,
                   onChanged: (value) {
                     setState(() {
                       settings.activateSounds = value;
-                      ref.read(settingsProvider.notifier).updateSettings(settings);
+                      ref
+                          .read(settingsProvider.notifier)
+                          .updateSettings(settings);
                     });
                   },
                 ),
                 const Divider(),
                 CheckboxListTile(
                   title: Text(AppLocalizations.of(context)!.activateVibrator),
-                  subtitle: Text(AppLocalizations.of(context)!.activateVibratorSummary),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.activateVibratorSummary,
+                  ),
                   value: settings.activateVibrator ?? false,
                   onChanged: (value) {
                     setState(() {
                       settings.activateVibrator = value;
-                      ref.read(settingsProvider.notifier).updateSettings(settings);
+                      ref
+                          .read(settingsProvider.notifier)
+                          .updateSettings(settings);
                     });
                   },
                 ),
@@ -97,12 +108,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 CheckboxListTile(
                   title: Text(AppLocalizations.of(context)!.keepScreenOn),
-                  subtitle: Text(AppLocalizations.of(context)!.keepScreenOnSummary),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.keepScreenOnSummary,
+                  ),
                   value: settings.keepScreenOn ?? false,
                   onChanged: (value) {
                     setState(() {
                       settings.keepScreenOn = value;
-                      ref.read(settingsProvider.notifier).updateSettings(settings);
+                      ref
+                          .read(settingsProvider.notifier)
+                          .updateSettings(settings);
                     });
                   },
                 ),
@@ -114,69 +129,86 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.deleteAllCounters),
                   subtitle: Text(
-                      AppLocalizations.of(context)!.deleteAllCountersSummary),
+                    AppLocalizations.of(context)!.deleteAllCountersSummary,
+                  ),
                   onTap: () => _resetData(context),
                 ),
-                if (_downloadsDirectory != null)
-                  ...[
-                    const Divider(),
-                    ListTile(
-                      title: Text(AppLocalizations.of(context)!.exportData),
-                      subtitle: Text(
-                          AppLocalizations.of(context)!.exportDataSummary),
-                      onTap: () => _exportData(context),
+                if (_downloadsDirectory != null) ...[
+                  const Divider(),
+                  ListTile(
+                    title: Text(AppLocalizations.of(context)!.exportData),
+                    subtitle: Text(
+                      AppLocalizations.of(context)!.exportDataSummary,
                     ),
-                  ],
+                    onTap: () => _exportData(context),
+                  ),
+                ],
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.importData),
-                  subtitle: Text(AppLocalizations.of(context)!.importDataSummary),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.importDataSummary,
+                  ),
                   onTap: () => _importData(context),
                 ),
-                if (synchronisationEnabled)
-                  ...[
-                    const Divider(),
-                    ListTile(
-                      title: Text(AppLocalizations.of(context)!.synchronizeData),
-                      subtitle: Text(AppLocalizations.of(context)!.synchronizeDataSummary),
-                      onTap: () async {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return const SyncProgressDialog();
-                          },
-                        );
-                      },
+                if (synchronisationEnabled) ...[
+                  const Divider(),
+                  ListTile(
+                    title: Text(AppLocalizations.of(context)!.synchronizeData),
+                    subtitle: Text(
+                      AppLocalizations.of(context)!.synchronizeDataSummary,
                     ),
-                    const Divider(),
-                    ListTile(
-                      title: Text(AppLocalizations.of(context)!.recoverData),
-                      subtitle: Text(AppLocalizations.of(context)!.recoverDataSummary),
-                      onTap: () {
-                        _recoverData(context);
-                      },
+                    onTap: () async {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return const SyncProgressDialog();
+                        },
+                      );
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: Text(AppLocalizations.of(context)!.recoverData),
+                    subtitle: Text(
+                      AppLocalizations.of(context)!.recoverDataSummary,
                     ),
-                    const Divider(),
-                    ListTile(
-                      title: Text(AppLocalizations.of(context)!.disableSynchronization),
-                      subtitle: Text(AppLocalizations.of(context)!.disableSynchronizationSummary),
-                      onTap: () {
-                        _disableSynchronization(context);
-                      },
+                    onTap: () {
+                      _recoverData(context);
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: Text(
+                      AppLocalizations.of(context)!.disableSynchronization,
                     ),
-                  ],
-                if (!synchronisationEnabled)
-                  ...[
-                    const Divider(),
-                    ListTile(
-                      title: Text(AppLocalizations.of(context)!.enableSynchronization),
-                      subtitle: Text(AppLocalizations.of(context)!.enableSynchronizationSummary),
-                      onTap: () async {
-                        _openSynchronizationScreen(context);
-                      },
+                    subtitle: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.disableSynchronizationSummary,
                     ),
-                  ]
+                    onTap: () {
+                      _disableSynchronization(context);
+                    },
+                  ),
+                ],
+                if (!synchronisationEnabled) ...[
+                  const Divider(),
+                  ListTile(
+                    title: Text(
+                      AppLocalizations.of(context)!.enableSynchronization,
+                    ),
+                    subtitle: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.enableSynchronizationSummary,
+                    ),
+                    onTap: () async {
+                      _openSynchronizationScreen(context);
+                    },
+                  ),
+                ],
               ],
             ),
             _SettingsSection(
@@ -189,8 +221,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.version),
                   subtitle: Text(version != null ? version! : ''),
-                  onTap: () {},
+                  onTap: () => _handleVersionTap(context),
                 ),
+                if (_developerTileVisible) ...[
+                  const Divider(),
+                  ListTile(
+                    title: Text(AppLocalizations.of(context)!.developerOptions),
+                    subtitle: Text(
+                      AppLocalizations.of(context)!.developerOptionsSummary,
+                    ),
+                    onTap: () => _openDeveloperLogs(context),
+                  ),
+                ],
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.tutorial),
@@ -220,7 +262,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.contactUs),
-                  subtitle: Text(AppLocalizations.of(context)!.contactUsSummary),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.contactUsSummary,
+                  ),
                   onTap: () => _contactUs(context),
                 ),
                 const Divider(),
@@ -253,41 +297,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  void _showDialog(BuildContext context, Widget title, Widget content, void Function()? confirmCallback, {bool showCancel = true, String? validateLabel}) {
+  void _showDialog(
+    BuildContext context,
+    Widget title,
+    Widget content,
+    void Function()? confirmCallback, {
+    bool showCancel = true,
+    String? validateLabel,
+  }) {
     showDialog(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            title: title,
-            content: content,
-            actions: [
-              if (showCancel == true)
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Text(AppLocalizations.of(context)!.cancel),
-                ),
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: title,
+          content: content,
+          actions: [
+            if (showCancel == true)
               TextButton(
                 onPressed: () {
-                  if (confirmCallback != null) {
-                    confirmCallback();
-                  }
                   Navigator.of(ctx).pop();
                 },
-                child: Text(validateLabel ?? AppLocalizations.of(context)!.validate),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
-            ],
-          );
-        });
+            TextButton(
+              onPressed: () {
+                if (confirmCallback != null) {
+                  confirmCallback();
+                }
+                Navigator.of(ctx).pop();
+              },
+              child: Text(
+                validateLabel ?? AppLocalizations.of(context)!.validate,
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _exportData(BuildContext ctx) async {
     if (_downloadsDirectory != null) {
-      List<Folder> folders = await ref.read(counterRepositoryProvider).getAllFolders();
-      List<Counter> counters = await ref.read(counterRepositoryProvider).getAllCounters();
-      Settings settings = await ref.read(counterRepositoryProvider).getSettings();
-      List<Statistics> statistics = await ref.read(counterRepositoryProvider).getAllStatistics();
+      List<Folder> folders = await ref
+          .read(counterRepositoryProvider)
+          .getAllFolders();
+      List<Counter> counters = await ref
+          .read(counterRepositoryProvider)
+          .getAllCounters();
+      Settings settings = await ref
+          .read(counterRepositoryProvider)
+          .getSettings();
+      List<Statistics> statistics = await ref
+          .read(counterRepositoryProvider)
+          .getAllStatistics();
       Map<String, dynamic> json = {'settings': settings};
       if (folders.isNotEmpty) {
         json['folders'] = folders;
@@ -298,7 +360,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (statistics.isNotEmpty) {
         json['statistics'] = statistics;
       }
-      final filePath = '${_downloadsDirectory!.path}/export_counter_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.json';
+      final filePath =
+          '${_downloadsDirectory!.path}/export_counter_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.json';
       final File file = File(filePath);
       final String jsonString = jsonEncode(json);
       final File writtenFile = await file.writeAsString(jsonString);
@@ -308,7 +371,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             children: [
               const Icon(Icons.check_circle_outline, color: Colors.white),
               const SizedBox(width: 10),
-              Flexible(child: Text(AppLocalizations.of(ctx)!.successfulMsgExportData(writtenFile.path))),
+              Flexible(
+                child: Text(
+                  AppLocalizations.of(
+                    ctx,
+                  )!.successfulMsgExportData(writtenFile.path),
+                ),
+              ),
             ],
           ),
         );
@@ -323,7 +392,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             const Icon(Icons.check_circle_outline, color: Colors.white),
             const SizedBox(width: 10),
-            Flexible(child: Text(AppLocalizations.of(ctx)!.notSupportedMsgExportData)),
+            Flexible(
+              child: Text(AppLocalizations.of(ctx)!.notSupportedMsgExportData),
+            ),
           ],
         ),
       );
@@ -338,7 +409,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final contents = await file.readAsString();
       if (contents.isNotEmpty) {
         var data = json.decode(contents);
-        if (data['settings'] != null || data['folders'] != null || data['counters'] != null) {
+        if (data['settings'] != null ||
+            data['folders'] != null ||
+            data['counters'] != null) {
           if (data['settings'] != null) {
             Settings settings = Settings.fromJson(data['settings']);
             settings.showTutorial = false;
@@ -346,15 +419,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           }
           if (data['folders'] != null) {
             await ref.read(counterRepositoryProvider).deleteAllFolders();
-            await ref.read(counterRepositoryProvider).batchInsertFolders(List<Map<String, Object?>>.from(data['folders']));
+            await ref
+                .read(counterRepositoryProvider)
+                .batchInsertFolders(
+                  List<Map<String, Object?>>.from(data['folders']),
+                );
           }
           if (data['counters'] != null) {
             await ref.read(counterRepositoryProvider).deleteAllCounters();
-            await ref.read(counterRepositoryProvider).batchInsertCounters(List<Map<String, Object?>>.from(data['counters']));
+            await ref
+                .read(counterRepositoryProvider)
+                .batchInsertCounters(
+                  List<Map<String, Object?>>.from(data['counters']),
+                );
           }
           if (data['statistics'] != null) {
             await ref.read(counterRepositoryProvider).deleteAllStatistics();
-            await ref.read(counterRepositoryProvider).batchInsertStatistics(List<Map<String, Object?>>.from(data['statistics']));
+            await ref
+                .read(counterRepositoryProvider)
+                .batchInsertStatistics(
+                  List<Map<String, Object?>>.from(data['statistics']),
+                );
           }
           ref.read(foldersProvider.notifier).refresh();
           if (!ctx.mounted) {
@@ -365,7 +450,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 const Icon(Icons.check_circle_outline, color: Colors.white),
                 const SizedBox(width: 10),
-                Flexible(child: Text(AppLocalizations.of(ctx)!.successfulMsgImportData)),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(ctx)!.successfulMsgImportData,
+                  ),
+                ),
               ],
             ),
           );
@@ -377,12 +466,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         return null;
       }
       _showDialog(
-          ctx,
-          Text(AppLocalizations.of(ctx)!.error),
-          Text(AppLocalizations.of(ctx)!.errorMsgImportData),
-          null,
-          showCancel: false,
-          validateLabel: AppLocalizations.of(ctx)!.ok
+        ctx,
+        Text(AppLocalizations.of(ctx)!.error),
+        Text(AppLocalizations.of(ctx)!.errorMsgImportData),
+        null,
+        showCancel: false,
+        validateLabel: AppLocalizations.of(ctx)!.ok,
       );
     }
   }
@@ -392,8 +481,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context,
       Text(AppLocalizations.of(context)!.warning),
       Text(AppLocalizations.of(context)!.warningMsgDeleteAllCounters),
-          () async {
-        final bool result = await ref.read(counterRepositoryProvider).deleteAllFolders();
+      () async {
+        final bool result = await ref
+            .read(counterRepositoryProvider)
+            .deleteAllFolders();
         ref.read(foldersProvider.notifier).refresh();
         await ref.read(counterRepositoryProvider).deleteAllCounters();
         await ref.read(counterRepositoryProvider).deleteAllStatistics();
@@ -408,7 +499,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 const Icon(Icons.check_circle_outline, color: Colors.white),
                 const SizedBox(width: 10),
-                Flexible(child: Text(AppLocalizations.of(context)!.successfulMsgDeleteAllData)),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context)!.successfulMsgDeleteAllData,
+                  ),
+                ),
               ],
             ),
           );
@@ -419,7 +514,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _shareApplication(BuildContext context) async {
-    final result = await Share.share(AppConfig.shareUrl, subject: AppLocalizations.of(context)!.shareSummary);
+    final result = await Share.share(
+      AppConfig.shareUrl,
+      subject: AppLocalizations.of(context)!.shareSummary,
+    );
     if (!context.mounted) {
       return;
     }
@@ -429,7 +527,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             const Icon(Icons.check_circle_outline, color: Colors.white),
             const SizedBox(width: 10),
-            Flexible(child: Text(AppLocalizations.of(context)!.thankYouForSharing)),
+            Flexible(
+              child: Text(AppLocalizations.of(context)!.thankYouForSharing),
+            ),
           ],
         ),
       );
@@ -449,7 +549,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             const Icon(Icons.error_outline, color: Colors.white),
             const SizedBox(width: 10),
-            Flexible(child: Text(AppLocalizations.of(context)!.errorWhenRatingTheApp)),
+            Flexible(
+              child: Text(AppLocalizations.of(context)!.errorWhenRatingTheApp),
+            ),
           ],
         ),
       );
@@ -478,7 +580,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             const Icon(Icons.error_outline, color: Colors.white),
             const SizedBox(width: 10),
-            Flexible(child: Text(AppLocalizations.of(context)!.errorWhenSendingEmail)),
+            Flexible(
+              child: Text(AppLocalizations.of(context)!.errorWhenSendingEmail),
+            ),
           ],
         ),
       );
@@ -487,93 +591,167 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _openSynchronizationScreen(BuildContext context) async {
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
-      return const SynchronizationScreen();
-    })).then((result) {
-      if (result != null && result == true) {
-        if (synchronisationEnabled != SynchronizationService().isInitialized) {
-          setState(() {
-            synchronisationEnabled = SynchronizationService().isInitialized;
-          });
-        }
-      }
-    });
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (ctx) {
+              return const SynchronizationScreen();
+            },
+          ),
+        )
+        .then((result) {
+          if (result != null && result == true) {
+            if (synchronisationEnabled !=
+                SynchronizationService().isInitialized) {
+              setState(() {
+                synchronisationEnabled = SynchronizationService().isInitialized;
+              });
+            }
+          }
+        });
   }
 
   String? _encodeQueryParameters(Map<String, String> params) {
     return params.entries
-        .map((MapEntry<String, String> e) =>
-    '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map(
+          (MapEntry<String, String> e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
   }
 
   void _disableSynchronization(BuildContext context) {
     _showDialog(
-        context,
-        Text(AppLocalizations.of(context)!.warning),
-        Text(AppLocalizations.of(context)!.warningMsgDisableSynchronization),
-        () {
-          setState(() {
-            SynchronizationService().resetApiUrl();
-            settings.synchronizationAccessToken = null;
-            settings.synchronizationApiUrl = null;
-            synchronisationEnabled = false;
-            ref.read(settingsProvider.notifier).updateSettings(settings);
-            ref.read(counterRepositoryProvider).resetCountersSynchronizationTimeStamp();
-            ref.read(counterRepositoryProvider).resetFoldersSynchronizationTimeStamp();
-          });
-        },
-        showCancel: true,
-        validateLabel: AppLocalizations.of(context)!.ok
+      context,
+      Text(AppLocalizations.of(context)!.warning),
+      Text(AppLocalizations.of(context)!.warningMsgDisableSynchronization),
+      () {
+        setState(() {
+          SynchronizationService().resetApiUrl();
+          settings.synchronizationAccessToken = null;
+          settings.synchronizationApiUrl = null;
+          synchronisationEnabled = false;
+          ref.read(settingsProvider.notifier).updateSettings(settings);
+          ref
+              .read(counterRepositoryProvider)
+              .resetCountersSynchronizationTimeStamp();
+          ref
+              .read(counterRepositoryProvider)
+              .resetFoldersSynchronizationTimeStamp();
+        });
+      },
+      showCancel: true,
+      validateLabel: AppLocalizations.of(context)!.ok,
     );
   }
 
   void _recoverData(BuildContext ctx) {
     _showDialog(
-        ctx,
-        Text(AppLocalizations.of(ctx)!.warning),
-        Text(AppLocalizations.of(ctx)!.warningMsgRecover),
-            () async {
-          final RecoverData? recoverData = await SynchronizationService().recoverData();
-          if (recoverData != null && recoverData.folders != null && recoverData.folders!.isNotEmpty) {
-            await ref.read(counterRepositoryProvider).deleteAllStatistics();
-            await ref.read(counterRepositoryProvider).deleteAllFolders();
-            await ref.read(counterRepositoryProvider).deleteAllFoldersHistory();
-            await ref.read(counterRepositoryProvider).batchInsertFolders(recoverData.folders!.map((folder) => folder.toJson()).toList());
-            if (recoverData.counters != null && recoverData.counters!.isNotEmpty) {
-              await ref.read(counterRepositoryProvider).deleteAllCounters();
-              await ref.read(counterRepositoryProvider).deleteAllCountersHistory();
-              await ref.read(counterRepositoryProvider).batchInsertCounters(recoverData.counters!.map((counter) => counter.toJson()).toList());
-            }
-            ref.read(foldersProvider.notifier).refresh();
-            if (!ctx.mounted) {
-              return;
-            }
-            final SnackBar snackBar = SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle_outline, color: Colors.white),
-                  const SizedBox(width: 10),
-                  Flexible(child: Text(AppLocalizations.of(ctx)!.successfulMsgImportData)),
-                ],
-              ),
-            );
-            ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+      ctx,
+      Text(AppLocalizations.of(ctx)!.warning),
+      Text(AppLocalizations.of(ctx)!.warningMsgRecover),
+      () async {
+        final RecoverData? recoverData = await SynchronizationService()
+            .recoverData();
+        if (recoverData != null &&
+            recoverData.folders != null &&
+            recoverData.folders!.isNotEmpty) {
+          await ref.read(counterRepositoryProvider).deleteAllStatistics();
+          await ref.read(counterRepositoryProvider).deleteAllFolders();
+          await ref.read(counterRepositoryProvider).deleteAllFoldersHistory();
+          await ref
+              .read(counterRepositoryProvider)
+              .batchInsertFolders(
+                recoverData.folders!.map((folder) => folder.toJson()).toList(),
+              );
+          if (recoverData.counters != null &&
+              recoverData.counters!.isNotEmpty) {
+            await ref.read(counterRepositoryProvider).deleteAllCounters();
+            await ref
+                .read(counterRepositoryProvider)
+                .deleteAllCountersHistory();
+            await ref
+                .read(counterRepositoryProvider)
+                .batchInsertCounters(
+                  recoverData.counters!
+                      .map((counter) => counter.toJson())
+                      .toList(),
+                );
           }
-        },
-        showCancel: true,
-        validateLabel: AppLocalizations.of(ctx)!.ok
+          ref.read(foldersProvider.notifier).refresh();
+          if (!ctx.mounted) {
+            return;
+          }
+          final SnackBar snackBar = SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.white),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(ctx)!.successfulMsgImportData,
+                  ),
+                ),
+              ],
+            ),
+          );
+          ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+        }
+      },
+      showCancel: true,
+      validateLabel: AppLocalizations.of(ctx)!.ok,
     );
+  }
+
+  void _handleVersionTap(BuildContext context) {
+    if (_developerTileVisible) {
+      return;
+    }
+
+    final now = DateTime.now();
+    if (_firstVersionTap == null ||
+        now.difference(_firstVersionTap!) > const Duration(seconds: 2)) {
+      _firstVersionTap = now;
+      _versionTapCount = 1;
+      return;
+    }
+
+    _versionTapCount += 1;
+    if (_versionTapCount >= 7) {
+      setState(() {
+        _developerTileVisible = true;
+        _versionTapCount = 0;
+        _firstVersionTap = null;
+      });
+      if (!mounted) {
+        return;
+      }
+      final snackBar = SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.code, color: Colors.white),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(AppLocalizations.of(context)!.developerModeEnabled),
+            ),
+          ],
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  void _openDeveloperLogs(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const DeveloperLogsScreen()));
   }
 }
 
 class _SettingsSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
-  const _SettingsSection({
-    required this.title,
-    required this.children,
-  });
+  const _SettingsSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -585,12 +763,14 @@ class _SettingsSection extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             title,
-            style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        Column(
-          children: children,
-        ),
+        Column(children: children),
       ],
     );
   }
