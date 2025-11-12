@@ -57,8 +57,8 @@ class Settings {
     data['activateSounds'] = (activateSounds == true ? 1 : 0);
     data['activateVibrator'] = (activateVibrator == true ? 1 : 0);
     data['counterCompactView'] = (counterCompactView == true ? 1 : 0);
-    data['counterSorting'] = counterSorting;
-    data['folderSorting'] = folderSorting;
+    data['counterSorting'] = counterSorting?.index;
+    data['folderSorting'] = folderSorting?.index;
     data['keepScreenOn'] = (keepScreenOn == true ? 1 : 0);
     data['lastModificationTimeStamp'] = lastModificationTimeStamp;
     data['synchronizationAccessToken'] = synchronizationAccessToken;

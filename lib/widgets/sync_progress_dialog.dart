@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:counter/l10n/app_localizations.dart';
@@ -8,6 +9,7 @@ import 'package:counter/models/settings.dart';
 import 'package:counter/models/sync_result.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:counter/utils/mail_service.dart';
+import 'package:counter/utils/logging_service.dart';
 import 'package:counter/utils/synchronization_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -143,6 +145,16 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     final Settings settings = await ref.read(counterRepositoryProvider).getSettings();
     
     errorHandler(error) {
+      unawaited(LoggingService().logMessage(
+        'Synchronization error captured in SyncProgressDialog',
+        details: {
+          'step': _currentStep?.toString(),
+          'hasMailConfig': settings.mailApiKey?.isNotEmpty == true &&
+              settings.mailApiDomain?.isNotEmpty == true &&
+              settings.mailSupport?.isNotEmpty == true,
+        },
+        error: error,
+      ));
       if (kDebugMode) {
         debugPrint('Catch error: $error');
       }
@@ -195,7 +207,21 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       if (mounted) {
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      unawaited(LoggingService().logMessage(
+        'Synchronization flow failed',
+        details: {
+          'step': _currentStep?.toString(),
+          'stepTitle': _currentStep != null
+              ? _steps.firstWhere(
+                  (s) => s.step == _currentStep,
+                  orElse: () => SyncStepData(step: _currentStep!, title: _currentStep.toString(), icon: Icons.error),
+                ).title
+              : null,
+        }..removeWhere((key, value) => value == null),
+        error: e,
+        stackTrace: stackTrace,
+      ));
       setState(() {
         _hasError = true;
         _errorMessage = e.toString().replaceFirst(RegExp(r'^[a-zA-Z]+:\s*'), '').trim(); // remove "Exception:"

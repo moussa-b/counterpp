@@ -87,6 +87,19 @@ class LoggingService {
     Object? error,
     StackTrace? stackTrace,
   }) async {
+    if (kDebugMode) {
+      debugPrint('[LoggingService] $message');
+      if (details != null && details.isNotEmpty) {
+        debugPrint('[LoggingService] Details: $details');
+      }
+      if (error != null) {
+        debugPrint('[LoggingService] Error: $error');
+      }
+      if (stackTrace != null) {
+        debugPrint('[LoggingService] Stack trace: $stackTrace');
+      }
+    }
+
     final timestamp = DateTime.now().toUtc().toIso8601String();
     final buffer = StringBuffer()..writeln('[$timestamp] $message');
 
