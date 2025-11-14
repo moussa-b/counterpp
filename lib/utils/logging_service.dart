@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:counter/models/app_config.dart';
+import 'package:counter/models/settings.dart';
+import 'package:counter/utils/mail_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -54,6 +57,8 @@ class LoggingService {
     String? requestBody,
     String? responseBody,
     Object? error,
+    Settings? settings,
+    bool sendEmail = true,
   }) async {
     final timestamp = DateTime.now().toUtc().toIso8601String();
     final buffer = StringBuffer()
@@ -79,6 +84,35 @@ class LoggingService {
     buffer.writeln('---');
 
     await _appendBuffer(buffer);
+
+    // Send email if enabled and settings are provided
+    if (sendEmail && settings != null) {
+      final emailContent = StringBuffer()
+        ..writeln('HTTP Request Failure')
+        ..writeln('Method: $method')
+        ..writeln('URL: ${url.toString()}')
+        ..writeln('Status: ${statusCode ?? 'N/A'}');
+      
+      if (error != null) {
+        emailContent.writeln('Error: $error');
+      }
+      
+      if (requestBody != null && requestBody.isNotEmpty) {
+        emailContent.writeln('Request body: $requestBody');
+      }
+      
+      if (responseBody != null && responseBody.isNotEmpty) {
+        emailContent.writeln('Response body: $responseBody');
+      }
+      
+      emailContent.writeln('Timestamp: $timestamp');
+
+      await _sendErrorEmailIfNeeded(
+        settings: settings,
+        subject: 'Counter++ - HTTP Request Error',
+        content: emailContent.toString(),
+      );
+    }
   }
 
   Future<void> logMessage(
@@ -86,6 +120,8 @@ class LoggingService {
     Map<String, Object?>? details,
     Object? error,
     StackTrace? stackTrace,
+    Settings? settings,
+    bool sendEmail = true,
   }) async {
     if (kDebugMode) {
       debugPrint('[LoggingService] $message');
@@ -121,6 +157,32 @@ class LoggingService {
     buffer.writeln('---');
 
     await _appendBuffer(buffer);
+
+    // Send email if enabled, settings are provided, and there's an error
+    if (sendEmail && settings != null && error != null) {
+      final emailContent = StringBuffer()
+        ..writeln('Message: $message')
+        ..writeln('Error: $error');
+      
+      if (details != null && details.isNotEmpty) {
+        emailContent.writeln('Details:');
+        details.forEach((key, value) {
+          emailContent.writeln('  $key: $value');
+        });
+      }
+      
+      if (stackTrace != null) {
+        emailContent.writeln('Stack trace: $stackTrace');
+      }
+      
+      emailContent.writeln('Timestamp: $timestamp');
+
+      await _sendErrorEmailIfNeeded(
+        settings: settings,
+        subject: 'Counter++ - Error',
+        content: emailContent.toString(),
+      );
+    }
   }
 
   Future<String> readLogs() async {
@@ -162,6 +224,42 @@ class LoggingService {
       if (kDebugMode) {
         debugPrint('Failed to write log entry: $e');
         debugPrint('$stackTrace');
+      }
+    }
+  }
+
+  Future<void> _sendErrorEmailIfNeeded({
+    required Settings settings,
+    required String subject,
+    required String content,
+  }) async {
+    // Check if mail configuration is available
+    if (settings.mailApiKey == null ||
+        settings.mailApiKey!.isEmpty ||
+        settings.mailApiDomain == null ||
+        settings.mailApiDomain!.isEmpty ||
+        settings.mailSupport == null ||
+        settings.mailSupport!.isEmpty) {
+      return;
+    }
+
+    try {
+      if (kDebugMode) {
+        debugPrint('Sending error email to developer');
+      }
+
+      await MailService.sendEmail(
+        apiKey: settings.mailApiKey!,
+        domain: settings.mailApiDomain!,
+        from: 'Counter++ Error <postmaster@${settings.mailApiDomain!}>',
+        to: [AppConfig.developerEmail, settings.mailSupport!],
+        subject: subject,
+        text: 'An error occurred:\n\n$content',
+      );
+    } catch (e) {
+      // Silently fail - email sending is not critical
+      if (kDebugMode) {
+        debugPrint('Failed to send error email: $e');
       }
     }
   }

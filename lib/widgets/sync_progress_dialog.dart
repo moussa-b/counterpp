@@ -2,13 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:counter/l10n/app_localizations.dart';
-import 'package:counter/models/app_config.dart';
 import 'package:counter/models/counter.dart';
 import 'package:counter/models/folder.dart';
 import 'package:counter/models/settings.dart';
 import 'package:counter/models/sync_result.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
-import 'package:counter/utils/mail_service.dart';
 import 'package:counter/utils/logging_service.dart';
 import 'package:counter/utils/synchronization_service.dart';
 import 'package:flutter/foundation.dart';
@@ -149,30 +147,12 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         'Synchronization error captured in SyncProgressDialog',
         details: {
           'step': _currentStep?.toString(),
-          'hasMailConfig': settings.mailApiKey?.isNotEmpty == true &&
-              settings.mailApiDomain?.isNotEmpty == true &&
-              settings.mailSupport?.isNotEmpty == true,
         },
         error: error,
+        settings: settings,
       ));
       if (kDebugMode) {
         debugPrint('Catch error: $error');
-      }
-      if (settings.mailApiKey != null && settings.mailApiKey!.isNotEmpty &&
-          settings.mailApiDomain != null && settings.mailApiDomain!.isNotEmpty &&
-          settings.mailSupport != null && settings.mailSupport!.isNotEmpty) {
-        if (kDebugMode) {
-          debugPrint('Sending error email to developer');
-        }
-        
-        MailService.sendEmail(
-          apiKey: settings.mailApiKey!,
-          domain: settings.mailApiDomain!,
-          from: 'Counter++ Error <postmaster@${settings.mailApiDomain!}>',
-          to: [AppConfig.developerEmail, settings.mailSupport!],
-          subject: 'Counter++ - Synchronization Error',
-          text: 'An error occurred during synchronization:\n\nError: $error\n\nTimestamp: ${DateTime.now()}',
-        );
       }
     }
     
@@ -221,6 +201,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         }..removeWhere((key, value) => value == null),
         error: e,
         stackTrace: stackTrace,
+        settings: settings,
       ));
       setState(() {
         _hasError = true;
