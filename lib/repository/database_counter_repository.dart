@@ -47,11 +47,11 @@ class DatabaseCounterRepository implements CounterRepository {
           WHERE f.id > 1 AND c.id IS NULL
       """;
 
-  get lastModificationTimeStamp {
+  int get lastModificationTimeStamp {
     return DateTime.now().millisecondsSinceEpoch;
   }
 
-  get lastSynchronizationTimeStamp {
+  int get lastSynchronizationTimeStamp {
     return DateTime.now().millisecondsSinceEpoch;
   }
 
@@ -313,7 +313,8 @@ class DatabaseCounterRepository implements CounterRepository {
           counter.counterLimit,
           folderId,
           counter.color,
-          if (folderId != null) folderId,
+          // Only bound when the orderInFolder subquery is present.
+          ?folderId,
           counter.step ?? 1,
           counter.note,
         ]);

@@ -486,7 +486,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _importData(BuildContext ctx) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    // file_picker 11 made FilePicker static; the instance-based
+    // FilePicker.platform accessor is gone.
+    final FilePickerResult? result = await FilePicker.pickFiles();
     if (result != null) {
       final String? filePath = result.files.single.path;
       if (filePath == null) {
