@@ -13,7 +13,8 @@ class SynchronizationScreen extends ConsumerStatefulWidget {
   const SynchronizationScreen({super.key});
 
   @override
-  ConsumerState<SynchronizationScreen> createState() => _SynchronizationScreenState();
+  ConsumerState<SynchronizationScreen> createState() =>
+      _SynchronizationScreenState();
 }
 
 class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
@@ -21,7 +22,7 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
   final _urlController = TextEditingController();
   final _userController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+
   bool _isTestSuccessful = false;
   bool _isTesting = false;
   bool _isPasswordVisible = false;
@@ -55,22 +56,25 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
 
     final uri = Uri.parse('$urlText/auth/login');
     final headers = {"Content-Type": "application/json"};
-    final body = jsonEncode({
-      "email": email,
-      "password": password,
-    });
+    final body = jsonEncode({"email": email, "password": password});
 
     try {
-
       final response = await http.post(uri, headers: headers, body: body);
+
+      if (!mounted) {
+        return;
+      }
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseData = jsonDecode(response.body);
-        if (kDebugMode) {
-          debugPrint(responseData['access_token']);
+        final Object? token = responseData['access_token'];
+        // A 2xx with no usable token is not a successful test: enabling the
+        // Validate button here would force-unwrap a null in _validate.
+        if (token is! String || token.isEmpty) {
+          throw Exception('Missing access token in response');
         }
         setState(() {
-          _accessToken = responseData['access_token'];
+          _accessToken = token;
           _apiUrl = urlText;
           _mailApiKey = responseData['mail_api_key'];
           _mailApiDomain = responseData['mail_api_domain'];
@@ -97,39 +101,70 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
       if (kDebugMode) {
         debugPrint(e.toString());
       }
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _isTestSuccessful = false;
         _isTesting = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.errorWhenTestTheSynchronization),
+          content: Text(
+            AppLocalizations.of(context)!.errorWhenTestTheSynchronization,
+          ),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
 
-  void _validate() async {
-    if (_isTestSuccessful) {
-      final settings = await ref.read(counterRepositoryProvider).getSettings();
-      settings.synchronizationAccessToken = _accessToken;
-      settings.synchronizationApiUrl = _apiUrl;
-      settings.mailApiKey = _mailApiKey;
-      settings.mailApiDomain = _mailApiDomain;
-      settings.mailSupport = _mailSupport;
-      SynchronizationService().setApiUrl(apiUrl: _apiUrl!, apiAccessToken: _accessToken!);
-      await ref.read(settingsProvider.notifier).updateSettings(settings);
-      var messenger = ScaffoldMessenger.of(context);
-      messenger.hideCurrentSnackBar();
-      messenger.showSnackBar(
+  Future<void> _validate() async {
+    final String? apiUrl = _apiUrl;
+    final String? accessToken = _accessToken;
+    if (!_isTestSuccessful || apiUrl == null || accessToken == null) {
+      return;
+    }
+    if (!SynchronizationService().setApiUrl(
+      apiUrl: apiUrl,
+      apiAccessToken: accessToken,
+    )) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.successfulMsgSaveSynchronization)
+          content: Text(
+            AppLocalizations.of(context)!.errorWhenTestTheSynchronization,
+          ),
+          backgroundColor: Colors.red,
         ),
       );
-      Navigator.of(context).pop(true);
+      return;
     }
+
+    final settings = await ref.read(counterRepositoryProvider).getSettings();
+    settings.synchronizationAccessToken = accessToken;
+    settings.synchronizationApiUrl = apiUrl;
+    settings.mailApiKey = _mailApiKey;
+    settings.mailApiDomain = _mailApiDomain;
+    settings.mailSupport = _mailSupport;
+    await ref.read(settingsProvider.notifier).updateSettings(settings);
+
+    if (!mounted) {
+      return;
+    }
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context)!.successfulMsgSaveSynchronization,
+        ),
+      ),
+    );
+    Navigator.of(context).pop(true);
   }
 
   @override
@@ -219,7 +254,9 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {
@@ -247,7 +284,11 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.wifi_protected_setup),
-                  label: Text(_isTesting ? AppLocalizations.of(context)!.testing : AppLocalizations.of(context)!.testConnection),
+                  label: Text(
+                    _isTesting
+                        ? AppLocalizations.of(context)!.testing
+                        : AppLocalizations.of(context)!.testConnection,
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.orange,
@@ -261,7 +302,9 @@ class _SynchronizationScreenState extends ConsumerState<SynchronizationScreen> {
                   label: Text(AppLocalizations.of(context)!.validate),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: _isTestSuccessful ? Colors.green : Colors.grey,
+                    backgroundColor: _isTestSuccessful
+                        ? Colors.green
+                        : Colors.grey,
                     foregroundColor: Colors.white,
                   ),
                 ),

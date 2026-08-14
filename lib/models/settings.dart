@@ -16,14 +16,23 @@ class Settings {
   String? mailSupport;
   int lastOpenedTabIndex = 0;
 
-  Settings({this.folderSorting, this.counterSorting, this.counterCompactView = false, this.lastModificationTimeStamp});
+  Settings({
+    this.folderSorting,
+    this.counterSorting,
+    this.counterCompactView = false,
+    this.lastModificationTimeStamp,
+  });
 
   Settings.fromJson(Map<String, dynamic> json) {
     activateSounds = json['activateSounds'] == 1;
     activateVibrator = json['activateVibrator'] == 1;
     counterCompactView = json['counterCompactView'] == 1;
-    counterSorting = json['counterSorting'] != null ? SortingOptions.values[json['counterSorting']] : null;
-    folderSorting = json['folderSorting'] != null ? SortingOptions.values[json['folderSorting']] : null;
+    counterSorting = json['counterSorting'] != null
+        ? SortingOptions.values[json['counterSorting']]
+        : null;
+    folderSorting = json['folderSorting'] != null
+        ? SortingOptions.values[json['folderSorting']]
+        : null;
     keepScreenOn = json['keepScreenOn'] == 1;
     lastModificationTimeStamp = json['lastModificationTimeStamp'];
     synchronizationAccessToken = json['synchronizationAccessToken'];
@@ -31,7 +40,9 @@ class Settings {
     mailApiKey = json['mailApiKey'];
     mailApiDomain = json['mailApiDomain'];
     mailSupport = json['mailSupport'];
-    showTutorial = json['showTutorial'] != null ? (json['showTutorial'] == 1) : true;
+    showTutorial = json['showTutorial'] != null
+        ? (json['showTutorial'] == 1)
+        : true;
     lastOpenedTabIndex = json['lastOpenedTabIndex'] ?? 0;
   }
 
@@ -68,6 +79,26 @@ class Settings {
     data['mailSupport'] = mailSupport;
     data['showTutorial'] = (showTutorial == true ? 1 : 0);
     data['lastOpenedTabIndex'] = lastOpenedTabIndex;
+    return data;
+  }
+
+  /// Names of the fields that hold credentials. Anything listed here must be
+  /// kept out of files that leave the app's private storage.
+  static const List<String> credentialFields = [
+    'synchronizationAccessToken',
+    'synchronizationApiUrl',
+    'mailApiKey',
+    'mailApiDomain',
+    'mailSupport',
+  ];
+
+  /// Serialization for user-facing exports: same as [toJson] minus the sync
+  /// token and mail credentials.
+  Map<String, dynamic> toJsonWithoutCredentials() {
+    final Map<String, dynamic> data = toJson();
+    for (final String field in credentialFields) {
+      data.remove(field);
+    }
     return data;
   }
 }

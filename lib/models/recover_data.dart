@@ -5,10 +5,7 @@ class RecoverData {
   List<Folder>? folders;
   List<Counter>? counters;
 
-  RecoverData({
-    required this.folders,
-    required this.counters,
-  });
+  RecoverData({required this.folders, required this.counters});
 
   factory RecoverData.fromJson(Map<String, dynamic> json) {
     return RecoverData(
@@ -23,8 +20,12 @@ class RecoverData {
 
   Map<String, dynamic> toJson() {
     return {
-      'folders': folders == null ? [] : folders!.map((folder) => folder.toJson()).toList(),
-      'counters': counters == null ? [] : counters!.map((counter) => counter.toJson()).toList(),
+      'folders': folders == null
+          ? []
+          : folders!.map((folder) => folder.toJson()).toList(),
+      'counters': counters == null
+          ? []
+          : counters!.map((counter) => counter.toJson()).toList(),
     };
   }
 }

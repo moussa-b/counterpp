@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:counter/models/count.dart';
 import 'package:counter/models/counter.dart';
 import 'package:counter/models/folder.dart';
-import 'package:counter/models/recover-data.dart';
+import 'package:counter/models/recover_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
+import 'package:http/http.dart' show Response;
 
 import 'logging_service.dart';
 
@@ -20,6 +20,12 @@ class SynchronizationService {
 
   String? _apiUrl;
   String? _apiAccessToken;
+  http.Client _client = http.Client();
+
+  /// Swaps in a stub client so tests can drive every response path without a
+  /// network. Production code never calls this.
+  @visibleForTesting
+  set client(http.Client client) => _client = client;
 
   bool get isInitialized {
     return _apiUrl != null &&
@@ -29,14 +35,19 @@ class SynchronizationService {
   }
 
   Map<String, String> get autorizationHeaders => {
-    'Authorization': 'Bearer ${_apiAccessToken}',
+    'Authorization': 'Bearer $_apiAccessToken',
   };
 
-  void setApiUrl({required String apiUrl, required String apiAccessToken}) {
+  /// Returns false and keeps the previous configuration when the arguments are
+  /// unusable, so callers can tell the user instead of silently syncing to the
+  /// old endpoint.
+  bool setApiUrl({required String apiUrl, required String apiAccessToken}) {
     if (isValidUrl(apiUrl) && apiAccessToken.isNotEmpty) {
       _apiUrl = apiUrl;
       _apiAccessToken = apiAccessToken;
+      return true;
     }
+    return false;
   }
 
   void resetApiUrl() {
@@ -55,7 +66,7 @@ class SynchronizationService {
     Object? body,
     bool ignoreErrors = false,
   }) async {
-    final url = Uri.parse('$endpoint');
+    final url = Uri.parse(endpoint);
     final mergedHeaders = {
       if (headers != null) ...headers,
       'Content-Type': 'application/json',
@@ -67,7 +78,7 @@ class SynchronizationService {
         : jsonEncode(body);
 
     try {
-      final response = await http.post(
+      final response = await _client.post(
         url,
         headers: mergedHeaders,
         body: serializedBody,
@@ -116,7 +127,7 @@ class SynchronizationService {
     Object? body,
     bool ignoreErrors = false,
   }) async {
-    final url = Uri.parse('$endpoint');
+    final url = Uri.parse(endpoint);
     final mergedHeaders = {
       if (headers != null) ...headers,
       'Content-Type': 'application/json',
@@ -128,7 +139,7 @@ class SynchronizationService {
         : jsonEncode(body);
 
     try {
-      final response = await http.delete(
+      final response = await _client.delete(
         url,
         headers: mergedHeaders,
         body: serializedBody,
@@ -176,14 +187,14 @@ class SynchronizationService {
     Map<String, String>? headers,
     bool ignoreErrors = false,
   }) async {
-    final url = Uri.parse('$endpoint');
+    final url = Uri.parse(endpoint);
     final mergedHeaders = {
       if (headers != null) ...headers,
       'Content-Type': 'application/json',
     };
 
     try {
-      final response = await http.get(url, headers: mergedHeaders);
+      final response = await _client.get(url, headers: mergedHeaders);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response;

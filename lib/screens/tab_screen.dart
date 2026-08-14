@@ -10,16 +10,16 @@ import 'package:counter/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-const HOME_TAB_INDEX = 0;
-const FOLDER_TAB_INDEX = 1;
-const SETTINGS_TAB_INDEX = 2;
+const homeTabIndex = 0;
+const folderTabIndex = 1;
+const settingsTabIndex = 2;
 
 // typedef resetCounterBuilder = void Function(BuildContext context, void Function() resetCounter);
 
 class TabsScreen extends ConsumerStatefulWidget {
   final int selectedTabIndex;
 
-  const TabsScreen({super.key, this.selectedTabIndex = 0,});
+  const TabsScreen({super.key, this.selectedTabIndex = 0});
 
   @override
   ConsumerState<TabsScreen> createState() => _TabsScreenState();
@@ -48,7 +48,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     Widget body;
     PreferredSizeWidget appBar;
     Widget? floatingActionButton;
-    if (_selectedIndex == HOME_TAB_INDEX) {
+    if (_selectedIndex == homeTabIndex) {
       body = CounterWidget(
         counterId: 1,
         builder: (BuildContext context, void Function() resetCounter) {
@@ -65,37 +65,31 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
                 _resetCounter!.call();
               }
             },
-          )
+          ),
         ],
       );
-    } else if (_selectedIndex == FOLDER_TAB_INDEX) {
+    } else if (_selectedIndex == folderTabIndex) {
       body = FoldersScreen(editMode: _editMode);
-      appBar = FoldersAppBar(onEditModeChange: (bool editMode) {
-        setState(() {
-          _editMode = editMode;
-        });
-      });
+      appBar = FoldersAppBar(
+        onEditModeChange: (bool editMode) {
+          setState(() {
+            _editMode = editMode;
+          });
+        },
+      );
       floatingActionButton = FloatingActionButton(
         onPressed: () {
-          showDialog(
-            context: context,
-            builder: (ctx) => const FolderDialog(),
-          );
+          showDialog(context: context, builder: (ctx) => const FolderDialog());
         },
         child: const Icon(FontAwesomeIcons.plus),
       );
-    } else if (_selectedIndex == SETTINGS_TAB_INDEX) {
+    } else if (_selectedIndex == settingsTabIndex) {
       body = const SettingsScreen();
-      appBar = AppBar(
-        title: Text(AppLocalizations.of(context)!.settings),
-      );
+      appBar = AppBar(title: Text(AppLocalizations.of(context)!.settings));
     } else {
-      appBar = AppBar(
-        title: const Text('Counter++'),
-      );
+      appBar = AppBar(title: const Text('Counter++'));
       body = const LoadingIndicator();
     }
-
 
     return Scaffold(
       appBar: appBar,
@@ -121,7 +115,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
         showUnselectedLabels: true,
         onTap: _onItemTapped,
       ),
-      floatingActionButton: floatingActionButton
+      floatingActionButton: floatingActionButton,
     );
   }
 }

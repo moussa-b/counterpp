@@ -5,10 +5,11 @@ import 'package:counter/l10n/app_localizations.dart';
 import 'package:counter/models/app_config.dart';
 import 'package:counter/models/counter.dart';
 import 'package:counter/models/folder.dart';
-import 'package:counter/models/recover-data.dart';
+import 'package:counter/models/recover_data.dart';
 import 'package:counter/models/settings.dart';
 import 'package:counter/models/statistics.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
 import 'package:counter/providers/folders_provider.dart';
 import 'package:counter/providers/settings_provider.dart';
 import 'package:counter/screens/developer_logs_screen.dart';
@@ -300,11 +301,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  /// [confirmCallback] is awaited and its failures surface as a snackbar.
+  /// Taking a `Future<void> Function()` rather than a plain closure is what
+  /// makes that possible: a `void` callback would run detached and any
+  /// exception inside it would vanish, leaving the user with a dialog that
+  /// closed as if the work had succeeded.
   void _showDialog(
     BuildContext context,
     Widget title,
     Widget content,
-    void Function()? confirmCallback, {
+    Future<void> Function()? confirmCallback, {
     bool showCancel = true,
     String? validateLabel,
   }) {
@@ -323,11 +329,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 child: Text(AppLocalizations.of(context)!.cancel),
               ),
             TextButton(
-              onPressed: () {
-                if (confirmCallback != null) {
-                  confirmCallback();
-                }
+              onPressed: () async {
+                // Resolved before the pop: ctx is defunct once the dialog is
+                // gone, so the messenger and the label have to be captured now.
+                final ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                  context,
+                );
+                final String genericError = AppLocalizations.of(
+                  context,
+                )!.errorMsgGeneric;
                 Navigator.of(ctx).pop();
+                if (confirmCallback == null) {
+                  return;
+                }
+                try {
+                  await confirmCallback();
+                } catch (e, stackTrace) {
+                  await LoggingService().logMessage(
+                    'Confirmed dialog action failed',
+                    error: e,
+                    stackTrace: stackTrace,
+                  );
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.white),
+                          const SizedBox(width: 10),
+                          Flexible(child: Text(genericError)),
+                        ],
+                      ),
+                    ),
+                  );
+                }
               },
               child: Text(
                 validateLabel ?? AppLocalizations.of(context)!.validate,
@@ -336,6 +370,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ],
         );
       },
+    );
+  }
+
+  // Takes the context explicitly: `downloadsfolder` re-exports package:path,
+  // whose top-level `context` collides with State.context in this library.
+  void _showErrorSnackBar(BuildContext ctx, String message) {
+    ScaffoldMessenger.of(ctx).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 10),
+            Flexible(child: Text(message)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -354,7 +404,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         List<Statistics> statistics = await ref
             .read(counterRepositoryProvider)
             .getAllStatistics();
-        Map<String, dynamic> json = {'settings': settings};
+        // The export lands in the shared Downloads folder and users attach it
+        // to support mails, so the sync token and Mailgun credentials must not
+        // travel with it. They stay in the local database and are re-applied
+        // from the synchronization screen instead.
+        Map<String, dynamic> json = {
+          'settings': settings.toJsonWithoutCredentials(),
+        };
         if (folders.isNotEmpty) {
           json['folders'] = folders;
         }
@@ -460,6 +516,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             if (data['settings'] != null) {
               Settings settings = Settings.fromJson(data['settings']);
               settings.showTutorial = false;
+              // Exports no longer carry credentials, so an import must not
+              // blank out the sync configuration already on this device.
+              final Settings current = await ref
+                  .read(counterRepositoryProvider)
+                  .getSettings();
+              settings.synchronizationAccessToken ??=
+                  current.synchronizationAccessToken;
+              settings.synchronizationApiUrl ??= current.synchronizationApiUrl;
+              settings.mailApiKey ??= current.mailApiKey;
+              settings.mailApiDomain ??= current.mailApiDomain;
+              settings.mailSupport ??= current.mailSupport;
               await ref
                   .read(counterRepositoryProvider)
                   .updateSettings(settings);
@@ -535,13 +602,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         return;
       }
 
-      if (!ctx.mounted) {
-        return null;
-      }
       await LoggingService().logMessage(
         'Data import failed: invalid file content',
         details: {'filePath': filePath},
       );
+      if (!ctx.mounted) {
+        return;
+      }
       _showDialog(
         ctx,
         Text(AppLocalizations.of(ctx)!.error),
@@ -591,9 +658,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _shareApplication(BuildContext context) async {
-    final result = await Share.share(
-      AppConfig.shareUrl,
-      subject: AppLocalizations.of(context)!.shareSummary,
+    final result = await SharePlus.instance.share(
+      ShareParams(
+        uri: Uri.parse(AppConfig.shareUrl),
+        subject: AppLocalizations.of(context)!.shareSummary,
+      ),
     );
     if (!context.mounted) {
       return;
@@ -702,19 +771,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context,
       Text(AppLocalizations.of(context)!.warning),
       Text(AppLocalizations.of(context)!.warningMsgDisableSynchronization),
-      () {
+      () async {
+        SynchronizationService().resetApiUrl();
+        settings.synchronizationAccessToken = null;
+        settings.synchronizationApiUrl = null;
+        // Awaited outside setState: setState must stay synchronous, and these
+        // writes previously ran detached with their failures swallowed.
+        await ref.read(settingsProvider.notifier).updateSettings(settings);
+        final CounterRepository repository = ref.read(
+          counterRepositoryProvider,
+        );
+        await repository.resetCountersSynchronizationTimeStamp();
+        await repository.resetFoldersSynchronizationTimeStamp();
+        if (!mounted) {
+          return;
+        }
         setState(() {
-          SynchronizationService().resetApiUrl();
-          settings.synchronizationAccessToken = null;
-          settings.synchronizationApiUrl = null;
           synchronisationEnabled = false;
-          ref.read(settingsProvider.notifier).updateSettings(settings);
-          ref
-              .read(counterRepositoryProvider)
-              .resetCountersSynchronizationTimeStamp();
-          ref
-              .read(counterRepositoryProvider)
-              .resetFoldersSynchronizationTimeStamp();
         });
       },
       showCancel: true,
@@ -730,50 +803,49 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       () async {
         final RecoverData? recoverData = await SynchronizationService()
             .recoverData();
-        if (recoverData != null &&
-            recoverData.folders != null &&
-            recoverData.folders!.isNotEmpty) {
-          await ref.read(counterRepositoryProvider).deleteAllStatistics();
-          await ref.read(counterRepositoryProvider).deleteAllFolders();
-          await ref.read(counterRepositoryProvider).deleteAllFoldersHistory();
-          await ref
-              .read(counterRepositoryProvider)
-              .batchInsertFolders(
-                recoverData.folders!.map((folder) => folder.toJson()).toList(),
-              );
-          if (recoverData.counters != null &&
-              recoverData.counters!.isNotEmpty) {
-            await ref.read(counterRepositoryProvider).deleteAllCounters();
-            await ref
-                .read(counterRepositoryProvider)
-                .deleteAllCountersHistory();
-            await ref
-                .read(counterRepositoryProvider)
-                .batchInsertCounters(
-                  recoverData.counters!
-                      .map((counter) => counter.toJson())
-                      .toList(),
-                );
-          }
-          ref.read(foldersProvider.notifier).refresh();
+        final List<Folder> folders = recoverData?.folders ?? const [];
+        final List<Counter> counters = recoverData?.counters ?? const [];
+        // Deleting folders cascades to their counters, so nothing is destroyed
+        // until the payload is known to be able to replace it. A response with
+        // folders but no counters used to wipe every counter with no restore.
+        if (folders.isEmpty || counters.isEmpty) {
           if (!ctx.mounted) {
             return;
           }
-          final SnackBar snackBar = SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_outline, color: Colors.white),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Text(
-                    AppLocalizations.of(ctx)!.successfulMsgImportData,
-                  ),
-                ),
-              ],
-            ),
-          );
-          ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+          _showErrorSnackBar(ctx, AppLocalizations.of(ctx)!.errorMsgGeneric);
+          return;
         }
+
+        final CounterRepository repository = ref.read(
+          counterRepositoryProvider,
+        );
+        await repository.deleteAllStatistics();
+        await repository.deleteAllFolders();
+        await repository.deleteAllFoldersHistory();
+        await repository.deleteAllCounters();
+        await repository.deleteAllCountersHistory();
+        await repository.batchInsertFolders(
+          folders.map((folder) => folder.toJson()).toList(),
+        );
+        await repository.batchInsertCounters(
+          counters.map((counter) => counter.toJson()).toList(),
+        );
+        ref.read(foldersProvider.notifier).refresh();
+        if (!ctx.mounted) {
+          return;
+        }
+        final SnackBar snackBar = SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_outline, color: Colors.white),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(AppLocalizations.of(ctx)!.successfulMsgImportData),
+              ),
+            ],
+          ),
+        );
+        ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
       },
       showCancel: true,
       validateLabel: AppLocalizations.of(ctx)!.ok,

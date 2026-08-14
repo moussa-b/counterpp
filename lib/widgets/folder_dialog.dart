@@ -16,22 +16,22 @@ class FolderDialog extends ConsumerStatefulWidget {
 class _FolderDialogState extends ConsumerState<FolderDialog> {
   final TextEditingController _controller = TextEditingController();
 
-  void _onSubmitted(BuildContext ctx) async {
+  Future<void> _onSubmitted(BuildContext ctx) async {
     var folderName = _controller.text.trim();
-    if (folderName.isNotEmpty) {
-      final foldersNotifier = ref.read(foldersProvider.notifier);
-      if (widget.folder?.id != null && widget.folder!.id! > 0) {
-        foldersNotifier.renameFolder(widget.folder!.id!, folderName).then((Folder? updatedFolder) {
-          closeAddFolderDialog(ctx, folder: updatedFolder);
-        });
-      } else {
-        foldersNotifier.addFolder(folderName).then((Folder? createdFolder) {
-          closeAddFolderDialog(ctx, folder: createdFolder);
-        });
-      }
+    if (folderName.isEmpty) {
+      closeAddFolderDialog(ctx);
       return;
     }
-    closeAddFolderDialog(ctx);
+    final foldersNotifier = ref.read(foldersProvider.notifier);
+    final Folder? folder = (widget.folder?.id != null && widget.folder!.id! > 0)
+        ? await foldersNotifier.renameFolder(widget.folder!.id!, folderName)
+        : await foldersNotifier.addFolder(folderName);
+    // The dialog can be dismissed while the write is in flight; popping a
+    // route through a defunct context throws.
+    if (!ctx.mounted) {
+      return;
+    }
+    closeAddFolderDialog(ctx, folder: folder);
   }
 
   void closeAddFolderDialog(BuildContext ctx, {Folder? folder}) {
@@ -52,13 +52,18 @@ class _FolderDialogState extends ConsumerState<FolderDialog> {
     }
     final bool isUpdate = (widget.folder?.id != null && widget.folder!.id! > 0);
     return AlertDialog(
-      title: Text(isUpdate ? AppLocalizations.of(context)!.renameFolder : AppLocalizations.of(context)!.createNewFolder),
+      title: Text(
+        isUpdate
+            ? AppLocalizations.of(context)!.renameFolder
+            : AppLocalizations.of(context)!.createNewFolder,
+      ),
       content: TextField(
         autofocus: true,
         controller: _controller,
         onSubmitted: (_) => _onSubmitted(context),
         decoration: InputDecoration(
-            hintText: AppLocalizations.of(context)!.createNewFolderPlaceholder),
+          hintText: AppLocalizations.of(context)!.createNewFolderPlaceholder,
+        ),
       ),
       actions: [
         TextButton(

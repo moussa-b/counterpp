@@ -15,9 +15,14 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 class CounterWidget extends ConsumerStatefulWidget {
   final int counterId;
 
-  final void Function(BuildContext context, void Function() resetCounter) builder;
+  final void Function(BuildContext context, void Function() resetCounter)
+  builder;
 
-  const CounterWidget({super.key, required this.counterId, required this.builder});
+  const CounterWidget({
+    super.key,
+    required this.counterId,
+    required this.builder,
+  });
 
   @override
   ConsumerState<CounterWidget> createState() => _CounterWidgetState();
@@ -38,7 +43,9 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
       getCounter(settings);
     });
     widget.builder.call(context, () {
-      ref.read(counterRepositoryProvider).resetCounterById(_id!).then((bool result) {
+      ref.read(counterRepositoryProvider).resetCounterById(_id!).then((
+        bool result,
+      ) {
         if (result) {
           setState(() {
             _count = 0;
@@ -49,8 +56,12 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
   }
 
   void getCounter(Settings settings) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    final Counter counter = await counterRepository.getCounterById(widget.counterId);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    final Counter counter = await counterRepository.getCounterById(
+      widget.counterId,
+    );
     setState(() {
       _count = counter.counterCount ?? 0;
       _color = counter.color;
@@ -62,10 +73,13 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
   }
 
   Future<Settings> getSettings() async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final Settings settings = await counterRepository.getSettings();
     final bool wakelockEnabled = await WakelockPlus.enabled;
-    if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
+    if (settings.keepScreenOn != null &&
+        settings.keepScreenOn != wakelockEnabled) {
       WakelockPlus.toggle(enable: settings.keepScreenOn!);
     }
     return settings;
@@ -73,7 +87,9 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final isInfinite = _limit == null || _limit! <= 0;
     final limit = isInfinite ? 20 : _limit!;
     var progress = 0.0;
@@ -88,8 +104,12 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
         progress = (_count! % 20) / 20;
       }
     }
-    Widget separator = SizedBox(height: MediaQuery.of(context).size.width * 0.05);
-    String? color = _id == 1 ? '#${Theme.of(context).primaryColor.value.toRadixString(16)}' : _color ;
+    Widget separator = SizedBox(
+      height: MediaQuery.of(context).size.width * 0.05,
+    );
+    String? color = _id == 1
+        ? '#${Theme.of(context).primaryColor.toARGB32().toRadixString(16)}'
+        : _color;
     final bool activateVibrator = _settings?.activateVibrator ?? false;
     final bool activateSounds = _settings?.activateSounds ?? false;
     return _count == null
@@ -98,9 +118,11 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (_name != null && _name!.isNotEmpty && _id != null && _id! > 1)
-                  ...[
-                    Padding(
+                if (_name != null &&
+                    _name!.isNotEmpty &&
+                    _id != null &&
+                    _id! > 1) ...[
+                  Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
                       _name!,
@@ -108,15 +130,15 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  separator
+                  separator,
                 ],
                 if (_limit != null && _limit! > 0) ...[
                   Text(
                     '${AppLocalizations.of(context)!.objective} : $_limit',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  separator
-                  ],
+                  separator,
+                ],
                 SizedBox(height: MediaQuery.of(context).size.width * 0.15),
                 CounterProgress(
                   color: color,
@@ -146,18 +168,24 @@ class _CounterWidgetState extends ConsumerState<CounterWidget> {
                 ),
                 separator,
                 ElevatedButton(
-                  onPressed: _count == 0 ? null : () {
-                    if (activateSounds) {
-                      AudioPlayer().play(AssetSource('audio/decrease.mp3'));
-                    }
-                    if (activateVibrator) {
-                      HapticFeedback.mediumImpact();
-                    }
-                    setState(() {
-                      _count = _count! - 1;
-                      counterRepository.decrementCounterById(widget.counterId);
-                    });
-                  },
+                  onPressed: _count == 0
+                      ? null
+                      : () {
+                          if (activateSounds) {
+                            AudioPlayer().play(
+                              AssetSource('audio/decrease.mp3'),
+                            );
+                          }
+                          if (activateVibrator) {
+                            HapticFeedback.mediumImpact();
+                          }
+                          setState(() {
+                            _count = _count! - 1;
+                            counterRepository.decrementCounterById(
+                              widget.counterId,
+                            );
+                          });
+                        },
                   child: const Text('-1'),
                 ),
               ],

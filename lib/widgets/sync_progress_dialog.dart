@@ -14,12 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 
-enum SyncStep {
-  folders,
-  deletedFolders,
-  counters,
-  deletedCounters,
-}
+enum SyncStep { folders, deletedFolders, counters, deletedCounters }
 
 class SyncProgressDialog extends ConsumerStatefulWidget {
   const SyncProgressDialog({super.key});
@@ -48,14 +43,10 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
     _animationController.forward();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startSynchronization();
@@ -79,26 +70,33 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     return () async {
       try {
         final response = await function(param);
-        if (response != null && response.statusCode >= 200 && response.statusCode < 300) {
+        if (response != null &&
+            response.statusCode >= 200 &&
+            response.statusCode < 300) {
           Map<String, dynamic>? responseData;
           try {
             responseData = json.decode(response.body);
           } catch (e) {
             // ignored
           }
-          return responseData != null && responseData['status'] == true ? SyncResult.success(
-            stepName: stepName,
-            data: responseData,
-            message: labels.syncSuccess,
-          ) : SyncResult.error(
-            stepName: stepName,
-            errorMessage: labels.syncError,
-            statusCode: response.statusCode,
-          );
+          return responseData != null && responseData['status'] == true
+              ? SyncResult.success(
+                  stepName: stepName,
+                  data: responseData,
+                  message: labels.syncSuccess,
+                )
+              : SyncResult.error(
+                  stepName: stepName,
+                  errorMessage: labels.syncError,
+                  statusCode: response.statusCode,
+                );
         } else {
-          String errorMessage = '${labels.httpError} ${response != null ? response.statusCode : ''}';
+          String errorMessage =
+              '${labels.httpError} ${response != null ? response.statusCode : ''}';
           try {
-            final errorData = json.decode(response != null ? response.body : '');
+            final errorData = json.decode(
+              response != null ? response.body : '',
+            );
             if (errorData['message'] != null) {
               errorMessage = errorData['message'];
             }
@@ -119,10 +117,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         } else if (e.toString().contains('SocketException')) {
           errorMessage = labels.synchronizationServerNotReachable;
         }
-        return SyncResult.error(
-          stepName: stepName,
-          errorMessage: errorMessage,
-        );
+        return SyncResult.error(stepName: stepName, errorMessage: errorMessage);
       }
     };
   }
@@ -134,50 +129,94 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       httpError: AppLocalizations.of(context)!.httpError,
       connectionError: AppLocalizations.of(context)!.connectionError,
       timeoutError: AppLocalizations.of(context)!.timeoutError,
-      synchronizationServerNotReachable: AppLocalizations.of(context)!.synchronizationServerNotReachable,
+      synchronizationServerNotReachable: AppLocalizations.of(
+        context,
+      )!.synchronizationServerNotReachable,
     );
-    final List<Folder> folders = await ref.read(counterRepositoryProvider).getAllFoldersToSynchronize();
-    final List<Counter> counters = await ref.read(counterRepositoryProvider).getAllCountersToSynchronize();
-    final List<int> folderIds = await ref.read(counterRepositoryProvider).getAllDeletedFolderIdsToSynchronize();
-    final List<int> counterIds = await ref.read(counterRepositoryProvider).getAllDeletedCounterIdsToSynchronize();
-    final Settings settings = await ref.read(counterRepositoryProvider).getSettings();
-    
+    final List<Folder> folders = await ref
+        .read(counterRepositoryProvider)
+        .getAllFoldersToSynchronize();
+    final List<Counter> counters = await ref
+        .read(counterRepositoryProvider)
+        .getAllCountersToSynchronize();
+    final List<int> folderIds = await ref
+        .read(counterRepositoryProvider)
+        .getAllDeletedFolderIdsToSynchronize();
+    final List<int> counterIds = await ref
+        .read(counterRepositoryProvider)
+        .getAllDeletedCounterIdsToSynchronize();
+    final Settings settings = await ref
+        .read(counterRepositoryProvider)
+        .getSettings();
+
     errorHandler(error) {
-      unawaited(LoggingService().logMessage(
-        'Synchronization error captured in SyncProgressDialog',
-        details: {
-          'step': _currentStep?.toString(),
-        },
-        error: error,
-        settings: settings,
-      ));
+      unawaited(
+        LoggingService().logMessage(
+          'Synchronization error captured in SyncProgressDialog',
+          details: {'step': _currentStep?.toString()},
+          error: error,
+          settings: settings,
+        ),
+      );
       if (kDebugMode) {
         debugPrint('Catch error: $error');
       }
     }
-    
+
     final List<Future<SyncResult> Function()> syncFunctions = [
-      _convertToSyncResultFunction(SynchronizationService().synchronizeFolders, folders, _steps[0].title, labels: labels, onError: errorHandler),
-      _convertToSyncResultFunction(SynchronizationService().synchronizeDeletedFolders, folderIds, _steps[1].title, labels: labels, onError: errorHandler),
-      _convertToSyncResultFunction(SynchronizationService().synchronizeCounters, counters, _steps[2].title, labels: labels, onError: errorHandler),
-      _convertToSyncResultFunction(SynchronizationService().synchronizeDeletedCounters, counterIds, _steps[3].title, labels: labels, onError: errorHandler),
+      _convertToSyncResultFunction(
+        SynchronizationService().synchronizeFolders,
+        folders,
+        _steps[0].title,
+        labels: labels,
+        onError: errorHandler,
+      ),
+      _convertToSyncResultFunction(
+        SynchronizationService().synchronizeDeletedFolders,
+        folderIds,
+        _steps[1].title,
+        labels: labels,
+        onError: errorHandler,
+      ),
+      _convertToSyncResultFunction(
+        SynchronizationService().synchronizeCounters,
+        counters,
+        _steps[2].title,
+        labels: labels,
+        onError: errorHandler,
+      ),
+      _convertToSyncResultFunction(
+        SynchronizationService().synchronizeDeletedCounters,
+        counterIds,
+        _steps[3].title,
+        labels: labels,
+        onError: errorHandler,
+      ),
     ];
 
     try {
       for (int i = 0; i < _steps.length; i++) {
+        // The user can cancel the dialog between two steps; stop instead of
+        // calling setState on a disposed State.
+        if (!mounted) {
+          return;
+        }
         setState(() {
           _currentStep = _steps[i].step;
         });
 
         final result = await syncFunctions[i]();
-        
+
         if (!result.isSuccess) {
           throw Exception(result.message);
         }
-        
+
         await Future.delayed(const Duration(milliseconds: 800));
       }
 
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _isCompleted = true;
         _currentStep = null;
@@ -187,33 +226,51 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       if (mounted) {
         Navigator.of(context).pop();
       }
+      return;
     } catch (e, stackTrace) {
-      unawaited(LoggingService().logMessage(
-        'Synchronization flow failed',
-        details: {
-          'step': _currentStep?.toString(),
-          'stepTitle': _currentStep != null
-              ? _steps.firstWhere(
-                  (s) => s.step == _currentStep,
-                  orElse: () => SyncStepData(step: _currentStep!, title: _currentStep.toString(), icon: Icons.error),
-                ).title
-              : null,
-        }..removeWhere((key, value) => value == null),
-        error: e,
-        stackTrace: stackTrace,
-        settings: settings,
-      ));
+      unawaited(
+        LoggingService().logMessage(
+          'Synchronization flow failed',
+          details: {
+            'step': _currentStep?.toString(),
+            'stepTitle': _currentStep != null
+                ? _steps
+                      .firstWhere(
+                        (s) => s.step == _currentStep,
+                        orElse: () => SyncStepData(
+                          step: _currentStep!,
+                          title: _currentStep.toString(),
+                          icon: Icons.error,
+                        ),
+                      )
+                      .title
+                : null,
+          }..removeWhere((key, value) => value == null),
+          error: e,
+          stackTrace: stackTrace,
+          settings: settings,
+        ),
+      );
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _hasError = true;
-        _errorMessage = e.toString().replaceFirst(RegExp(r'^[a-zA-Z]+:\s*'), '').trim(); // remove "Exception:"
+        _errorMessage = e
+            .toString()
+            .replaceFirst(RegExp(r'^[a-zA-Z]+:\s*'), '')
+            .trim(); // remove "Exception:"
       });
     }
 
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    // hasClients is false once the dialog is gone; reading position would throw.
+    if (mounted && _scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   @override
@@ -243,11 +300,9 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
-          padding : const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: SingleChildScrollView(
             controller: _scrollController,
             child: Column(
@@ -272,11 +327,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     if (_hasError) {
       return Column(
         children: [
-          const Icon(
-            Icons.error,
-            color: Colors.red,
-            size: 48,
-          ),
+          const Icon(Icons.error, color: Colors.red, size: 48),
           const SizedBox(height: 12),
           Text(
             AppLocalizations.of(context)!.syncErrorTitle,
@@ -301,11 +352,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     if (_isCompleted) {
       return Column(
         children: [
-          const Icon(
-            Icons.check_circle,
-            color: Colors.green,
-            size: 48,
-          ),
+          const Icon(Icons.check_circle, color: Colors.green, size: 48),
           const SizedBox(height: 12),
           Text(
             AppLocalizations.of(context)!.syncCompletedTitle,
@@ -333,10 +380,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         const SizedBox(height: 16),
         Text(
           AppLocalizations.of(context)!.syncInProgressTitle,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
           softWrap: true,
         ),
@@ -360,9 +404,11 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
 
   Widget _buildStepItem(SyncStepData stepData) {
     final isCurrentStep = _currentStep == stepData.step;
-    final isCompleted = _isCompleted || 
-        (_currentStep != null && 
-         _steps.indexOf(stepData) < _steps.indexWhere((s) => s.step == _currentStep));
+    final isCompleted =
+        _isCompleted ||
+        (_currentStep != null &&
+            _steps.indexOf(stepData) <
+                _steps.indexWhere((s) => s.step == _currentStep));
 
     Widget leadingWidget;
 
@@ -384,10 +430,14 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isCurrentStep ? Colors.blue.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.05),
+        color: isCurrentStep
+            ? Colors.blue.withValues(alpha: 0.1)
+            : Colors.grey.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCurrentStep ? Colors.blue.withValues(alpha: 0.3) : Colors.transparent,
+          color: isCurrentStep
+              ? Colors.blue.withValues(alpha: 0.3)
+              : Colors.transparent,
           width: 1,
         ),
       ),
@@ -454,11 +504,7 @@ class SyncStepData {
   final String title;
   final IconData icon;
 
-  SyncStepData({
-    required this.step,
-    required this.title,
-    required this.icon,
-  });
+  SyncStepData({required this.step, required this.title, required this.icon});
 }
 
 class SyncLabels {

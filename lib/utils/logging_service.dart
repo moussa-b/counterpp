@@ -7,6 +7,29 @@ import 'package:counter/utils/mail_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
+/// Header names whose values must never reach the log file. The log is shown
+/// in the developer screen and can be read off the device, so a bearer token
+/// written here is a token leaked.
+const Set<String> _sensitiveHeaderNames = {
+  'authorization',
+  'proxy-authorization',
+  'cookie',
+  'set-cookie',
+};
+
+/// Replaces the value of every credential-bearing header with a placeholder,
+/// keeping the header names so the log still shows what was sent.
+Map<String, String> redactSensitiveHeaders(Map<String, String> headers) {
+  return headers.map(
+    (String name, String value) => MapEntry(
+      name,
+      _sensitiveHeaderNames.contains(name.toLowerCase())
+          ? '***redacted***'
+          : value,
+    ),
+  );
+}
+
 /// Centralized logging utility to persist diagnostic information.
 class LoggingService {
   LoggingService._internal();
@@ -66,7 +89,9 @@ class LoggingService {
       ..writeln('Status: ${statusCode ?? 'N/A'}');
 
     if (requestHeaders != null && requestHeaders.isNotEmpty) {
-      buffer.writeln('Request headers: $requestHeaders');
+      buffer.writeln(
+        'Request headers: ${redactSensitiveHeaders(requestHeaders)}',
+      );
     }
 
     if (requestBody != null && requestBody.isNotEmpty) {
@@ -92,19 +117,19 @@ class LoggingService {
         ..writeln('Method: $method')
         ..writeln('URL: ${url.toString()}')
         ..writeln('Status: ${statusCode ?? 'N/A'}');
-      
+
       if (error != null) {
         emailContent.writeln('Error: $error');
       }
-      
+
       if (requestBody != null && requestBody.isNotEmpty) {
         emailContent.writeln('Request body: $requestBody');
       }
-      
+
       if (responseBody != null && responseBody.isNotEmpty) {
         emailContent.writeln('Response body: $responseBody');
       }
-      
+
       emailContent.writeln('Timestamp: $timestamp');
 
       await _sendErrorEmailIfNeeded(
@@ -163,18 +188,18 @@ class LoggingService {
       final emailContent = StringBuffer()
         ..writeln('Message: $message')
         ..writeln('Error: $error');
-      
+
       if (details != null && details.isNotEmpty) {
         emailContent.writeln('Details:');
         details.forEach((key, value) {
           emailContent.writeln('  $key: $value');
         });
       }
-      
+
       if (stackTrace != null) {
         emailContent.writeln('Stack trace: $stackTrace');
       }
-      
+
       emailContent.writeln('Timestamp: $timestamp');
 
       await _sendErrorEmailIfNeeded(
