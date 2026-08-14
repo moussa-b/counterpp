@@ -26,7 +26,7 @@ class CountersScreen extends ConsumerStatefulWidget {
   ConsumerState<CountersScreen> createState() => _CountersScreenState();
 }
 
-class _CountersScreenState extends ConsumerState<CountersScreen>{
+class _CountersScreenState extends ConsumerState<CountersScreen> {
   bool _editMode = false;
 
   @override
@@ -42,7 +42,8 @@ class _CountersScreenState extends ConsumerState<CountersScreen>{
     AsyncValue<List<Counter>> counters = ref.watch(countersProvider);
     if (settings.isLoading || counters.isLoading) {
       content = const LoadingIndicator();
-    } if (counters.value == null || counters.value!.isEmpty) {
+    }
+    if (counters.value == null || counters.value!.isEmpty) {
       content = Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -57,22 +58,31 @@ class _CountersScreenState extends ConsumerState<CountersScreen>{
         ),
       );
     } else {
-      final bool showCounterGrid = settings.hasValue && settings.value != null && settings.value!.counterCompactView == true;
+      final bool showCounterGrid =
+          settings.hasValue &&
+          settings.value != null &&
+          settings.value!.counterCompactView == true;
       content = Column(
         children: [
           const LastModifiedCounter(),
           if (!_editMode)
             Expanded(
               child: showCounterGrid
-                  ? CounterGrid(counters: counters.value!, settings: settings.value!)
-                  : CounterList(counters: counters.value!, settings: settings.value!),
+                  ? CounterGrid(
+                      counters: counters.value!,
+                      settings: settings.value!,
+                    )
+                  : CounterList(
+                      counters: counters.value!,
+                      settings: settings.value!,
+                    ),
             ),
           if (_editMode)
             Expanded(
               child: showCounterGrid
                   ? EditableCounterGrid(counters: counters.value!)
                   : EditableCounterList(counters: counters.value!),
-            )
+            ),
         ],
       );
     }
@@ -103,13 +113,11 @@ class _CountersScreenState extends ConsumerState<CountersScreen>{
                 });
               },
             ),
-          if (!_editMode) const CountersPopupMenu()
+          if (!_editMode) const CountersPopupMenu(),
         ],
         scrolledUnderElevation: 0.0,
       ),
-      body: SafeArea(
-          child: content,
-        ),
+      body: SafeArea(child: content),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addCounter(context),
         child: const Icon(FontAwesomeIcons.plus),
@@ -118,9 +126,13 @@ class _CountersScreenState extends ConsumerState<CountersScreen>{
   }
 
   void _addCounter(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
-      return CounterFormScreen(currentFolder: widget.folder);
-    }));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          return CounterFormScreen(currentFolder: widget.folder);
+        },
+      ),
+    );
   }
 
   void _synchronizeCountersCount() {

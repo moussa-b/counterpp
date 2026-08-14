@@ -5,16 +5,10 @@ class Count {
   Count({required this.counterId, required this.count});
 
   factory Count.fromJson(Map<String, dynamic> json) {
-    return Count(
-      counterId: json['counterId'],
-      count: json['count'],
-    );
+    return Count(counterId: json['counterId'], count: json['count']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'counterId': counterId,
-      'count': count,
-    };
+    return {'counterId': counterId, 'count': count};
   }
 }

@@ -17,7 +17,12 @@ class CounterGridItem extends ConsumerStatefulWidget {
   final bool active;
   final Settings? settings;
 
-  const CounterGridItem({super.key, required this.counter, this.active = true, this.settings});
+  const CounterGridItem({
+    super.key,
+    required this.counter,
+    this.active = true,
+    this.settings,
+  });
 
   @override
   ConsumerState<CounterGridItem> createState() => _CounterGridItemState();
@@ -33,7 +38,9 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
   }
 
   int getStep() {
-    return widget.counter.step != null && widget.counter.step! > 0 ? widget.counter.step! : 1;
+    return widget.counter.step != null && widget.counter.step! > 0
+        ? widget.counter.step!
+        : 1;
   }
 
   @override
@@ -44,20 +51,24 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
     final Color color = Utils.hexToColor(widget.counter.color);
     return Material(
       child: InkWell(
-        onTap: !widget.active ? null : () {
-          if (activateSounds) {
-            AudioPlayer().play(AssetSource('audio/decrease.mp3'));
-          }
-          if (activateVibrator) {
-            HapticFeedback.mediumImpact();
-          }
-          setState(() {
-            _count = _count + getStep();
-            final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-            counterRepository.incrementCounterById(widget.counter.id!);
-            ref.read(lastModifiedCounterProvider.notifier).refresh();
-          });
-        },
+        onTap: !widget.active
+            ? null
+            : () {
+                if (activateSounds) {
+                  AudioPlayer().play(AssetSource('audio/decrease.mp3'));
+                }
+                if (activateVibrator) {
+                  HapticFeedback.mediumImpact();
+                }
+                setState(() {
+                  _count = _count + getStep();
+                  final CounterRepository counterRepository = ref.read(
+                    counterRepositoryProvider,
+                  );
+                  counterRepository.incrementCounterById(widget.counter.id!);
+                  ref.read(lastModifiedCounterProvider.notifier).refresh();
+                });
+              },
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -79,8 +90,9 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize:
-                            Theme.of(context).textTheme.titleLarge!.fontSize!,
+                        fontSize: Theme.of(
+                          context,
+                        ).textTheme.titleLarge!.fontSize!,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -95,12 +107,15 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                           if (!widget.active) {
                             return;
                           }
-                          BottomSheetAction? value = await showModalBottomSheet<BottomSheetAction?>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return CounterBottomSheet(counter: widget.counter);
-                            },
-                          );
+                          BottomSheetAction? value =
+                              await showModalBottomSheet<BottomSheetAction?>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CounterBottomSheet(
+                                    counter: widget.counter,
+                                  );
+                                },
+                              );
                           if (value == BottomSheetAction.reset) {
                             setState(() {
                               _count = 0;
@@ -110,12 +125,10 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                         color: Colors.white,
                         textColor: color,
                         shape: const CircleBorder(),
-                        child: const Icon(
-                          FontAwesomeIcons.ellipsisVertical,
-                        ),
+                        child: const Icon(FontAwesomeIcons.ellipsisVertical),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
               Expanded(
@@ -127,18 +140,24 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: Theme.of(context).textTheme.titleLarge!.fontSize! + 15,
+                        fontSize:
+                            Theme.of(context).textTheme.titleLarge!.fontSize! +
+                            15,
                       ),
                     ),
-                    if (widget.counter.counterLimit != null && widget.counter.counterLimit! > 0)
+                    if (widget.counter.counterLimit != null &&
+                        widget.counter.counterLimit! > 0)
                       Text(
                         '/${widget.counter.counterLimit!}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize:
-                          Theme.of(context).textTheme.titleMedium!.fontSize! + 15,
+                              Theme.of(
+                                context,
+                              ).textTheme.titleMedium!.fontSize! +
+                              15,
                         ),
-                      )
+                      ),
                   ],
                 ),
               ),

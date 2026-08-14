@@ -20,9 +20,14 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
   Future<void> setFolderId(int folderId) async {
     _folderId = folderId;
     if (_folderId > 0) {
-      final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-      final Settings settings = await ref.read(counterRepositoryProvider).getSettings();
-      List<Counter> counters = await counterRepository.getCountersByFolderIdSorted(folderId, settings.counterSorting);
+      final CounterRepository counterRepository = ref.read(
+        counterRepositoryProvider,
+      );
+      final Settings settings = await ref
+          .read(counterRepositoryProvider)
+          .getSettings();
+      List<Counter> counters = await counterRepository
+          .getCountersByFolderIdSorted(folderId, settings.counterSorting);
       update((List<Counter> previousState) => counters);
     } else {
       update((List<Counter> previousState) => []);
@@ -30,15 +35,24 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
   }
 
   Future<Counter?> updateCounter(Counter counter) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    final Counter updatedCounter = await counterRepository.updateCounter(counter);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    final Counter updatedCounter = await counterRepository.updateCounter(
+      counter,
+    );
     if (updatedCounter.id != null && updatedCounter.id! > 0) {
-      if (updatedCounter.folder != null && updatedCounter.folder!.id != null && updatedCounter.folder!.id! > 0) {
+      if (updatedCounter.folder != null &&
+          updatedCounter.folder!.id != null &&
+          updatedCounter.folder!.id! > 0) {
         ref.read(foldersProvider.notifier).refresh();
         if (updatedCounter.folder!.id == _folderId) {
           update((List<Counter> previousState) {
             final List<Counter> newState = [...previousState];
-            final index = newState.indexWhere((Counter counter) => counter.id != null && counter.id == updatedCounter.id);
+            final index = newState.indexWhere(
+              (Counter counter) =>
+                  counter.id != null && counter.id == updatedCounter.id,
+            );
             newState[index] = updatedCounter;
             return newState;
           });
@@ -50,13 +64,21 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
   }
 
   Future<Counter?> addCounter(Counter counter) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    final Counter createdCounter = await counterRepository.createCounter(counter);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    final Counter createdCounter = await counterRepository.createCounter(
+      counter,
+    );
     if (createdCounter.id != null && createdCounter.id! > 0) {
-      if (createdCounter.folder != null && createdCounter.folder!.id != null && createdCounter.folder!.id! > 0) {
+      if (createdCounter.folder != null &&
+          createdCounter.folder!.id != null &&
+          createdCounter.folder!.id! > 0) {
         ref.read(foldersProvider.notifier).refresh();
         if (createdCounter.folder!.id == _folderId) {
-          update((List<Counter> previousState) => [...previousState, createdCounter]);
+          update(
+            (List<Counter> previousState) => [...previousState, createdCounter],
+          );
         }
       }
       return createdCounter;
@@ -65,18 +87,32 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
   }
 
   Future<bool> deleteCounter(Counter counterToDelete) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    final bool deleted = await counterRepository.deleteCounterById(counterToDelete.id!);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    final bool deleted = await counterRepository.deleteCounterById(
+      counterToDelete.id!,
+    );
     if (deleted) {
-      update((List<Counter> previousState) => previousState.where((Counter counter) => counter.id != counterToDelete.id).toList());
+      update(
+        (List<Counter> previousState) => previousState
+            .where((Counter counter) => counter.id != counterToDelete.id)
+            .toList(),
+      );
       ref.read(foldersProvider.notifier).refresh();
       return deleted;
     }
     return false;
   }
 
-  Future<Counter?> duplicateCounterById(int counterId, {String? suffix, bool resetValue = true}) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+  Future<Counter?> duplicateCounterById(
+    int counterId, {
+    String? suffix,
+    bool resetValue = true,
+  }) async {
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final Counter counter = await counterRepository.getCounterById(counterId);
     if (counter.id != null && counter.id! > 0) {
       counter.id = 0;
@@ -92,12 +128,16 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
   }
 
   Future<bool> resetCounterById(int counterId) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final bool result = await counterRepository.resetCounterById(counterId);
     if (result) {
       update((List<Counter> previousState) {
         final List<Counter> newState = [...previousState];
-        final index = newState.indexWhere((Counter counter) => counter.id != null && counter.id == counterId);
+        final index = newState.indexWhere(
+          (Counter counter) => counter.id != null && counter.id == counterId,
+        );
         newState[index].counterCount = 0;
         return newState;
       });
@@ -124,12 +164,16 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
       final int index = e.$1;
       return ReorderItem(id: counter.id!, order: index);
     }).toList();
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final bool result = await counterRepository.reorderCounters(reorderItems);
     return result;
   }
 }
 
-final countersProvider = AsyncNotifierProvider<CountersNotifier, List<Counter>>(() {
-  return CountersNotifier();
-});
+final countersProvider = AsyncNotifierProvider<CountersNotifier, List<Counter>>(
+  () {
+    return CountersNotifier();
+  },
+);

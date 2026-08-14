@@ -14,21 +14,21 @@ class FolderStatisticsScreen extends ConsumerStatefulWidget {
   const FolderStatisticsScreen({super.key, required this.folder});
 
   @override
-  ConsumerState<FolderStatisticsScreen> createState() => _FolderStatisticsScreenState();
+  ConsumerState<FolderStatisticsScreen> createState() =>
+      _FolderStatisticsScreenState();
 }
 
-class _FolderStatisticsScreenState extends ConsumerState<FolderStatisticsScreen> {
-
+class _FolderStatisticsScreenState
+    extends ConsumerState<FolderStatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<List<Counter>> counters = ref.watch(countersProvider);
     Widget content;
     if (counters.isLoading) {
       content = const LoadingIndicator();
-    } if (counters.value == null || counters.value!.isEmpty) {
-      content = Center(
-        child: Text(AppLocalizations.of(context)!.noCounter),
-      );
+    }
+    if (counters.value == null || counters.value!.isEmpty) {
+      content = Center(child: Text(AppLocalizations.of(context)!.noCounter));
     } else {
       content = Column(
         children: [
@@ -57,12 +57,12 @@ class _FolderStatisticsScreenState extends ConsumerState<FolderStatisticsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.folderStatistics(widget.folder.name!)),
+        title: Text(
+          AppLocalizations.of(context)!.folderStatistics(widget.folder.name!),
+        ),
         scrolledUnderElevation: 0.0,
       ),
-      body: SafeArea(
-        child: content,
-      ),
+      body: SafeArea(child: content),
     );
   }
 }

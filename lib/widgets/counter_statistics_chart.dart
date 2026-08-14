@@ -10,49 +10,52 @@ class CounterStatisticsChart extends StatelessWidget {
   final CalendarPeriod calendarPeriod;
   final DateTime selectedDate;
 
-  const CounterStatisticsChart(
-      {super.key,
-      required this.statistics,
-      required this.calendarPeriod,
-      required this.selectedDate});
+  const CounterStatisticsChart({
+    super.key,
+    required this.statistics,
+    required this.calendarPeriod,
+    required this.selectedDate,
+  });
 
   @override
   Widget build(BuildContext context) {
-
     if (statistics.isEmpty) {
       return Center(child: Text(AppLocalizations.of(context)!.noStatistics));
     }
-    
+
     return BarChart(
       BarChartData(
-          barGroups: barGroups,
-          titlesData: FlTitlesData(
-            show: true,
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 30,
-                getTitlesWidget: (double value, TitleMeta meta) => getTitlesWidget(context, value, meta),
-              ),
+        barGroups: barGroups,
+        titlesData: FlTitlesData(
+          show: true,
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 30,
+              getTitlesWidget: (double value, TitleMeta meta) =>
+                  getTitlesWidget(context, value, meta),
             ),
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 30,
-              ),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-          )),
+          ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: true, reservedSize: 30),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+      ),
     );
   }
 
-  SideTitleWidget getTitlesWidget(BuildContext context, double value, TitleMeta meta) {
-    switch(calendarPeriod) {
+  SideTitleWidget getTitlesWidget(
+    BuildContext context,
+    double value,
+    TitleMeta meta,
+  ) {
+    switch (calendarPeriod) {
       case CalendarPeriod.day:
         return getTitlesWidgetForDay(value, meta);
       case CalendarPeriod.week:
@@ -68,7 +71,7 @@ class CounterStatisticsChart extends StatelessWidget {
     final List<int> increments = [];
     final List<int> decrements = [];
     final List<int> resets = [];
-    switch(calendarPeriod) {
+    switch (calendarPeriod) {
       case CalendarPeriod.day:
         for (int i = 0; i < 24; i += 2) {
           increments.add(0);
@@ -104,15 +107,17 @@ class CounterStatisticsChart extends StatelessWidget {
         }
         break;
     }
-    
+
     if (statistics.isNotEmpty) {
       for (Statistics stat in statistics) {
         if (stat.dateTimeStamp == null || stat.type == null) {
           continue;
         }
         int index;
-        final DateTime statDateTime = DateTime.fromMillisecondsSinceEpoch(stat.dateTimeStamp!);
-        switch(calendarPeriod) {
+        final DateTime statDateTime = DateTime.fromMillisecondsSinceEpoch(
+          stat.dateTimeStamp!,
+        );
+        switch (calendarPeriod) {
           case CalendarPeriod.day:
             index = (statDateTime.hour / 2.0).floor();
             break;
@@ -141,34 +146,37 @@ class CounterStatisticsChart extends StatelessWidget {
     }
     final List<BarChartGroupData> datas = [];
     for (int i = 0; i < increments.length; i++) {
-      datas.add(BarChartGroupData(
-        x: i,
-        barRods: [
-          BarChartRodData(
-            toY: increments[i].toDouble(),
-            width: 8,
-            borderRadius: BorderRadius.zero,
-            color: Colors.green,
-          ),
-          BarChartRodData(
-            toY: decrements[i].toDouble(),
-            width: 8,
-            borderRadius: BorderRadius.zero,
-            color: Colors.yellow,
-          ),
-          BarChartRodData(
-            toY: resets[i].toDouble(),
-            width: 8,
-            borderRadius: BorderRadius.zero,
-            color: Colors.red,
-          ),
-        ],
-      ));
+      datas.add(
+        BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              toY: increments[i].toDouble(),
+              width: 8,
+              borderRadius: BorderRadius.zero,
+              color: Colors.green,
+            ),
+            BarChartRodData(
+              toY: decrements[i].toDouble(),
+              width: 8,
+              borderRadius: BorderRadius.zero,
+              color: Colors.yellow,
+            ),
+            BarChartRodData(
+              toY: resets[i].toDouble(),
+              width: 8,
+              borderRadius: BorderRadius.zero,
+              color: Colors.red,
+            ),
+          ],
+        ),
+      );
     }
     return datas;
   }
 
-  int getIndexWithLowerBound(int day) { // must match CounterStatisticsDataTable.getLowerBound
+  int getIndexWithLowerBound(int day) {
+    // must match CounterStatisticsDataTable.getLowerBound
     int closestLowerBound;
     if (day > 30) {
       closestLowerBound = 28;
@@ -188,7 +196,11 @@ class CounterStatisticsChart extends StatelessWidget {
     );
   }
 
-  SideTitleWidget getTitlesWidgetForWeek(BuildContext context, double value, TitleMeta meta) {
+  SideTitleWidget getTitlesWidgetForWeek(
+    BuildContext context,
+    double value,
+    TitleMeta meta,
+  ) {
     String text;
     switch (value.toInt()) {
       case 0:
@@ -216,11 +228,7 @@ class CounterStatisticsChart extends StatelessWidget {
         text = '';
         break;
     }
-    return SideTitleWidget(
-      meta: meta,
-      space: 4,
-      child: Text(text),
-    );
+    return SideTitleWidget(meta: meta, space: 4, child: Text(text));
   }
 
   SideTitleWidget getTitlesWidgetForMonth(double value, TitleMeta meta) {
@@ -231,7 +239,11 @@ class CounterStatisticsChart extends StatelessWidget {
     );
   }
 
-  SideTitleWidget getTitlesWidgetForYear(BuildContext context, double value, TitleMeta meta) {
+  SideTitleWidget getTitlesWidgetForYear(
+    BuildContext context,
+    double value,
+    TitleMeta meta,
+  ) {
     String text;
     switch (value.toInt()) {
       case 0:
@@ -274,10 +286,6 @@ class CounterStatisticsChart extends StatelessWidget {
         text = '';
         break;
     }
-    return SideTitleWidget(
-      meta: meta,
-      space: 4,
-      child: Text(text),
-    );
+    return SideTitleWidget(meta: meta, space: 4, child: Text(text));
   }
 }

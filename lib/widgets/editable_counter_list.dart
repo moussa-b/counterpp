@@ -15,20 +15,24 @@ class EditableCounterList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return ReorderableListView(
       children: counters.map((Counter counter) {
-        final String keyValue = '${counter.id!}-${counter.lastModificationTimeStamp ?? counter.creationTimeStamp!}';
+        final String keyValue =
+            '${counter.id!}-${counter.lastModificationTimeStamp ?? counter.creationTimeStamp!}';
         return CounterListItem(
-            key: ValueKey<String>(keyValue),
-            counter: counter,
-            active: false
+          key: ValueKey<String>(keyValue),
+          counter: counter,
+          active: false,
         );
       }).toList(),
       onReorder: (int oldIndex, int newIndex) async {
-        bool result = await ref.read(countersProvider.notifier).onReorder(oldIndex, newIndex);
+        bool result = await ref
+            .read(countersProvider.notifier)
+            .onReorder(oldIndex, newIndex);
         if (result) {
-          Settings settings = await ref.read(counterRepositoryProvider).getSettings();
+          Settings settings = await ref
+              .read(counterRepositoryProvider)
+              .getSettings();
           settings.counterSorting = SortingOptions.custom;
           ref.read(settingsProvider.notifier).updateSettings(settings);
         }

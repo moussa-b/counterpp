@@ -20,12 +20,19 @@ class EditableFolderList extends ConsumerWidget {
         final String keyValue =
             '${folder.id!}-${folder.lastModificationTimeStamp!}';
         return FolderListItem(
-            key: ValueKey<String>(keyValue), folder: folder, active: false);
+          key: ValueKey<String>(keyValue),
+          folder: folder,
+          active: false,
+        );
       }).toList(),
       onReorder: (int oldIndex, int newIndex) async {
-        bool result = await ref.read(foldersProvider.notifier).onReorder(oldIndex, newIndex);
+        bool result = await ref
+            .read(foldersProvider.notifier)
+            .onReorder(oldIndex, newIndex);
         if (result) {
-          Settings settings = await ref.read(counterRepositoryProvider).getSettings();
+          Settings settings = await ref
+              .read(counterRepositoryProvider)
+              .getSettings();
           settings.folderSorting = SortingOptions.custom;
           ref.read(settingsProvider.notifier).updateSettings(settings);
         }

@@ -22,7 +22,8 @@ class CounterStatisticsScreen extends ConsumerStatefulWidget {
       _CounterStatisticsScreenState();
 }
 
-class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScreen> {
+class _CounterStatisticsScreenState
+    extends ConsumerState<CounterStatisticsScreen> {
   CalendarPeriod _calendarPeriod = CalendarPeriod.day;
   DateTime _selectedDate = DateTime.now();
   List<Statistics>? _statistics;
@@ -36,32 +37,69 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
   void getCounterStatistics() async {
     DateTime start;
     DateTime end;
-    switch(_calendarPeriod) {
+    switch (_calendarPeriod) {
       case CalendarPeriod.day:
         final DateTime startDate = _selectedDate;
-        start = DateTime(startDate.year, startDate.month, startDate.day, 0, 0, 0);
-        end = DateTime(startDate.year, startDate.month, startDate.day, 23, 59, 59);
+        start = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day,
+          0,
+          0,
+          0,
+        );
+        end = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day,
+          23,
+          59,
+          59,
+        );
         break;
       case CalendarPeriod.week:
         final DateTime startDate = Utils.getFirstDayOfWeek(_selectedDate);
         final DateTime endDate = Utils.getLastDayOfWeek(_selectedDate);
-        start = DateTime(startDate.year, startDate.month, startDate.day, 0, 0, 0);
+        start = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day,
+          0,
+          0,
+          0,
+        );
         end = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
         break;
       case CalendarPeriod.month:
         final DateTime startDate = Utils.getFirstDayOfMonth(_selectedDate);
         final DateTime endDate = Utils.getLastDayOfMonth(_selectedDate);
-        start = DateTime(startDate.year, startDate.month, startDate.day, 0, 0, 0);
+        start = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day,
+          0,
+          0,
+          0,
+        );
         end = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
         break;
       case CalendarPeriod.year:
         final DateTime startDate = Utils.getFirstDayOfYear(_selectedDate);
         final DateTime endDate = Utils.getLastDayOfYear(_selectedDate);
-        start = DateTime(startDate.year, startDate.month, startDate.day, 0, 0, 0);
+        start = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day,
+          0,
+          0,
+          0,
+        );
         end = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
         break;
     }
-    final List<Statistics> statistics = await ref.read(counterRepositoryProvider).getCounterStatistics(widget.counter.id!, start, end);
+    final List<Statistics> statistics = await ref
+        .read(counterRepositoryProvider)
+        .getCounterStatistics(widget.counter.id!, start, end);
     setState(() {
       _statistics = statistics;
     });
@@ -70,29 +108,58 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
   String get textButtonLabel {
     switch (_calendarPeriod) {
       case CalendarPeriod.day:
-        return DateFormat('dd MMMM yyyy', Localizations.localeOf(context).languageCode).format(_selectedDate);
+        return DateFormat(
+          'dd MMMM yyyy',
+          Localizations.localeOf(context).languageCode,
+        ).format(_selectedDate);
       case CalendarPeriod.week:
         {
-          final DateTime firstDayOfWeek = Utils.getFirstDayOfWeek(_selectedDate);
+          final DateTime firstDayOfWeek = Utils.getFirstDayOfWeek(
+            _selectedDate,
+          );
           final DateTime lastDayOfWeek = Utils.getLastDayOfWeek(_selectedDate);
-          final String firstDayOfWeekStr = DateFormat('dd MMMM yyyy', Localizations.localeOf(context).languageCode).format(firstDayOfWeek);
-          final String lastDayOfWeekStr = DateFormat('dd MMMM yyyy', Localizations.localeOf(context).languageCode).format(lastDayOfWeek);
+          final String firstDayOfWeekStr = DateFormat(
+            'dd MMMM yyyy',
+            Localizations.localeOf(context).languageCode,
+          ).format(firstDayOfWeek);
+          final String lastDayOfWeekStr = DateFormat(
+            'dd MMMM yyyy',
+            Localizations.localeOf(context).languageCode,
+          ).format(lastDayOfWeek);
           return '$firstDayOfWeekStr - $lastDayOfWeekStr';
         }
       case CalendarPeriod.month:
         {
-          final DateTime firstDayOfMonth = Utils.getFirstDayOfMonth(_selectedDate);
-          final DateTime lastDayOfMonth = Utils.getLastDayOfMonth(_selectedDate);
-          final String firstDayOfMonthStr = DateFormat('dd MMMM yyyy', Localizations.localeOf(context).languageCode).format(firstDayOfMonth);
-          final String lastDayOfMonthStr = DateFormat('dd MMMM yyyy', Localizations.localeOf(context).languageCode).format(lastDayOfMonth);
+          final DateTime firstDayOfMonth = Utils.getFirstDayOfMonth(
+            _selectedDate,
+          );
+          final DateTime lastDayOfMonth = Utils.getLastDayOfMonth(
+            _selectedDate,
+          );
+          final String firstDayOfMonthStr = DateFormat(
+            'dd MMMM yyyy',
+            Localizations.localeOf(context).languageCode,
+          ).format(firstDayOfMonth);
+          final String lastDayOfMonthStr = DateFormat(
+            'dd MMMM yyyy',
+            Localizations.localeOf(context).languageCode,
+          ).format(lastDayOfMonth);
           return '$firstDayOfMonthStr - $lastDayOfMonthStr';
         }
       case CalendarPeriod.year:
         {
-          final DateTime firstDayOfYear = Utils.getFirstDayOfYear(_selectedDate);
+          final DateTime firstDayOfYear = Utils.getFirstDayOfYear(
+            _selectedDate,
+          );
           final DateTime lastDayOfYear = Utils.getLastDayOfYear(_selectedDate);
-          final String firstDayOfYearStr = DateFormat('dd MMMM yyyy', Localizations.localeOf(context).languageCode).format(firstDayOfYear);
-          final String lastDayOfYearStr = DateFormat('dd MMMM yyyy', Localizations.localeOf(context).languageCode).format(lastDayOfYear);
+          final String firstDayOfYearStr = DateFormat(
+            'dd MMMM yyyy',
+            Localizations.localeOf(context).languageCode,
+          ).format(firstDayOfYear);
+          final String lastDayOfYearStr = DateFormat(
+            'dd MMMM yyyy',
+            Localizations.localeOf(context).languageCode,
+          ).format(lastDayOfYear);
           return '$firstDayOfYearStr - $lastDayOfYearStr';
         }
     }
@@ -104,49 +171,57 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
     if (_statistics == null) {
       content.add(const Expanded(child: Center(child: LoadingIndicator())));
     } else if (_statistics!.isEmpty) {
-      content.add(Expanded(
+      content.add(
+        Expanded(
           child: Center(
-              child: Text(
-        AppLocalizations.of(context)!.noStatistics,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: Theme.of(context).textTheme.titleLarge!.fontSize!,
-        ),
-      ))));
-    } else {
-      content.add(Expanded(
-        flex: 1,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
-          child: CounterStatisticsChart(
-            statistics: _statistics != null ? _statistics! : [],
-            calendarPeriod: _calendarPeriod,
-            selectedDate: _selectedDate,
+            child: Text(
+              AppLocalizations.of(context)!.noStatistics,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: Theme.of(context).textTheme.titleLarge!.fontSize!,
+              ),
+            ),
           ),
         ),
-      ));
+      );
+    } else {
       content.add(
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
-              child: SingleChildScrollView(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: CounterStatisticsDataTable(
-                    statistics: _statistics != null ? _statistics! : [],
-                    calendarPeriod: _calendarPeriod,
-                    selectedDate: _selectedDate,
-                  ),
+        Expanded(
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+            child: CounterStatisticsChart(
+              statistics: _statistics != null ? _statistics! : [],
+              calendarPeriod: _calendarPeriod,
+              selectedDate: _selectedDate,
+            ),
+          ),
+        ),
+      );
+      content.add(
+        Expanded(
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+            child: SingleChildScrollView(
+              child: SizedBox(
+                width: double.infinity,
+                child: CounterStatisticsDataTable(
+                  statistics: _statistics != null ? _statistics! : [],
+                  calendarPeriod: _calendarPeriod,
+                  selectedDate: _selectedDate,
                 ),
               ),
             ),
-          ));
+          ),
+        ),
+      );
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!
-            .counterStatistics(widget.counter.name!)),
+        title: Text(
+          AppLocalizations.of(context)!.counterStatistics(widget.counter.name!),
+        ),
         scrolledUnderElevation: 0.0,
       ),
       body: SafeArea(
@@ -154,12 +229,11 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
           children: [
             Center(
               child: PeriodSelector(
-                onPeriodChange: (CalendarPeriod calendarPeriod) =>
-                    setState(() {
-                      _calendarPeriod = calendarPeriod;
-                      _statistics = null;
-                      getCounterStatistics();
-                    }),
+                onPeriodChange: (CalendarPeriod calendarPeriod) => setState(() {
+                  _calendarPeriod = calendarPeriod;
+                  _statistics = null;
+                  getCounterStatistics();
+                }),
               ),
             ),
             const SizedBox(height: 16),
@@ -169,18 +243,28 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
                   icon: const Icon(Icons.chevron_left),
                   onPressed: () {
                     setState(() {
-                      switch(_calendarPeriod) {
+                      switch (_calendarPeriod) {
                         case CalendarPeriod.day:
-                          _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                          _selectedDate = _selectedDate.subtract(
+                            const Duration(days: 1),
+                          );
                           break;
                         case CalendarPeriod.week:
-                          _selectedDate = _selectedDate.subtract(const Duration(days: 7));
+                          _selectedDate = _selectedDate.subtract(
+                            const Duration(days: 7),
+                          );
                           break;
                         case CalendarPeriod.month:
-                          _selectedDate = _selectedDate.subtract(Duration(days: Utils.getDaysInMonth(_selectedDate)));
+                          _selectedDate = _selectedDate.subtract(
+                            Duration(days: Utils.getDaysInMonth(_selectedDate)),
+                          );
                           break;
                         case CalendarPeriod.year:
-                          _selectedDate = DateTime(_selectedDate.year - 1, _selectedDate.month, _selectedDate.day);
+                          _selectedDate = DateTime(
+                            _selectedDate.year - 1,
+                            _selectedDate.month,
+                            _selectedDate.day,
+                          );
                           break;
                       }
                       _statistics = null;
@@ -194,10 +278,11 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
                       onPressed: () async {
                         DateTime? selectedDate = await showDatePicker(
                           // initialDatePickerMode: DatePickerMode.year,
-                            context: context,
-                            initialDate: _selectedDate,
-                            firstDate: DateTime(DateTime.now().year - 3),
-                            lastDate: DateTime(DateTime.now().year + 1));
+                          context: context,
+                          initialDate: _selectedDate,
+                          firstDate: DateTime(DateTime.now().year - 3),
+                          lastDate: DateTime(DateTime.now().year + 1),
+                        );
                         if (selectedDate != null) {
                           setState(() {
                             _selectedDate = selectedDate;
@@ -214,18 +299,28 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
                   icon: const Icon(Icons.chevron_right),
                   onPressed: () {
                     setState(() {
-                      switch(_calendarPeriod) {
+                      switch (_calendarPeriod) {
                         case CalendarPeriod.day:
-                          _selectedDate = _selectedDate.add(const Duration(days: 1));
+                          _selectedDate = _selectedDate.add(
+                            const Duration(days: 1),
+                          );
                           break;
                         case CalendarPeriod.week:
-                          _selectedDate = _selectedDate.add(const Duration(days: 7));
+                          _selectedDate = _selectedDate.add(
+                            const Duration(days: 7),
+                          );
                           break;
                         case CalendarPeriod.month:
-                          _selectedDate = _selectedDate.add(Duration(days: Utils.getDaysInMonth(_selectedDate)));
+                          _selectedDate = _selectedDate.add(
+                            Duration(days: Utils.getDaysInMonth(_selectedDate)),
+                          );
                           break;
                         case CalendarPeriod.year:
-                          _selectedDate = DateTime(_selectedDate.year + 1, _selectedDate.month, _selectedDate.day);
+                          _selectedDate = DateTime(
+                            _selectedDate.year + 1,
+                            _selectedDate.month,
+                            _selectedDate.day,
+                          );
                           break;
                       }
                       _statistics = null;
@@ -235,7 +330,7 @@ class _CounterStatisticsScreenState extends ConsumerState<CounterStatisticsScree
                 ),
               ],
             ),
-            ...content
+            ...content,
           ],
         ),
       ),

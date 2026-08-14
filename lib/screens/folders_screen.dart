@@ -39,7 +39,9 @@ class FoldersScreen extends ConsumerWidget {
         ),
       );
     } else {
-      content = editMode == true ? EditableFolderList(folders: folders.value!) : FolderList(folders: folders.value!);
+      content = editMode == true
+          ? EditableFolderList(folders: folders.value!)
+          : FolderList(folders: folders.value!);
     }
 
     return content;

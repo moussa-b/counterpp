@@ -10,21 +10,27 @@ class LastModifiedCounter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<Counter?> lastModifiedCounter =
-        ref.watch(lastModifiedCounterProvider);
+    AsyncValue<Counter?> lastModifiedCounter = ref.watch(
+      lastModifiedCounterProvider,
+    );
     if (lastModifiedCounter.hasValue) {
       final String lastModificationLabel;
-      if (lastModifiedCounter.value != null && lastModifiedCounter.value!.lastModificationTimeStamp != null) {
-        lastModificationLabel = '${lastModifiedCounter.value!.name} - ${DateFormat('dd/MM/yy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(lastModifiedCounter.value!.lastModificationTimeStamp!))}';
+      if (lastModifiedCounter.value != null &&
+          lastModifiedCounter.value!.lastModificationTimeStamp != null) {
+        lastModificationLabel =
+            '${lastModifiedCounter.value!.name} - ${DateFormat('dd/MM/yy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(lastModifiedCounter.value!.lastModificationTimeStamp!))}';
       } else {
         lastModificationLabel = AppLocalizations.of(context)!.none;
       }
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          AppLocalizations.of(context)!
-              .lastCounterModified(lastModificationLabel),
-          style: TextStyle(color: Theme.of(context).textTheme.titleMedium!.color),
+          AppLocalizations.of(
+            context,
+          )!.lastCounterModified(lastModificationLabel),
+          style: TextStyle(
+            color: Theme.of(context).textTheme.titleMedium!.color,
+          ),
           textAlign: TextAlign.center,
         ),
       );

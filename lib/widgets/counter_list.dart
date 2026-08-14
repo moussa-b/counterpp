@@ -10,7 +10,8 @@ class CounterList extends StatelessWidget {
 
   CounterList({super.key, required this.counters, required this.settings}) {
     WakelockPlus.enabled.then((bool wakelockEnabled) {
-      if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
+      if (settings.keepScreenOn != null &&
+          settings.keepScreenOn != wakelockEnabled) {
         WakelockPlus.toggle(enable: settings.keepScreenOn!);
       }
     });
@@ -21,7 +22,8 @@ class CounterList extends StatelessWidget {
     return ListView.builder(
       itemBuilder: (ctx, index) {
         final Counter counter = counters[index];
-        final String keyValue = '${counter.id!}-${counter.lastModificationTimeStamp ?? counter.creationTimeStamp!}';
+        final String keyValue =
+            '${counter.id!}-${counter.lastModificationTimeStamp ?? counter.creationTimeStamp!}';
         return CounterListItem(
           key: ValueKey<String>(keyValue),
           counter: counter,

@@ -8,12 +8,13 @@ class TutorialPage extends StatelessWidget {
   final String? title;
   final String subtitle;
 
-  const TutorialPage(
-      {super.key,
-      required this.color,
-      required this.image,
-      this.title,
-      required this.subtitle});
+  const TutorialPage({
+    super.key,
+    required this.color,
+    required this.image,
+    this.title,
+    required this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,27 +33,18 @@ class TutorialPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Image
-          Expanded(
-            child: Image.asset(
-              image,
-              fit: BoxFit.contain,
-            ),
-          ),
+          Expanded(child: Image.asset(image, fit: BoxFit.contain)),
           const SizedBox(height: verticalSpacing),
-          if (title != null)
-            ...[
-              Center(
-                child: Text(
-                  title!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
-                ),
+          if (title != null) ...[
+            Center(
+              child: Text(
+                title!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 24),
               ),
-              const SizedBox(height: verticalSpacing),
-            ],
+            ),
+            const SizedBox(height: verticalSpacing),
+          ],
           // Subtitle
           Center(
             child: Text(

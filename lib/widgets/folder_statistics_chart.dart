@@ -16,20 +16,25 @@ class FolderStatisticsChart extends StatelessWidget {
         .reduce((a, b) => a + b);
     const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
     return counters
-        .where((Counter counter) => counter.counterCount != null && counter.counterCount! > 0)
+        .where(
+          (Counter counter) =>
+              counter.counterCount != null && counter.counterCount! > 0,
+        )
         .map((Counter counter) {
-      return PieChartSectionData(
-          color: Utils.hexToColor(counter.color!),
-          value: (100.0 * counter.counterCount! / total).roundToDouble(),
-          title: counter.name,
-          radius: radius,
-          titleStyle: const TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            shadows: shadows,
-          ));
-    }).toList();
+          return PieChartSectionData(
+            color: Utils.hexToColor(counter.color!),
+            value: (100.0 * counter.counterCount! / total).roundToDouble(),
+            title: counter.name,
+            radius: radius,
+            titleStyle: const TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: shadows,
+            ),
+          );
+        })
+        .toList();
   }
 
   @override
@@ -39,31 +44,35 @@ class FolderStatisticsChart extends StatelessWidget {
       crossAxisCount: counters.length > 5 ? 5 : counters.length,
       childAspectRatio: 4,
       children: counters
-          .where((Counter counter) => counter.counterCount != null && counter.counterCount! > 0)
-          .map((Counter counter) =>
-          Row(
-                children: [
-                  Container(
-                    width: 12.0,
-                    height: 12.0,
-                    decoration: BoxDecoration(color: Utils.hexToColor(counter.color!)),
+          .where(
+            (Counter counter) =>
+                counter.counterCount != null && counter.counterCount! > 0,
+          )
+          .map(
+            (Counter counter) => Row(
+              children: [
+                Container(
+                  width: 12.0,
+                  height: 12.0,
+                  decoration: BoxDecoration(
+                    color: Utils.hexToColor(counter.color!),
                   ),
-                  const SizedBox(width: 4),
-                  Text(counter.name!),
-                ],
-              ))
+                ),
+                const SizedBox(width: 4),
+                Text(counter.name!),
+              ],
+            ),
+          )
           .toList(),
     );
 
     return Column(
       children: [
         Expanded(
-          child: PieChart(
-            PieChartData(sections: getChartSections(counters)),
-          ),
+          child: PieChart(PieChartData(sections: getChartSections(counters))),
         ),
         const SizedBox(height: 8),
-        legend
+        legend,
       ],
     );
   }

@@ -4,7 +4,7 @@ import 'package:counter/l10n/app_localizations.dart';
 
 class PeriodSelector extends StatefulWidget {
   final void Function(CalendarPeriod calendarPeriod)? onPeriodChange;
-  
+
   const PeriodSelector({super.key, this.onPeriodChange});
 
   @override

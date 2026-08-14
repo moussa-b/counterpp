@@ -55,7 +55,6 @@ class _TutorialScreenState extends State<TutorialScreen> {
         ),
       ]);
     });
-
   }
 
   @override
@@ -66,10 +65,15 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
   void _onSkip() => _controller.jumpToPage(pages.length);
 
-  void _onNext() => _controller.nextPage(duration: const Duration(milliseconds: 350), curve: Curves.easeIn);
+  void _onNext() => _controller.nextPage(
+    duration: const Duration(milliseconds: 350),
+    curve: Curves.easeIn,
+  );
 
   void _onContinue() {
-    widget.continueCallback != null ? widget.continueCallback!() : Navigator.pop(context);
+    widget.continueCallback != null
+        ? widget.continueCallback!()
+        : Navigator.pop(context);
   }
 
   Widget _getPageButtons() {
@@ -87,9 +91,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
               onPressed: _onSkip,
               child: Text(
                 AppLocalizations.of(context)!.skip,
-                style: buttonTextStyle.copyWith(
-                  color: Colors.white,
-                ),
+                style: buttonTextStyle.copyWith(color: Colors.white),
               ),
             ),
           ),
@@ -118,15 +120,13 @@ class _TutorialScreenState extends State<TutorialScreen> {
                   ),
                   child: Text(
                     AppLocalizations.of(context)!.next,
-                    style: buttonTextStyle.copyWith(
-                      color: Colors.black,
-                    ),
+                    style: buttonTextStyle.copyWith(color: Colors.black),
                   ),
                 ),
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }

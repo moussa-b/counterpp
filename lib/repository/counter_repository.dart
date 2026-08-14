@@ -20,20 +20,27 @@ abstract interface class CounterRepository {
   Future<Counter> getCounterById(int counterId);
   Future<Counter?> getLastModifiedCounter(int folderId);
   Future<List<Counter>> getCountersByFolderId(int folderId);
-  Future<List<Counter>> getCountersByFolderIdSorted(int folderId, SortingOptions? counterSorting);
+  Future<List<Counter>> getCountersByFolderIdSorted(
+    int folderId,
+    SortingOptions? counterSorting,
+  );
   Future<List<Counter>> getAllCounters();
   Future<List<Counter>> getAllCountersToSynchronize();
   Future<List<int>> getAllDeletedCounterIdsToSynchronize();
   Future<bool> updateCountersSynchronizationTimestamp(List<int> counterIds);
   Future<bool> updateCountersSynchronizationTimestampByFolderId(int folderId);
-  Future<bool> updateDeletedCountersSynchronizationTimestamp(List<int> counterIds);
+  Future<bool> updateDeletedCountersSynchronizationTimestamp(
+    List<int> counterIds,
+  );
   Future<bool> synchronizeCountersCount(int folderId);
   Future<List<Count>> getCountsByFolderId(int folderId);
   Future<List<Folder>> getAllFolders();
   Future<List<Folder>> getAllFoldersToSynchronize();
   Future<List<int>> getAllDeletedFolderIdsToSynchronize();
   Future<bool> updateFoldersSynchronizationTimestamp(List<int> folderIds);
-  Future<bool> updateDeletedFoldersSynchronizationTimestamp(List<int> folderIds);
+  Future<bool> updateDeletedFoldersSynchronizationTimestamp(
+    List<int> folderIds,
+  );
   Future<List<Folder>> getAllFoldersSorted(SortingOptions? sortingOptions);
   Future<Folder> createFolder(String folderName);
   Future<Folder> renameFolder(int folderId, String folderName);
@@ -53,8 +60,15 @@ abstract interface class CounterRepository {
   Future<bool> reorderFolders(List<ReorderItem> reorderItems);
   Future<bool> reorderCounters(List<ReorderItem> reorderItems);
   Future<Statistics> addStatistics(Statistics statistics);
-  Future<void> addStatisticsForFolder(int folderId, StatisticsType statisticsType);
-  Future<List<Statistics>> getCounterStatistics(int counterId, DateTime start, DateTime end);
+  Future<void> addStatisticsForFolder(
+    int folderId,
+    StatisticsType statisticsType,
+  );
+  Future<List<Statistics>> getCounterStatistics(
+    int counterId,
+    DateTime start,
+    DateTime end,
+  );
   Future<List<Statistics>> getAllStatistics();
   Future<bool> deleteAllStatistics();
   Future<int> batchInsertFolders(List<Map<String, Object?>> jsonList);

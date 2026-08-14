@@ -11,13 +11,14 @@ class Export {
   int? versionCode;
   String? versionName;
 
-  Export(
-      {this.counters,
-        this.databaseVersion,
-        this.folders,
-        this.statistics,
-        this.versionCode,
-        this.versionName});
+  Export({
+    this.counters,
+    this.databaseVersion,
+    this.folders,
+    this.statistics,
+    this.versionCode,
+    this.versionName,
+  });
 
   Export.fromJson(Map<String, dynamic> json) {
     if (json['counters'] != null) {

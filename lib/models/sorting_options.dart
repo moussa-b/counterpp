@@ -5,5 +5,5 @@ enum SortingOptions {
   valueAsc, // counter count for folder or counter value for counter
   valueDesc,
   creationDateAsc,
-  creationDateDesc
+  creationDateDesc,
 }

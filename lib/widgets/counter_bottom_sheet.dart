@@ -12,10 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CounterBottomSheet extends ConsumerWidget {
-  const CounterBottomSheet({
-    super.key,
-    required this.counter,
-  });
+  const CounterBottomSheet({super.key, required this.counter});
 
   final Counter counter;
 
@@ -26,15 +23,20 @@ class CounterBottomSheet extends ConsumerWidget {
         ListTile(
           title: Center(child: Text(counter.name!)),
           subtitle: Center(
-              child: Column(
-                children: [
-                  Text(counter.counterCount?.toString() != null ? '${AppLocalizations.of(context)!.value} : ${counter.counterCount}' : ''),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.close),
-                  ),
-                ],
-              )),
+            child: Column(
+              children: [
+                Text(
+                  counter.counterCount?.toString() != null
+                      ? '${AppLocalizations.of(context)!.value} : ${counter.counterCount}'
+                      : '',
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.close),
+                ),
+              ],
+            ),
+          ),
         ),
         const Divider(),
         BottomSheetItem(
@@ -55,9 +57,11 @@ class CounterBottomSheet extends ConsumerWidget {
           label: AppLocalizations.of(context)!.editCounter,
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (ctx) {
-                return CounterFormScreen(counterId: counter.id);
-              }),
+              MaterialPageRoute(
+                builder: (ctx) {
+                  return CounterFormScreen(counterId: counter.id);
+                },
+              ),
             );
           },
         ),
@@ -65,7 +69,12 @@ class CounterBottomSheet extends ConsumerWidget {
           icon: const Icon(Icons.copy_all),
           label: AppLocalizations.of(context)!.duplicate,
           onTap: () {
-            ref.read(countersProvider.notifier).duplicateCounterById(counter.id!, suffix: ' - ${AppLocalizations.of(context)!.copy}');
+            ref
+                .read(countersProvider.notifier)
+                .duplicateCounterById(
+                  counter.id!,
+                  suffix: ' - ${AppLocalizations.of(context)!.copy}',
+                );
           },
         ),
         BottomSheetItem(
@@ -75,7 +84,9 @@ class CounterBottomSheet extends ConsumerWidget {
           showConfirmationDialog: true,
           result: BottomSheetAction.reset,
           dialogTitle: Text(AppLocalizations.of(context)!.warning),
-          dialogContent: Text(AppLocalizations.of(context)!.warningMsgResetCounter),
+          dialogContent: Text(
+            AppLocalizations.of(context)!.warningMsgResetCounter,
+          ),
           onTap: () {
             ref.read(countersProvider.notifier).resetCounterById(counter.id!);
             Navigator.pop(context);
@@ -87,7 +98,9 @@ class CounterBottomSheet extends ConsumerWidget {
           closeOnTap: false,
           showConfirmationDialog: true,
           dialogTitle: Text(AppLocalizations.of(context)!.warning),
-          dialogContent: Text(AppLocalizations.of(context)!.warningMsgDeleteCounter),
+          dialogContent: Text(
+            AppLocalizations.of(context)!.warningMsgDeleteCounter,
+          ),
           onTap: () {
             ref.read(countersProvider.notifier).deleteCounter(counter);
             ref.read(lastModifiedCounterProvider.notifier).refresh();
@@ -99,9 +112,11 @@ class CounterBottomSheet extends ConsumerWidget {
           label: AppLocalizations.of(context)!.statistics,
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (ctx) {
-                return CounterStatisticsScreen(counter: counter);
-              }),
+              MaterialPageRoute(
+                builder: (ctx) {
+                  return CounterStatisticsScreen(counter: counter);
+                },
+              ),
             );
           },
         ),

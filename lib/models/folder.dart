@@ -7,14 +7,15 @@ class Folder {
   int? counterNumber;
   int? synchronizationTimeStamp;
 
-  Folder(
-      {this.creationTimeStamp,
-      this.id,
-      this.lastModificationTimeStamp,
-      this.name,
-      this.folderOrder,
-      this.counterNumber,
-      this.synchronizationTimeStamp});
+  Folder({
+    this.creationTimeStamp,
+    this.id,
+    this.lastModificationTimeStamp,
+    this.name,
+    this.folderOrder,
+    this.counterNumber,
+    this.synchronizationTimeStamp,
+  });
 
   Folder.fromJson(Map<String, dynamic> json) {
     creationTimeStamp = json['creationTimeStamp'];

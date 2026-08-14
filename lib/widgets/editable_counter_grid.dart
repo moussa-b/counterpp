@@ -23,9 +23,9 @@ class EditableCounterGrid extends ConsumerWidget {
         final String keyValue =
             '${counter.id!}-${counter.lastModificationTimeStamp ?? counter.creationTimeStamp!}';
         return CounterGridItem(
-            key: ValueKey<String>(keyValue),
-            counter: counter,
-            active: false
+          key: ValueKey<String>(keyValue),
+          counter: counter,
+          active: false,
         );
       },
       itemCount: counters.length,
@@ -36,9 +36,16 @@ class EditableCounterGrid extends ConsumerWidget {
         childAspectRatio: 1.5,
       ),
       onReorder: (int oldIndex, int newIndex) async {
-        bool result = await ref.read(countersProvider.notifier).onReorder(oldIndex, newIndex + 1); // newIndex + 1 to have behavior similar to ReorderableListView
+        bool result = await ref
+            .read(countersProvider.notifier)
+            .onReorder(
+              oldIndex,
+              newIndex + 1,
+            ); // newIndex + 1 to have behavior similar to ReorderableListView
         if (result) {
-          Settings settings = await ref.read(counterRepositoryProvider).getSettings();
+          Settings settings = await ref
+              .read(counterRepositoryProvider)
+              .getSettings();
           settings.counterSorting = SortingOptions.custom;
           ref.read(settingsProvider.notifier).updateSettings(settings);
         }

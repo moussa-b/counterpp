@@ -1,7 +1,1 @@
-enum BottomSheetAction {
-  edit,
-  duplicate,
-  reset,
-  delete,
-  deleteAll
-}
+enum BottomSheetAction { edit, duplicate, reset, delete, deleteAll }

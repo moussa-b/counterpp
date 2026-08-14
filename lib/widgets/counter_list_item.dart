@@ -19,7 +19,12 @@ class CounterListItem extends ConsumerStatefulWidget {
   final bool active;
   final Settings? settings;
 
-  const CounterListItem({super.key, required this.counter, this.active = true, this.settings});
+  const CounterListItem({
+    super.key,
+    required this.counter,
+    this.active = true,
+    this.settings,
+  });
 
   @override
   ConsumerState<CounterListItem> createState() => _CounterListItemState();
@@ -45,12 +50,16 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
   }
 
   int getStep() {
-    return widget.counter.step != null && widget.counter.step! > 0 ? widget.counter.step! : 1;
+    return widget.counter.step != null && widget.counter.step! > 0
+        ? widget.counter.step!
+        : 1;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isInfinite = widget.counter.counterLimit == null || widget.counter.counterLimit! <= 0;
+    final isInfinite =
+        widget.counter.counterLimit == null ||
+        widget.counter.counterLimit! <= 0;
     final limit = isInfinite ? 20 : widget.counter.counterLimit!;
     double progress = 0.0;
     if (!isInfinite) {
@@ -63,51 +72,75 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
       progress = (_count % 20) / 20;
     }
 
-    final double infinityContainerSize = Theme.of(context).textTheme.titleLarge!.fontSize! + 8;
+    final double infinityContainerSize =
+        Theme.of(context).textTheme.titleLarge!.fontSize! + 8;
     const double size = 55; // can not be too big
     final bool activateVibrator = widget.settings?.activateVibrator ?? false;
     final bool activateSounds = widget.settings?.activateSounds ?? false;
 
     return Card(
       child: ListTile(
-        title: Text(widget.counter.name!, style: Theme.of(context).textTheme.titleLarge,textAlign: TextAlign.center),
+        title: Text(
+          widget.counter.name!,
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
         subtitle: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
               icon: const Icon(FontAwesomeIcons.minus),
-              onPressed: _count <= 0 || !widget.active ? null : () {
-                if (activateSounds) {
-                  AudioPlayer().play(AssetSource('audio/decrease.mp3'));
-                }
-                if (activateVibrator) {
-                  HapticFeedback.mediumImpact();
-                }
-                setState(() {
-                  _count = _count - getStep();
-                  final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-                  counterRepository.decrementCounterById(widget.counter.id!);
-                  ref.read(lastModifiedCounterProvider.notifier).refresh();
-                });
-              },
+              onPressed: _count <= 0 || !widget.active
+                  ? null
+                  : () {
+                      if (activateSounds) {
+                        AudioPlayer().play(AssetSource('audio/decrease.mp3'));
+                      }
+                      if (activateVibrator) {
+                        HapticFeedback.mediumImpact();
+                      }
+                      setState(() {
+                        _count = _count - getStep();
+                        final CounterRepository counterRepository = ref.read(
+                          counterRepositoryProvider,
+                        );
+                        counterRepository.decrementCounterById(
+                          widget.counter.id!,
+                        );
+                        ref
+                            .read(lastModifiedCounterProvider.notifier)
+                            .refresh();
+                      });
+                    },
             ),
-            Text(_count.toString(), style: Theme.of(context).textTheme.titleLarge,),
+            Text(
+              _count.toString(),
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             IconButton(
               icon: const Icon(FontAwesomeIcons.plus),
-              onPressed: !widget.active ? null : () {
-                if (activateSounds) {
-                  AudioPlayer().play(AssetSource('audio/increase.mp3'));
-                }
-                if (activateVibrator) {
-                  HapticFeedback.mediumImpact();
-                }
-                setState(() {
-                  _count = _count + getStep();
-                  final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-                  counterRepository.incrementCounterById(widget.counter.id!);
-                  ref.read(lastModifiedCounterProvider.notifier).refresh();
-                });
-              },
+              onPressed: !widget.active
+                  ? null
+                  : () {
+                      if (activateSounds) {
+                        AudioPlayer().play(AssetSource('audio/increase.mp3'));
+                      }
+                      if (activateVibrator) {
+                        HapticFeedback.mediumImpact();
+                      }
+                      setState(() {
+                        _count = _count + getStep();
+                        final CounterRepository counterRepository = ref.read(
+                          counterRepositoryProvider,
+                        );
+                        counterRepository.incrementCounterById(
+                          widget.counter.id!,
+                        );
+                        ref
+                            .read(lastModifiedCounterProvider.notifier)
+                            .refresh();
+                      });
+                    },
             ),
           ],
         ),
@@ -125,36 +158,41 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
           },
           content: isInfinite
               ? SizedBox(
-              width: infinityContainerSize,
-              height: infinityContainerSize,
-              child: Icon(
-                FontAwesomeIcons.infinity,
-                color: Utils.hexToColor(widget.counter.color),
-                size: Theme.of(context).textTheme.titleMedium!.fontSize! + 4,
-              ))
+                  width: infinityContainerSize,
+                  height: infinityContainerSize,
+                  child: Icon(
+                    FontAwesomeIcons.infinity,
+                    color: Utils.hexToColor(widget.counter.color),
+                    size:
+                        Theme.of(context).textTheme.titleMedium!.fontSize! + 4,
+                  ),
+                )
               : Text(
-            _count.toString(),
-            style: TextStyle(
-                color: Utils.hexToColor(widget.counter.color),
-                fontSize:
-                Theme.of(context).textTheme.titleLarge!.fontSize),
-          ),
+                  _count.toString(),
+                  style: TextStyle(
+                    color: Utils.hexToColor(widget.counter.color),
+                    fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                  ),
+                ),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.more_vert),
-          onPressed: !widget.active ? null : () async {
-            BottomSheetAction? value = await showModalBottomSheet<BottomSheetAction?>(
-              context: context,
-              builder: (BuildContext context) {
-                return CounterBottomSheet(counter: widget.counter);
-              },
-            );
-            if (value == BottomSheetAction.reset) {
-              setState(() {
-                _count = 0;
-              });
-            }
-          },
+          onPressed: !widget.active
+              ? null
+              : () async {
+                  BottomSheetAction? value =
+                      await showModalBottomSheet<BottomSheetAction?>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return CounterBottomSheet(counter: widget.counter);
+                        },
+                      );
+                  if (value == BottomSheetAction.reset) {
+                    setState(() {
+                      _count = 0;
+                    });
+                  }
+                },
         ),
       ),
     );

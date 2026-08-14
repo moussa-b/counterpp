@@ -10,10 +10,11 @@ class CounterGrid extends StatelessWidget {
 
   CounterGrid({super.key, required this.counters, required this.settings}) {
     WakelockPlus.enabled.then((bool wakelockEnabled) {
-          if (settings.keepScreenOn != null && settings.keepScreenOn != wakelockEnabled) {
-            WakelockPlus.toggle(enable: settings.keepScreenOn!);
-          }
-        });
+      if (settings.keepScreenOn != null &&
+          settings.keepScreenOn != wakelockEnabled) {
+        WakelockPlus.toggle(enable: settings.keepScreenOn!);
+      }
+    });
   }
 
   @override
@@ -27,7 +28,7 @@ class CounterGrid extends StatelessWidget {
         return CounterGridItem(
           key: ValueKey<String>(keyValue),
           counter: counter,
-          settings: settings
+          settings: settings,
         );
       },
       itemCount: counters.length,
@@ -38,6 +39,5 @@ class CounterGrid extends StatelessWidget {
         childAspectRatio: 1.5,
       ),
     );
-
   }
 }

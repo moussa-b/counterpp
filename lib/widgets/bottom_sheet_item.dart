@@ -5,37 +5,45 @@ import 'package:counter/l10n/app_localizations.dart';
 class BottomSheetItem extends StatelessWidget {
   final Icon icon;
   final String label;
-  final BottomSheetAction? result; // result to send back to Widget that opened the BottomSheet
+  final BottomSheetAction?
+  result; // result to send back to Widget that opened the BottomSheet
   final void Function() onTap;
   final bool closeOnTap;
   final bool showConfirmationDialog;
   final Widget? dialogTitle;
   final Widget? dialogContent;
 
-  void _showDialog(BuildContext context, void Function() confirmCallback, Widget title, Widget content, BottomSheetAction? result) {
+  void _showDialog(
+    BuildContext context,
+    void Function() confirmCallback,
+    Widget title,
+    Widget content,
+    BottomSheetAction? result,
+  ) {
     showDialog(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            title: title,
-            content: content,
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                },
-                child: Text(AppLocalizations.of(ctx)!.cancel),
-              ),
-              TextButton(
-                onPressed: () {
-                  confirmCallback();
-                  Navigator.pop(ctx, result);
-                },
-                child: Text(AppLocalizations.of(ctx)!.validate),
-              ),
-            ],
-          );
-        });
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: title,
+          content: content,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: Text(AppLocalizations.of(ctx)!.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                confirmCallback();
+                Navigator.pop(ctx, result);
+              },
+              child: Text(AppLocalizations.of(ctx)!.validate),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   const BottomSheetItem({
@@ -57,16 +65,15 @@ class BottomSheetItem extends StatelessWidget {
         if (closeOnTap) {
           Navigator.pop(context);
         }
-        if (showConfirmationDialog && dialogContent != null && dialogTitle != null) {
+        if (showConfirmationDialog &&
+            dialogContent != null &&
+            dialogTitle != null) {
           _showDialog(context, onTap, dialogTitle!, dialogContent!, result);
         } else {
           onTap();
         }
       },
-      child: ListTile(
-        leading: icon,
-        title: Text(label),
-      ),
+      child: ListTile(leading: icon, title: Text(label)),
     );
   }
 }

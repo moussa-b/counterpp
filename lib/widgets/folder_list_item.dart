@@ -18,11 +18,19 @@ class FolderListItem extends ConsumerWidget {
     final int folderId = folder.id!;
     ref.read(countersProvider.notifier).setFolderId(folderId);
     ref.read(lastModifiedCounterProvider.notifier).setFolderId(folderId);
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
-      return CountersScreen(folder: folder);
-    })).then((_) async {
-      ref.read(counterRepositoryProvider).synchronizeCountersCount(folderId);
-    });
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (ctx) {
+              return CountersScreen(folder: folder);
+            },
+          ),
+        )
+        .then((_) async {
+          ref
+              .read(counterRepositoryProvider)
+              .synchronizeCountersCount(folderId);
+        });
   }
 
   @override
@@ -33,19 +41,22 @@ class FolderListItem extends ConsumerWidget {
         child: ListTile(
           leading: const Icon(Icons.folder),
           title: Text(folder.name!),
-          subtitle: Text(AppLocalizations.of(context)!
-              .counterNumber(folder.counterNumber!)),
-          trailing: active ? IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              showModalBottomSheet<void>(
-                context: context,
-                builder: (BuildContext context) {
-                  return FolderBottomSheet(folder: folder);
-                },
-              );
-            },
-          ) : null,
+          subtitle: Text(
+            AppLocalizations.of(context)!.counterNumber(folder.counterNumber!),
+          ),
+          trailing: active
+              ? IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: () {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return FolderBottomSheet(folder: folder);
+                      },
+                    );
+                  },
+                )
+              : null,
         ),
       ),
     );

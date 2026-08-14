@@ -16,8 +16,7 @@ class FoldersPopupMenu extends ConsumerStatefulWidget {
   const FoldersPopupMenu({super.key});
 
   @override
-  ConsumerState<FoldersPopupMenu> createState() =>
-      _FoldersPopupMenuState();
+  ConsumerState<FoldersPopupMenu> createState() => _FoldersPopupMenuState();
 }
 
 enum _PopupOption { custom, alphabetical, counterCount, creationDate }
@@ -33,28 +32,37 @@ class _FoldersPopupMenuState extends ConsumerState<FoldersPopupMenu> {
   }
 
   void initSettings() async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    counterRepository.getSettings().then((Settings settings) => setState(() {
-      _settings = settings;
-    }));
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    counterRepository.getSettings().then(
+      (Settings settings) => setState(() {
+        _settings = settings;
+      }),
+    );
   }
 
   CheckedPopupMenuItem<_PopupOption> _buildCheckedPopupMenuItemWidget(
-      String title, IconData? iconData, _PopupOption option,
-      {bool rotate = false, bool checked = false}) {
+    String title,
+    IconData? iconData,
+    _PopupOption option, {
+    bool rotate = false,
+    bool checked = false,
+  }) {
     var popupMenuItem = CheckedPopupMenuItem<_PopupOption>(
-        checked: checked,
-        value: option,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(child: Text(title)),
-            if (iconData != null)
-              rotate
-                  ? Transform.rotate(angle: pi / 2, child: Icon(iconData))
-                  : Icon(iconData),
-          ],
-        ));
+      checked: checked,
+      value: option,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: Text(title)),
+          if (iconData != null)
+            rotate
+                ? Transform.rotate(angle: pi / 2, child: Icon(iconData))
+                : Icon(iconData),
+        ],
+      ),
+    );
     return popupMenuItem;
   }
 
@@ -74,31 +82,37 @@ class _FoldersPopupMenuState extends ConsumerState<FoldersPopupMenu> {
       customChecked = _settings!.folderSorting == SortingOptions.custom;
       alphabeticalChecked =
           _settings!.folderSorting == SortingOptions.alphabeticalAsc ||
-              _settings!.folderSorting == SortingOptions.alphabeticalDesc;
+          _settings!.folderSorting == SortingOptions.alphabeticalDesc;
       counterCountChecked =
           _settings!.folderSorting == SortingOptions.valueAsc ||
-              _settings!.folderSorting == SortingOptions.valueDesc;
+          _settings!.folderSorting == SortingOptions.valueDesc;
       creationDateChecked =
           _settings!.folderSorting == SortingOptions.creationDateAsc ||
-              _settings!.folderSorting == SortingOptions.creationDateDesc;
+          _settings!.folderSorting == SortingOptions.creationDateDesc;
       switch (_settings!.folderSorting!) {
         case SortingOptions.alphabeticalAsc:
           alphabeticalIcon = FontAwesomeIcons.arrowUpZA;
-          alphabeticalTitle = AppLocalizations.of(context)!
-              .alphabeticalOrderWithSuffix('(A-Z)');
+          alphabeticalTitle = AppLocalizations.of(
+            context,
+          )!.alphabeticalOrderWithSuffix('(A-Z)');
           break;
         case SortingOptions.alphabeticalDesc:
           alphabeticalIcon = FontAwesomeIcons.arrowDownZA;
-          alphabeticalTitle = AppLocalizations.of(context)!
-              .alphabeticalOrderWithSuffix('(Z-A)');
+          alphabeticalTitle = AppLocalizations.of(
+            context,
+          )!.alphabeticalOrderWithSuffix('(Z-A)');
           break;
         case SortingOptions.valueAsc:
           counterCountIcon = FontAwesomeIcons.arrowUp91;
-          valueTitle = AppLocalizations.of(context)!.counterCountWithSuffix('(1-9)');
+          valueTitle = AppLocalizations.of(
+            context,
+          )!.counterCountWithSuffix('(1-9)');
           break;
         case SortingOptions.valueDesc:
           counterCountIcon = FontAwesomeIcons.arrowDown19;
-          valueTitle = AppLocalizations.of(context)!.counterCountWithSuffix('(9-1)');
+          valueTitle = AppLocalizations.of(
+            context,
+          )!.counterCountWithSuffix('(9-1)');
           break;
         case SortingOptions.creationDateAsc:
           creationDateIcon = FontAwesomeIcons.arrowUp;
@@ -112,48 +126,50 @@ class _FoldersPopupMenuState extends ConsumerState<FoldersPopupMenu> {
     }
 
     return PopupMenuButton<_PopupOption>(
-        elevation: 10,
-        icon: const Icon(FontAwesomeIcons.sliders),
-        onSelected: (_PopupOption value) {
-          onMenuItemSelected(value);
-        },
-        offset: Offset(0.0, _appBarHeight),
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(15.0))),
-        itemBuilder: (ctx) {
-          return [
-            NonDismissiblePopupMenuItem(
-              child: Text(
-                AppLocalizations.of(context)!.sortBy,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+      elevation: 10,
+      icon: const Icon(FontAwesomeIcons.sliders),
+      onSelected: (_PopupOption value) {
+        onMenuItemSelected(value);
+      },
+      offset: Offset(0.0, _appBarHeight),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+      ),
+      itemBuilder: (ctx) {
+        return [
+          NonDismissiblePopupMenuItem(
+            child: Text(
+              AppLocalizations.of(context)!.sortBy,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            _buildCheckedPopupMenuItemWidget(
-              AppLocalizations.of(context)!.custom,
-              null,
-              _PopupOption.custom,
-              checked: customChecked,
-            ),
-            _buildCheckedPopupMenuItemWidget(
-              alphabeticalTitle,
-              alphabeticalIcon,
-              _PopupOption.alphabetical,
-              checked: alphabeticalChecked,
-            ),
-            _buildCheckedPopupMenuItemWidget(
-              valueTitle,
-              counterCountIcon,
-              _PopupOption.counterCount,
-              checked: counterCountChecked,
-            ),
-            _buildCheckedPopupMenuItemWidget(
-              creationDateTitle,
-              creationDateIcon,
-              _PopupOption.creationDate,
-              checked: creationDateChecked,
-            ),
-          ];
-        });
+          ),
+          _buildCheckedPopupMenuItemWidget(
+            AppLocalizations.of(context)!.custom,
+            null,
+            _PopupOption.custom,
+            checked: customChecked,
+          ),
+          _buildCheckedPopupMenuItemWidget(
+            alphabeticalTitle,
+            alphabeticalIcon,
+            _PopupOption.alphabetical,
+            checked: alphabeticalChecked,
+          ),
+          _buildCheckedPopupMenuItemWidget(
+            valueTitle,
+            counterCountIcon,
+            _PopupOption.counterCount,
+            checked: counterCountChecked,
+          ),
+          _buildCheckedPopupMenuItemWidget(
+            creationDateTitle,
+            creationDateIcon,
+            _PopupOption.creationDate,
+            checked: creationDateChecked,
+          ),
+        ];
+      },
+    );
   }
 
   void onMenuItemSelected(_PopupOption option) async {

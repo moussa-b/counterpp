@@ -18,8 +18,11 @@ class Utils {
   }
 
   static int getNumberOfDaysInMonth(int year, int month) {
-    final DateTime lastDayOfMonth =
-        DateTime(year, month + 1, 1).subtract(const Duration(days: 1));
+    final DateTime lastDayOfMonth = DateTime(
+      year,
+      month + 1,
+      1,
+    ).subtract(const Duration(days: 1));
     return lastDayOfMonth.day;
   }
 
@@ -51,7 +54,9 @@ class Utils {
 
   static int getDaysInMonth(DateTime date) {
     DateTime firstDayOfNextMonth = DateTime(date.year, date.month + 1, 1);
-    DateTime lastDayOfMonth = firstDayOfNextMonth.subtract(const Duration(days: 1));
+    DateTime lastDayOfMonth = firstDayOfNextMonth.subtract(
+      const Duration(days: 1),
+    );
     return lastDayOfMonth.day;
   }
 }

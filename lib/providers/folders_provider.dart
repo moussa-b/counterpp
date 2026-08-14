@@ -12,21 +12,33 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
 
   @override
   FutureOr<List<Folder>> build() async {
-    final Settings settings = await ref.read(counterRepositoryProvider).getSettings();
-    return ref.read(counterRepositoryProvider).getAllFoldersSorted(settings.folderSorting); // initialize data
+    final Settings settings = await ref
+        .read(counterRepositoryProvider)
+        .getSettings();
+    return ref
+        .read(counterRepositoryProvider)
+        .getAllFoldersSorted(settings.folderSorting); // initialize data
   }
 
   void refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final Settings settings = await ref.read(counterRepositoryProvider).getSettings();
-      return ref.read(counterRepositoryProvider).getAllFoldersSorted(settings.folderSorting);
+      final Settings settings = await ref
+          .read(counterRepositoryProvider)
+          .getSettings();
+      return ref
+          .read(counterRepositoryProvider)
+          .getAllFoldersSorted(settings.folderSorting);
     });
   }
 
   Future<Folder?> addFolder(String folderName) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    final Folder createdFolder = await counterRepository.createFolder(folderName);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    final Folder createdFolder = await counterRepository.createFolder(
+      folderName,
+    );
     if (createdFolder.id != null && createdFolder.id! > 0) {
       update((List<Folder> previousState) => [...previousState, createdFolder]);
       return createdFolder;
@@ -35,12 +47,19 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
   }
 
   Future<Folder?> renameFolder(int folderId, String folderName) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    final Folder updatedFolder = await counterRepository.renameFolder(folderId, folderName);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    final Folder updatedFolder = await counterRepository.renameFolder(
+      folderId,
+      folderName,
+    );
     if (updatedFolder.id != null && updatedFolder.id! > 0) {
       update((List<Folder> previousState) {
         final List<Folder> newState = [...previousState];
-        final index = newState.indexWhere((Folder folder) => folder.id != null && folder.id == updatedFolder.id);
+        final index = newState.indexWhere(
+          (Folder folder) => folder.id != null && folder.id == updatedFolder.id,
+        );
         newState[index] = updatedFolder;
         return newState;
       });
@@ -50,17 +69,25 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
   }
 
   Future<bool> deleteFolderById(int folderId) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final bool deleted = await counterRepository.deleteFolderById(folderId);
     if (deleted) {
-      update((List<Folder> previousState) => previousState.where((Folder folder) => folder.id != folderId).toList());
+      update(
+        (List<Folder> previousState) => previousState
+            .where((Folder folder) => folder.id != folderId)
+            .toList(),
+      );
       return deleted;
     }
     return false;
   }
 
   Future<Folder?> duplicateFolderById(int folderId, {String? suffix}) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final Folder folder = await counterRepository.getFolderById(folderId);
     if (folder.id != null && folder.id! > 0) {
       return addFolder('${folder.name!}${suffix ?? ''}');
@@ -69,17 +96,25 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
   }
 
   Future<bool> resetAllCountersForFolderId(int folderId) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     return counterRepository.resetAllCountersForFolderId(folderId);
   }
 
   Future<bool> deleteAllCountersForFolderId(int folderId) async {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
-    bool result = await counterRepository.deleteAllCountersForFolderId(folderId);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
+    bool result = await counterRepository.deleteAllCountersForFolderId(
+      folderId,
+    );
     if (result) {
       update((List<Folder> previousState) {
         final List<Folder> newState = [...previousState];
-        final index = newState.indexWhere((Folder folder) => folder.id != null && folder.id == folderId);
+        final index = newState.indexWhere(
+          (Folder folder) => folder.id != null && folder.id == folderId,
+        );
         newState[index].counterNumber = 0;
         return newState;
       });
@@ -100,12 +135,16 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
       final int index = e.$1;
       return ReorderItem(id: folder.id!, order: index);
     }).toList();
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     final bool result = await counterRepository.reorderFolders(reorderItems);
     return result;
   }
 }
 
-final foldersProvider = AsyncNotifierProvider<FoldersNotifier, List<Folder>>(() {
-  return FoldersNotifier();
-});
+final foldersProvider = AsyncNotifierProvider<FoldersNotifier, List<Folder>>(
+  () {
+    return FoldersNotifier();
+  },
+);

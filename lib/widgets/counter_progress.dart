@@ -63,9 +63,7 @@ class CounterProgress extends StatelessWidget {
                 color: fillColor,
                 useGradient: isInfinite,
               ),
-              child: Center(
-                child: content,
-              ),
+              child: Center(child: content),
             ),
           ),
         ),

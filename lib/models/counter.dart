@@ -15,20 +15,21 @@ class Counter {
   String? note;
   int? synchronizationTimeStamp;
 
-  Counter(
-      {this.color,
-        this.counterCount,
-        this.creationTimeStamp,
-        this.folder,
-        this.id,
-        this.lastModificationTimeStamp,
-        this.counterLimit,
-        this.name,
-        this.counterOrder,
-        this.orderInFolder,
-        this.step,
-        this.note,
-        this.synchronizationTimeStamp});
+  Counter({
+    this.color,
+    this.counterCount,
+    this.creationTimeStamp,
+    this.folder,
+    this.id,
+    this.lastModificationTimeStamp,
+    this.counterLimit,
+    this.name,
+    this.counterOrder,
+    this.orderInFolder,
+    this.step,
+    this.note,
+    this.synchronizationTimeStamp,
+  });
 
   Counter.fromJson(Map<String, dynamic> json) {
     color = json['color'];

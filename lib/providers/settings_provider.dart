@@ -5,7 +5,7 @@ import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SettingsNotifier extends AsyncNotifier<Settings> {
-  SettingsNotifier(): super();
+  SettingsNotifier() : super();
 
   @override
   FutureOr<Settings> build() {
@@ -13,7 +13,9 @@ class SettingsNotifier extends AsyncNotifier<Settings> {
   }
 
   Future<Settings> updateSettings(Settings settings) async {
-    final Settings updatedSettings = await ref.read(counterRepositoryProvider).updateSettings(settings);
+    final Settings updatedSettings = await ref
+        .read(counterRepositoryProvider)
+        .updateSettings(settings);
     update((Settings previousSettings) => updatedSettings);
     return updatedSettings;
   }

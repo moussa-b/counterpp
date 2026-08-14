@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:counter/l10n/app_localizations.dart';
 
 class FolderStatisticsDataTable extends StatelessWidget {
-  const FolderStatisticsDataTable({
-    super.key,
-    required this.counters,
-  });
+  const FolderStatisticsDataTable({super.key, required this.counters});
 
   final List<Counter> counters;
 
   @override
   Widget build(BuildContext context) {
     return DataTable(
-      headingRowColor: WidgetStateColor.resolveWith((states) => Theme.of(context).primaryColor),
+      headingRowColor: WidgetStateColor.resolveWith(
+        (states) => Theme.of(context).primaryColor,
+      ),
       columns: <DataColumn>[
         DataColumn(
           label: Text(
@@ -35,10 +34,12 @@ class FolderStatisticsDataTable extends StatelessWidget {
         ),
       ],
       rows: counters.map((Counter counter) {
-        return DataRow(cells: <DataCell>[
-          DataCell(Text(counter.name!)),
-          DataCell(Text(counter.counterCount!.toString())),
-        ]);
+        return DataRow(
+          cells: <DataCell>[
+            DataCell(Text(counter.name!)),
+            DataCell(Text(counter.counterCount!.toString())),
+          ],
+        );
       }).toList(),
     );
   }

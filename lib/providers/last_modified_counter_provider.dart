@@ -16,8 +16,9 @@ class LastModifiedCounterNotifier extends AsyncNotifier<Counter?> {
   Future<void> setFolderId(int folderId) async {
     _folderId = folderId;
     if (_folderId > 0) {
-      final Counter? counter =
-          await ref.read(counterRepositoryProvider).getLastModifiedCounter(_folderId);
+      final Counter? counter = await ref
+          .read(counterRepositoryProvider)
+          .getLastModifiedCounter(_folderId);
       update((Counter? previousState) => counter);
     } else {
       update((Counter? previousState) => null);
@@ -31,6 +32,7 @@ class LastModifiedCounterNotifier extends AsyncNotifier<Counter?> {
   }
 }
 
-final lastModifiedCounterProvider = AsyncNotifierProvider<LastModifiedCounterNotifier, Counter?>(() {
-  return LastModifiedCounterNotifier();
-});
+final lastModifiedCounterProvider =
+    AsyncNotifierProvider<LastModifiedCounterNotifier, Counter?>(() {
+      return LastModifiedCounterNotifier();
+    });

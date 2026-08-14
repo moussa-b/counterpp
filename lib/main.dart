@@ -18,9 +18,7 @@ final theme = ThemeData(
 );
 
 void main() {
-  runApp(const ProviderScope(
-    child: App(),
-  ));
+  runApp(const ProviderScope(child: App()));
 }
 
 class App extends ConsumerStatefulWidget {
@@ -34,7 +32,9 @@ class _AppState extends ConsumerState<App> {
   bool showTutorial = true;
 
   Future<Settings> getSettings() {
-    final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+    final CounterRepository counterRepository = ref.read(
+      counterRepositoryProvider,
+    );
     return counterRepository.getSettings();
   }
 
@@ -42,18 +42,15 @@ class _AppState extends ConsumerState<App> {
   Widget build(BuildContext context) {
     final asyncValue = ref.watch(asyncCounterRepositoryProvider);
     return MaterialApp(
-        // debugShowCheckedModeBanner: false,
-        theme: theme,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('fr'),
+      // debugShowCheckedModeBanner: false,
+      theme: theme,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
+      supportedLocales: const [Locale('en'), Locale('fr')],
       home: asyncValue.when(
         data: (data) => FutureBuilder<Settings>(
           future: getSettings(),
@@ -68,15 +65,23 @@ class _AppState extends ConsumerState<App> {
               return const LoadingIndicator();
             } else {
               if (showTutorial && snapshot.data!.showTutorial != false) {
-                final CounterRepository counterRepository = ref.read(counterRepositoryProvider);
+                final CounterRepository counterRepository = ref.read(
+                  counterRepositoryProvider,
+                );
                 final Settings settings = Settings.copy(snapshot.data!);
                 settings.showTutorial = false;
                 counterRepository.updateSettings(settings);
-                return TutorialScreen(continueCallback: () => setState(() {
-                  showTutorial = false;
-                }));
+                return TutorialScreen(
+                  continueCallback: () => setState(() {
+                    showTutorial = false;
+                  }),
+                );
               } else {
-                return TabsScreen(selectedTabIndex: snapshot.data != null ? snapshot.data!.lastOpenedTabIndex : 0);
+                return TabsScreen(
+                  selectedTabIndex: snapshot.data != null
+                      ? snapshot.data!.lastOpenedTabIndex
+                      : 0,
+                );
               }
             }
           },

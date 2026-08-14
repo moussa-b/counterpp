@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/counter_widget.dart';
 
 class CounterScreen extends ConsumerStatefulWidget {
-
   const CounterScreen({super.key, required this.counter});
 
   final Counter counter;
@@ -36,7 +35,7 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
                   _resetCounter!.call();
                 }
               },
-            )
+            ),
           ],
         ),
         body: SafeArea(

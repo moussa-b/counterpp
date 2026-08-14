@@ -12,11 +12,9 @@ class FolderList extends StatelessWidget {
     return ListView.builder(
       itemBuilder: (ctx, index) {
         final Folder folder = folders[index];
-        final String keyValue = '${folder.id!}-${folder.lastModificationTimeStamp!}';
-        return FolderListItem(
-          key: ValueKey<String>(keyValue),
-          folder: folder,
-        );
+        final String keyValue =
+            '${folder.id!}-${folder.lastModificationTimeStamp!}';
+        return FolderListItem(key: ValueKey<String>(keyValue), folder: folder);
       },
       itemCount: folders.length,
     );

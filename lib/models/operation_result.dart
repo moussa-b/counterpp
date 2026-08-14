@@ -5,10 +5,7 @@ class OperationStatus {
   OperationStatus({required this.status, this.message});
 
   Map<String, dynamic> toJson() {
-    return {
-      'status': status,
-      'message': message,
-    };
+    return {'status': status, 'message': message};
   }
 
   factory OperationStatus.fromJson(Map<String, dynamic> json) {
