@@ -271,11 +271,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   onTap: () => _contactUs(context),
                 ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.privacyPolicy),
-                  onTap: () {},
-                ),
+                if (AppConfig.hasPrivacyPolicy) ...[
+                  const Divider(),
+                  ListTile(
+                    title: Text(AppLocalizations.of(context)!.privacyPolicy),
+                    onTap: () => _openPrivacyPolicy(context),
+                  ),
+                ],
               ],
             ),
           ],
@@ -888,6 +890,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    final Uri uri = Uri.parse(AppConfig.privacyPolicyUrl);
+    final bool launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (launched || !context.mounted) {
+      return;
+    }
+    _showErrorSnackBar(context, AppLocalizations.of(context)!.errorMsgGeneric);
   }
 
   void _openDeveloperLogs(BuildContext context) {
