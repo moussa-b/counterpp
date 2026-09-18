@@ -82,9 +82,15 @@ fvm flutter gen-l10n
 ## Health Stack
 
 - TYPECHECK: fvm flutter analyze
-- LINT: fvm dart format --output=none --set-exit-if-changed lib/ test/
+- LINT: fvm dart format --output=none --set-exit-if-changed $(git ls-files '*.dart')
 - TEST: fvm flutter test
+- DEADCODE: fvm dart run dart_code_linter:metrics check-unused-code lib
 - DEPS: fvm flutter pub outdated
+
+The lint command is scoped to tracked files on purpose. `flutter gen-l10n`
+rewrites `lib/l10n/app_localizations*.dart` in a style `dart format` disagrees
+with, so passing `lib/` would fail the gate after every build. Those files and
+`lib/generated/` are gitignored, so `git ls-files` leaves them out.
 
 ## Tests
 
@@ -92,6 +98,16 @@ fvm flutter gen-l10n
 engine on the host VM through `sqflite_common_ffi` and hands each case its own
 throwaway database, so repository tests run against the production schema,
 triggers and foreign keys rather than a mock.
+
+`test/helpers/test_container.dart` builds on it for the provider tests: it hands
+back a `ProviderContainer` with `counterRepositoryProvider` overridden to a
+throwaway repository, so the notifiers run against real SQL without waiting on
+app startup.
+
+One trap when testing notifiers: every mutator calls `update(...)` without
+awaiting it, so the new state lands a microtask after the method's own future
+completes. Assert through a helper that calls `pumpEventQueue()` first, the way
+`names()` does in the provider tests, or the read races the write.
 
 Two seams exist purely for tests and are not used in production:
 `DatabaseCounterRepository(databaseDirectory:)` and
