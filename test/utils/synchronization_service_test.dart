@@ -50,18 +50,24 @@ void main() {
       expect(SynchronizationService().isInitialized, isTrue);
     });
 
-    test('rejects a url with no scheme and keeps the previous configuration', () {
-      SynchronizationService().setApiUrl(apiUrl: apiUrl, apiAccessToken: token);
+    test(
+      'rejects a url with no scheme and keeps the previous configuration',
+      () {
+        SynchronizationService().setApiUrl(
+          apiUrl: apiUrl,
+          apiAccessToken: token,
+        );
 
-      final bool accepted = SynchronizationService().setApiUrl(
-        apiUrl: 'example.invalid/api',
-        apiAccessToken: token,
-      );
+        final bool accepted = SynchronizationService().setApiUrl(
+          apiUrl: 'example.invalid/api',
+          apiAccessToken: token,
+        );
 
-      expect(accepted, isFalse);
-      // Still pointing at the previous, valid endpoint rather than a broken one.
-      expect(SynchronizationService().isInitialized, isTrue);
-    });
+        expect(accepted, isFalse);
+        // Still pointing at the previous, valid endpoint rather than a broken one.
+        expect(SynchronizationService().isInitialized, isTrue);
+      },
+    );
 
     test('rejects an empty token', () {
       expect(

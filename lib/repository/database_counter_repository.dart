@@ -17,10 +17,9 @@ import 'counter_repository.dart';
 class DatabaseCounterRepository implements CounterRepository {
   /// Overrides the directory the database file lives in. Only tests set this,
   /// so each one gets an isolated database instead of sharing the app's.
-  DatabaseCounterRepository({String? databaseDirectory})
-    : _databaseDirectory = databaseDirectory;
+  DatabaseCounterRepository({this.databaseDirectory});
 
-  final String? _databaseDirectory;
+  final String? databaseDirectory;
   sql.Database? _db;
   static const _selectCounterSql = """
       SELECT c.*,
@@ -65,7 +64,7 @@ class DatabaseCounterRepository implements CounterRepository {
     if (isInitialized()) {
       return true;
     } else {
-      final String dbPath = _databaseDirectory ?? await sql.getDatabasesPath();
+      final String dbPath = databaseDirectory ?? await sql.getDatabasesPath();
       _db = await sql.openDatabase(
         path.join(dbPath, 'counter.db'),
         version: 2,

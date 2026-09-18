@@ -122,11 +122,11 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
     return result;
   }
 
+  /// [newIndex] is the index the folder ends up at once it has been removed
+  /// from [oldIndex], the way `onReorderItem` and `ReorderableGridView` report
+  /// it.
   Future<bool> onReorder(int oldIndex, int newIndex) async {
     final List<Folder> newState = [...state.value!];
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     final Folder oldIndexFolder = newState.removeAt(oldIndex);
     newState.insert(newIndex, oldIndexFolder);
     update((List<Folder> previousState) => newState);

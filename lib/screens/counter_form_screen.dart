@@ -123,19 +123,17 @@ class _CounterFormScreenState extends ConsumerState<CounterFormScreen> {
                           TextFormField(
                             maxLength: 50,
                             initialValue: _formCounter!.name,
-                            buildCounter:
-                                (
-                                  context, {
-                                  required currentLength,
-                                  required isFocused,
-                                  required maxLength,
-                                }) => null,
+                            buildCounter: (
+                              context, {
+                              required currentLength,
+                              required isFocused,
+                              required maxLength,
+                            }) => null,
                             decoration: InputDecoration(
                               border: const OutlineInputBorder(),
                               suffixText: "$_nameLength/50",
-                              labelText: AppLocalizations.of(
-                                context,
-                              )!.counterName,
+                              labelText: AppLocalizations.of(context)!
+                                  .counterName,
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
                             ),
@@ -149,9 +147,8 @@ class _CounterFormScreenState extends ConsumerState<CounterFormScreen> {
                                   value.isEmpty ||
                                   value.trim().length <= 1 ||
                                   value.trim().length > 50) {
-                                return AppLocalizations.of(
-                                  context,
-                                )!.pleaseEnterValidValue;
+                                return AppLocalizations.of(context)!
+                                    .pleaseEnterValidValue;
                               }
                               return null;
                             },
@@ -184,9 +181,8 @@ class _CounterFormScreenState extends ConsumerState<CounterFormScreen> {
                                   value.trim().isNotEmpty &&
                                   (int.tryParse(value) == null ||
                                       int.tryParse(value)! <= 0)) {
-                                return AppLocalizations.of(
-                                  context,
-                                )!.pleaseEnterValidValue;
+                                return AppLocalizations.of(context)!
+                                    .pleaseEnterValidValue;
                               }
                               return null;
                             },
@@ -222,9 +218,8 @@ class _CounterFormScreenState extends ConsumerState<CounterFormScreen> {
                                   value.trim().isNotEmpty &&
                                   (int.tryParse(value) == null ||
                                       int.tryParse(value)! <= 0)) {
-                                return AppLocalizations.of(
-                                  context,
-                                )!.pleaseEnterValidValue;
+                                return AppLocalizations.of(context)!
+                                    .pleaseEnterValidValue;
                               }
                               return null;
                             },
@@ -251,9 +246,8 @@ class _CounterFormScreenState extends ConsumerState<CounterFormScreen> {
                             ),
                             decoration: InputDecoration(
                               border: const OutlineInputBorder(),
-                              labelText: AppLocalizations.of(
-                                context,
-                              )!.incrementationValue,
+                              labelText: AppLocalizations.of(context)!
+                                  .incrementationValue,
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
                             ),
@@ -262,9 +256,8 @@ class _CounterFormScreenState extends ConsumerState<CounterFormScreen> {
                                   value.trim().isNotEmpty &&
                                   (int.tryParse(value) == null ||
                                       int.tryParse(value)! <= 0)) {
-                                return AppLocalizations.of(
-                                  context,
-                                )!.pleaseEnterValidValue;
+                                return AppLocalizations.of(context)!
+                                    .pleaseEnterValidValue;
                               }
                               return null;
                             },

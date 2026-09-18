@@ -129,9 +129,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       httpError: AppLocalizations.of(context)!.httpError,
       connectionError: AppLocalizations.of(context)!.connectionError,
       timeoutError: AppLocalizations.of(context)!.timeoutError,
-      synchronizationServerNotReachable: AppLocalizations.of(
-        context,
-      )!.synchronizationServerNotReachable,
+      synchronizationServerNotReachable: AppLocalizations.of(context)!
+          .synchronizationServerNotReachable,
     );
     final List<Folder> folders = await ref
         .read(counterRepositoryProvider)

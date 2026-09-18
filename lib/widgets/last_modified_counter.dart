@@ -25,9 +25,8 @@ class LastModifiedCounter extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          AppLocalizations.of(
-            context,
-          )!.lastCounterModified(lastModificationLabel),
+          AppLocalizations.of(context)!
+              .lastCounterModified(lastModificationLabel),
           style: TextStyle(
             color: Theme.of(context).textTheme.titleMedium!.color,
           ),

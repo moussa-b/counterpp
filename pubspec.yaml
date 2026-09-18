@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.10+11
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.13.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -37,22 +37,22 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   audioplayers: ^6.6.0
-  device_info_plus: ^12.4.0
-  file_picker: ^11.0.3
-  fl_chart: 1.0.0 # pinned: 1.1.0+ needs Matrix4.translateByDouble, only in newer Flutter
-  flex_color_picker: ^3.7.1
+  device_info_plus: ^13.2.0
+  file_picker: ^13.1.0
+  fl_chart: ^1.0.0
+  flex_color_picker: ^4.0.0
   flutter_riverpod: ^3.3.2
-  font_awesome_flutter: ^10.9.1
-  google_fonts: ^6.3.2
+  font_awesome_flutter: ^11.0.0
+  google_fonts: ^8.2.1
   http: ^1.4.0
   in_app_review: ^2.0.10
   intl: ^0.20.2
-  package_info_plus: ^9.0.1
+  package_info_plus: ^10.2.1
   path_provider: ^2.1.5
-  permission_handler: ^12.0.3
+  permission_handler: ^13.0.2
   reorderable_grid_view: ^2.2.8
-  share_plus: ^12.0.2
-  smooth_page_indicator: ^1.2.1
+  share_plus: ^13.3.0
+  smooth_page_indicator: ^3.0.0
   sqflite: ^2.4.2
   path: ^1.9.0
   url_launcher: ^6.3.2

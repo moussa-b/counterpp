@@ -151,11 +151,11 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
     }
   }
 
+  /// [newIndex] is the index the counter ends up at once it has been removed
+  /// from [oldIndex], the way `onReorderItem` and `ReorderableGridView` report
+  /// it.
   Future<bool> onReorder(int oldIndex, int newIndex) async {
     final List<Counter> newState = [...state.value!];
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     final Counter oldIndexCounter = newState.removeAt(oldIndex);
     newState.insert(newIndex, oldIndexCounter);
     update((List<Counter> previousState) => newState);

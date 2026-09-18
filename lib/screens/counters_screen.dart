@@ -97,7 +97,7 @@ class _CountersScreenState extends ConsumerState<CountersScreen> {
           // ),
           if (_editMode)
             IconButton(
-              icon: const Icon(FontAwesomeIcons.checkDouble),
+              icon: const FaIcon(FontAwesomeIcons.checkDouble),
               onPressed: () {
                 setState(() {
                   _editMode = false;
@@ -120,7 +120,7 @@ class _CountersScreenState extends ConsumerState<CountersScreen> {
       body: SafeArea(child: content),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addCounter(context),
-        child: const Icon(FontAwesomeIcons.plus),
+        child: const FaIcon(FontAwesomeIcons.plus),
       ),
     );
   }

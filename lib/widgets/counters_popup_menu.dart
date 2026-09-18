@@ -50,7 +50,7 @@ class _CountersPopupMenuState extends ConsumerState<CountersPopupMenu> {
 
   CheckedPopupMenuItem<_PopupOption> _buildCheckedPopupMenuItemWidget(
     String title,
-    IconData? iconData,
+    FaIconData? iconData,
     _PopupOption option, {
     bool rotate = false,
     bool checked = false,
@@ -64,8 +64,8 @@ class _CountersPopupMenuState extends ConsumerState<CountersPopupMenu> {
           Expanded(child: Text(title)),
           if (iconData != null)
             rotate
-                ? Transform.rotate(angle: pi / 2, child: Icon(iconData))
-                : Icon(iconData),
+                ? Transform.rotate(angle: pi / 2, child: FaIcon(iconData))
+                : FaIcon(iconData),
         ],
       ),
     );
@@ -78,9 +78,9 @@ class _CountersPopupMenuState extends ConsumerState<CountersPopupMenu> {
     bool alphabeticalChecked = false;
     bool counterCountChecked = false;
     bool creationDateChecked = false;
-    IconData? alphabeticalIcon;
-    IconData? counterCountIcon;
-    IconData? creationDateIcon;
+    FaIconData? alphabeticalIcon;
+    FaIconData? counterCountIcon;
+    FaIconData? creationDateIcon;
     String alphabeticalTitle = AppLocalizations.of(context)!.alphabeticalOrder;
     String valueTitle = AppLocalizations.of(context)!.counterCountOrder;
     String creationDateTitle = AppLocalizations.of(context)!.creationDate;
@@ -98,27 +98,23 @@ class _CountersPopupMenuState extends ConsumerState<CountersPopupMenu> {
       switch (_settings!.counterSorting!) {
         case SortingOptions.alphabeticalAsc:
           alphabeticalIcon = FontAwesomeIcons.arrowUpZA;
-          alphabeticalTitle = AppLocalizations.of(
-            context,
-          )!.alphabeticalOrderWithSuffix('(A-Z)');
+          alphabeticalTitle = AppLocalizations.of(context)!
+              .alphabeticalOrderWithSuffix('(A-Z)');
           break;
         case SortingOptions.alphabeticalDesc:
           alphabeticalIcon = FontAwesomeIcons.arrowDownZA;
-          alphabeticalTitle = AppLocalizations.of(
-            context,
-          )!.alphabeticalOrderWithSuffix('(Z-A)');
+          alphabeticalTitle = AppLocalizations.of(context)!
+              .alphabeticalOrderWithSuffix('(Z-A)');
           break;
         case SortingOptions.valueAsc:
           counterCountIcon = FontAwesomeIcons.arrowUp91;
-          valueTitle = AppLocalizations.of(
-            context,
-          )!.counterCountWithSuffix('(1-9)');
+          valueTitle = AppLocalizations.of(context)!
+              .counterCountWithSuffix('(1-9)');
           break;
         case SortingOptions.valueDesc:
           counterCountIcon = FontAwesomeIcons.arrowDown19;
-          valueTitle = AppLocalizations.of(
-            context,
-          )!.counterCountWithSuffix('(9-1)');
+          valueTitle = AppLocalizations.of(context)!
+              .counterCountWithSuffix('(9-1)');
           break;
         case SortingOptions.creationDateAsc:
           creationDateIcon = FontAwesomeIcons.arrowUp;
@@ -133,7 +129,7 @@ class _CountersPopupMenuState extends ConsumerState<CountersPopupMenu> {
 
     return PopupMenuButton<_PopupOption>(
       elevation: 10,
-      icon: const Icon(FontAwesomeIcons.sliders),
+      icon: const FaIcon(FontAwesomeIcons.sliders),
       onSelected: (_PopupOption value) {
         onMenuItemSelected(value);
       },

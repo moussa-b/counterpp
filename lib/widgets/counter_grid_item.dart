@@ -90,9 +90,10 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: Theme.of(
-                          context,
-                        ).textTheme.titleLarge!.fontSize!,
+                        fontSize: Theme.of(context)
+                            .textTheme
+                            .titleLarge!
+                            .fontSize!,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -125,7 +126,7 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                         color: Colors.white,
                         textColor: color,
                         shape: const CircleBorder(),
-                        child: const Icon(FontAwesomeIcons.ellipsisVertical),
+                        child: const FaIcon(FontAwesomeIcons.ellipsisVertical),
                       ),
                     ),
                   ),
@@ -152,9 +153,10 @@ class _CounterGridItemState extends ConsumerState<CounterGridItem> {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize:
-                              Theme.of(
-                                context,
-                              ).textTheme.titleMedium!.fontSize! +
+                              Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .fontSize! +
                               15,
                         ),
                       ),

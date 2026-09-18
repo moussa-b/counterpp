@@ -25,7 +25,7 @@ class EditableCounterList extends ConsumerWidget {
           active: false,
         );
       }).toList(),
-      onReorder: (int oldIndex, int newIndex) async {
+      onReorderItem: (int oldIndex, int newIndex) async {
         bool result = await ref
             .read(countersProvider.notifier)
             .onReorder(oldIndex, newIndex);

@@ -188,9 +188,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       AppLocalizations.of(context)!.disableSynchronization,
                     ),
                     subtitle: Text(
-                      AppLocalizations.of(
-                        context,
-                      )!.disableSynchronizationSummary,
+                      AppLocalizations.of(context)!
+                          .disableSynchronizationSummary,
                     ),
                     onTap: () {
                       _disableSynchronization(context);
@@ -204,9 +203,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       AppLocalizations.of(context)!.enableSynchronization,
                     ),
                     subtitle: Text(
-                      AppLocalizations.of(
-                        context,
-                      )!.enableSynchronizationSummary,
+                      AppLocalizations.of(context)!
+                          .enableSynchronizationSummary,
                     ),
                     onTap: () async {
                       _openSynchronizationScreen(context);
@@ -337,9 +335,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 final ScaffoldMessengerState messenger = ScaffoldMessenger.of(
                   context,
                 );
-                final String genericError = AppLocalizations.of(
-                  context,
-                )!.errorMsgGeneric;
+                final String genericError = AppLocalizations.of(context)!
+                    .errorMsgGeneric;
                 Navigator.of(ctx).pop();
                 if (confirmCallback == null) {
                   return;
@@ -435,9 +432,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(width: 10),
                 Flexible(
                   child: Text(
-                    AppLocalizations.of(
-                      ctx,
-                    )!.successfulMsgExportData(writtenFile.path),
+                    AppLocalizations.of(ctx)!
+                        .successfulMsgExportData(writtenFile.path),
                   ),
                 ),
               ],
@@ -486,11 +482,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _importData(BuildContext ctx) async {
-    // file_picker 11 made FilePicker static; the instance-based
-    // FilePicker.platform accessor is gone.
-    final FilePickerResult? result = await FilePicker.pickFiles();
+    // file_picker 13 dropped FilePickerResult: pickFiles() returns a plain
+    // list and pickFile() is the single-selection entry point.
+    final PlatformFile? result = await FilePicker.pickFile();
     if (result != null) {
-      final String? filePath = result.files.single.path;
+      final String? filePath = result.path;
       if (filePath == null) {
         await LoggingService().logMessage(
           'Data import failed: missing file path',
@@ -907,9 +903,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _openDeveloperLogs(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const DeveloperLogsScreen()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const DeveloperLogsScreen()));
   }
 }
 

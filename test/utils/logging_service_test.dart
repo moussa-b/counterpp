@@ -41,13 +41,14 @@ void main() {
 
   group('redactSensitiveHeaders', () {
     test('masks the value of every credential-bearing header', () {
-      final Map<String, String> redacted =
-          redactSensitiveHeaders(<String, String>{
-            'Authorization': 'Bearer secret-token',
-            'Proxy-Authorization': 'Basic abc',
-            'Cookie': 'session=abc',
-            'Content-Type': 'application/json',
-          });
+      final Map<String, String> redacted = redactSensitiveHeaders(
+        <String, String>{
+          'Authorization': 'Bearer secret-token',
+          'Proxy-Authorization': 'Basic abc',
+          'Cookie': 'session=abc',
+          'Content-Type': 'application/json',
+        },
+      );
 
       expect(redacted['Authorization'], '***redacted***');
       expect(redacted['Proxy-Authorization'], '***redacted***');

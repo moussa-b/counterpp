@@ -25,7 +25,7 @@ class EditableFolderList extends ConsumerWidget {
           active: false,
         );
       }).toList(),
-      onReorder: (int oldIndex, int newIndex) async {
+      onReorderItem: (int oldIndex, int newIndex) async {
         bool result = await ref
             .read(foldersProvider.notifier)
             .onReorder(oldIndex, newIndex);

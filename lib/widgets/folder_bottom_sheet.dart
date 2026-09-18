@@ -27,9 +27,8 @@ class FolderBottomSheet extends ConsumerWidget {
             child: Column(
               children: [
                 Text(
-                  AppLocalizations.of(
-                    context,
-                  )!.counterNumber(folder.counterNumber!),
+                  AppLocalizations.of(context)!
+                      .counterNumber(folder.counterNumber!),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),

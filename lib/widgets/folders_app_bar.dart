@@ -34,7 +34,7 @@ class _FoldersAppBarState extends State<FoldersAppBar> {
         // ),
         if (_editMode)
           IconButton(
-            icon: const Icon(FontAwesomeIcons.checkDouble),
+            icon: const FaIcon(FontAwesomeIcons.checkDouble),
             onPressed: () {
               setState(() {
                 _editMode = false;

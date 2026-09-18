@@ -67,10 +67,7 @@ class SynchronizationService {
     bool ignoreErrors = false,
   }) async {
     final url = Uri.parse(endpoint);
-    final mergedHeaders = {
-      if (headers != null) ...headers,
-      'Content-Type': 'application/json',
-    };
+    final mergedHeaders = {...?headers, 'Content-Type': 'application/json'};
     final serializedBody = body == null
         ? null
         : body is String
@@ -128,10 +125,7 @@ class SynchronizationService {
     bool ignoreErrors = false,
   }) async {
     final url = Uri.parse(endpoint);
-    final mergedHeaders = {
-      if (headers != null) ...headers,
-      'Content-Type': 'application/json',
-    };
+    final mergedHeaders = {...?headers, 'Content-Type': 'application/json'};
     final serializedBody = body == null
         ? null
         : body is String
@@ -188,10 +182,7 @@ class SynchronizationService {
     bool ignoreErrors = false,
   }) async {
     final url = Uri.parse(endpoint);
-    final mergedHeaders = {
-      if (headers != null) ...headers,
-      'Content-Type': 'application/json',
-    };
+    final mergedHeaders = {...?headers, 'Content-Type': 'application/json'};
 
     try {
       final response = await _client.get(url, headers: mergedHeaders);

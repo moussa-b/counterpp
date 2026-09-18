@@ -76,28 +76,25 @@ void main() {
       expect(await repository.getAllCountersToSynchronize(), isEmpty);
     });
 
-    test(
-      'never returns the built-in counter, even once it carries a stale marker',
-      () async {
-        // Regression: the WHERE clause read `id > 1 AND sync IS NULL OR sync <
-        // lastMod`, which SQLite groups as `(id > 1 AND sync IS NULL) OR (sync <
-        // lastMod)`. The id guard silently stopped applying to the second branch,
-        // so the internal counter leaked into the payload sent to the server.
-        await repository.updateCountersSynchronizationTimestampByFolderId(
-          builtInFolderId,
-        );
-        await Future<void>.delayed(const Duration(milliseconds: 5));
-        await repository.incrementCounterById(builtInCounterId);
+    test('never returns the built-in counter, even once it carries a stale marker', () async {
+      // Regression: the WHERE clause read `id > 1 AND sync IS NULL OR sync <
+      // lastMod`, which SQLite groups as `(id > 1 AND sync IS NULL) OR (sync <
+      // lastMod)`. The id guard silently stopped applying to the second branch,
+      // so the internal counter leaked into the payload sent to the server.
+      await repository.updateCountersSynchronizationTimestampByFolderId(
+        builtInFolderId,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await repository.incrementCounterById(builtInCounterId);
 
-        final List<Counter> pending = await repository
-            .getAllCountersToSynchronize();
+      final List<Counter> pending = await repository
+          .getAllCountersToSynchronize();
 
-        expect(
-          pending.map((Counter c) => c.id),
-          isNot(contains(builtInCounterId)),
-        );
-      },
-    );
+      expect(
+        pending.map((Counter c) => c.id),
+        isNot(contains(builtInCounterId)),
+      );
+    });
   });
 
   group('getAllFoldersToSynchronize', () {
@@ -113,47 +110,44 @@ void main() {
   });
 
   group('ordering', () {
-    test(
-      'a counter created after a deletion does not reuse a live order',
-      () async {
-        // Regression: order came from `1 + COUNT(*)`. After deleting one of three
-        // counters the count no longer matched the highest order, so the next
-        // counter was handed an order that was already taken and the two rows
-        // sorted arbitrarily.
-        final Folder folder = await createFolder('Work');
-        final Counter first = await createCounter('First', folder: folder);
-        final Counter second = await createCounter('Second', folder: folder);
-        final Counter third = await createCounter('Third', folder: folder);
+    test('a counter created after a deletion does not reuse a live order', () async {
+      // Regression: order came from `1 + COUNT(*)`. After deleting one of three
+      // counters the count no longer matched the highest order, so the next
+      // counter was handed an order that was already taken and the two rows
+      // sorted arbitrarily.
+      final Folder folder = await createFolder('Work');
+      final Counter first = await createCounter('First', folder: folder);
+      final Counter second = await createCounter('Second', folder: folder);
+      final Counter third = await createCounter('Third', folder: folder);
 
-        await repository.deleteCounterById(second.id!);
-        final Counter fourth = await createCounter('Fourth', folder: folder);
+      await repository.deleteCounterById(second.id!);
+      final Counter fourth = await createCounter('Fourth', folder: folder);
 
-        final List<Counter> counters = await repository.getCountersByFolderId(
-          folder.id!,
-        );
-        final List<int> orders =
-            counters.map((Counter c) => c.orderInFolder!).toList()..sort();
-        expect(
-          orders.toSet(),
-          hasLength(orders.length),
-          reason: 'orderInFolder must stay unique',
-        );
-        expect(fourth.orderInFolder, greaterThan(third.orderInFolder!));
-        expect(
-          counters.map((Counter c) => c.id),
-          containsAll(<int>[first.id!, third.id!, fourth.id!]),
-        );
+      final List<Counter> counters = await repository.getCountersByFolderId(
+        folder.id!,
+      );
+      final List<int> orders =
+          counters.map((Counter c) => c.orderInFolder!).toList()..sort();
+      expect(
+        orders.toSet(),
+        hasLength(orders.length),
+        reason: 'orderInFolder must stay unique',
+      );
+      expect(fourth.orderInFolder, greaterThan(third.orderInFolder!));
+      expect(
+        counters.map((Counter c) => c.id),
+        containsAll(<int>[first.id!, third.id!, fourth.id!]),
+      );
 
-        final List<int> globalOrders = (await repository.getAllCounters())
-            .map((Counter c) => c.counterOrder!)
-            .toList();
-        expect(
-          globalOrders.toSet(),
-          hasLength(globalOrders.length),
-          reason: 'counterOrder must stay unique',
-        );
-      },
-    );
+      final List<int> globalOrders = (await repository.getAllCounters())
+          .map((Counter c) => c.counterOrder!)
+          .toList();
+      expect(
+        globalOrders.toSet(),
+        hasLength(globalOrders.length),
+        reason: 'counterOrder must stay unique',
+      );
+    });
 
     test(
       'a folder created after a deletion does not reuse a live order',
@@ -435,24 +429,18 @@ void main() {
       },
     );
 
-    test(
-      'deletions are not recorded while synchronization is disabled',
-      () async {
-        // The history triggers are guarded on a non-empty access token: with sync
-        // off there is no server to inform, so no history is accumulated.
-        final Folder folder = await createFolder('Work');
-        final Counter counter = await createCounter('Verses', folder: folder);
+    test('deletions are not recorded while synchronization is disabled', () async {
+      // The history triggers are guarded on a non-empty access token: with sync
+      // off there is no server to inform, so no history is accumulated.
+      final Folder folder = await createFolder('Work');
+      final Counter counter = await createCounter('Verses', folder: folder);
 
-        await repository.deleteCounterById(counter.id!);
-        await repository.deleteFolderById(folder.id!);
+      await repository.deleteCounterById(counter.id!);
+      await repository.deleteFolderById(folder.id!);
 
-        expect(
-          await repository.getAllDeletedCounterIdsToSynchronize(),
-          isEmpty,
-        );
-        expect(await repository.getAllDeletedFolderIdsToSynchronize(), isEmpty);
-      },
-    );
+      expect(await repository.getAllDeletedCounterIdsToSynchronize(), isEmpty);
+      expect(await repository.getAllDeletedFolderIdsToSynchronize(), isEmpty);
+    });
 
     test(
       'deleteAllCountersForFolderId only clears the target folder',

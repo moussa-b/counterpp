@@ -81,7 +81,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
         onPressed: () {
           showDialog(context: context, builder: (ctx) => const FolderDialog());
         },
-        child: const Icon(FontAwesomeIcons.plus),
+        child: const FaIcon(FontAwesomeIcons.plus),
       );
     } else if (_selectedIndex == settingsTabIndex) {
       body = const SettingsScreen();

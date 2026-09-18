@@ -89,7 +89,7 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(FontAwesomeIcons.minus),
+              icon: const FaIcon(FontAwesomeIcons.minus),
               onPressed: _count <= 0 || !widget.active
                   ? null
                   : () {
@@ -118,7 +118,7 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             IconButton(
-              icon: const Icon(FontAwesomeIcons.plus),
+              icon: const FaIcon(FontAwesomeIcons.plus),
               onPressed: !widget.active
                   ? null
                   : () {
@@ -160,11 +160,14 @@ class _CounterListItemState extends ConsumerState<CounterListItem> {
               ? SizedBox(
                   width: infinityContainerSize,
                   height: infinityContainerSize,
-                  child: Icon(
-                    FontAwesomeIcons.infinity,
-                    color: Utils.hexToColor(widget.counter.color),
-                    size:
-                        Theme.of(context).textTheme.titleMedium!.fontSize! + 4,
+                  child: Center(
+                    child: FaIcon(
+                      FontAwesomeIcons.infinity,
+                      color: Utils.hexToColor(widget.counter.color),
+                      size:
+                          Theme.of(context).textTheme.titleMedium!.fontSize! +
+                          4,
+                    ),
                   ),
                 )
               : Text(

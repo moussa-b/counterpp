@@ -40,7 +40,7 @@ class CounterBottomSheet extends ConsumerWidget {
         ),
         const Divider(),
         BottomSheetItem(
-          icon: const Icon(FontAwesomeIcons.maximize),
+          icon: const FaIcon(FontAwesomeIcons.maximize),
           label: AppLocalizations.of(context)!.fullScreen,
           onTap: () {
             Navigator.of(context).push(
