@@ -44,6 +44,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build/
+
+# Generated localization code. `flutter gen-l10n` rewrites lib/l10n/
+# app_localizations*.dart on every build; lib/generated/ is a leftover of the
+# Flutter Intl IDE plugin and nothing imports it any more.
+/lib/generated/
+/lib/l10n/app_localizations.dart
+/lib/l10n/app_localizations_*.dart
 
 # App Signing keystore
 upload-keystore.jks
