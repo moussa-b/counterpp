@@ -1,3 +1,4 @@
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:wakelock_plus_platform_interface/wakelock_plus_platform_interface.dart';
 
 /// Stands in for the wakelock plugin during widget tests.
@@ -29,9 +30,17 @@ class FakeWakelock extends WakelockPlusPlatformInterface {
 
 /// Installs a [FakeWakelock] and returns it, so a test can read [toggles].
 ///
-/// Call from `setUp` in any test that reaches `CounterWidget`.
+/// Call from `setUp` in any test that reaches `CounterWidget`, `CounterList`
+/// or `CounterGrid`.
+///
+/// Both seams have to be set. `WakelockPlus` reads the platform instance once,
+/// into the top-level `wakelockPlusPlatformInstance` the package exposes for
+/// exactly this, so assigning only `WakelockPlusPlatformInterface.instance`
+/// works for the first test in a file and is silently ignored by every one
+/// after it.
 FakeWakelock installFakeWakelock() {
   final FakeWakelock fake = FakeWakelock();
   WakelockPlusPlatformInterface.instance = fake;
+  wakelockPlusPlatformInstance = fake;
   return fake;
 }
