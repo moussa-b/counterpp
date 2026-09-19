@@ -17,8 +17,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.bdzapps.counter.counter"
     // Google Play requires targeting API 36 (Android 16) to publish updates after 2026-08-31.
-    // Compiling against 37 is forced by permission_handler_android; targetSdk stays at 36.
-    compileSdk = 37
+    compileSdk = 36
     ndkVersion = "28.2.13676358"
 
     compileOptions {

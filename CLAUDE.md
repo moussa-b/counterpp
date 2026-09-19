@@ -22,10 +22,10 @@ talks to a user-configured remote endpoint.
 - `lib/widgets/` — reusable UI, including the counter grid/list variants and
   their editable (reorderable) counterparts.
 - `lib/utils/` — cross-cutting services: `synchronization_service.dart`,
-  `logging_service.dart` (also handles crash/log email reporting),
-  `permission_utils.dart`.
-- `lib/l10n/` + `lib/generated/` — generated localization code, do not edit by
-  hand.
+  `logging_service.dart` (also handles crash/log email reporting).
+- `lib/l10n/` — ARB sources plus the `app_localizations*.dart` that
+  `flutter gen-l10n` derives from them. The generated files are gitignored;
+  edit the ARB files and regenerate, never the Dart.
 
 `assets/sql_scripts/` holds sample SQL used by the app for table bootstrapping.
 
@@ -61,7 +61,7 @@ Platform floors that the toolchain forces, all verified by a release build:
 | Where | Value | Why |
 |---|---|---|
 | Gradle / AGP / Kotlin | 9.3.1 / 9.1.0 / 2.4.0 | Flutter 3.47 rejects Gradle below 8.14 |
-| `compileSdk` | 37 | `permission_handler_android` requires it; `targetSdk` stays 36 for Google Play |
+| `compileSdk` / `targetSdk` | 36 | Google Play requires targeting API 36 to publish updates |
 | `minSdkVersion` | 30 | set in `android/app/build.gradle.kts` |
 | iOS deployment target | 15.0 | raised by Flutter's own migrator |
 
