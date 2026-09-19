@@ -14,6 +14,10 @@ import 'fake_counter_repository.dart';
 /// Pass [repository] to keep using one you already seeded; otherwise an empty
 /// [FakeCounterRepository] is created and returned.
 ///
+/// Set [settle] to false when the widget under test keeps animating, which is
+/// the case for anything showing a `LoadingIndicator`: `pumpAndSettle` would
+/// spin until it times out.
+///
 /// Set [wrapInScaffold] to false for a widget that builds its own `Scaffold`,
 /// which every screen does. Leave it on for the pieces under `lib/widgets/`,
 /// since `ListTile`, `Card` and friends need a `Material` ancestor.
@@ -27,6 +31,7 @@ Future<FakeCounterRepository> pumpApp(
   FakeCounterRepository? repository,
   Locale locale = const Locale('en'),
   bool wrapInScaffold = true,
+  bool settle = true,
 }) async {
   final FakeCounterRepository repo = repository ?? FakeCounterRepository();
   // The default test surface is 800x600, which is wider and much shorter than
@@ -54,7 +59,13 @@ Future<FakeCounterRepository> pumpApp(
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  // A widget that never stops animating, such as anything still showing a
+  // LoadingIndicator, can never be settled. Pass settle: false for those.
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
   return repo;
 }
 

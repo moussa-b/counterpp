@@ -24,10 +24,11 @@ class _FolderStatisticsScreenState
   Widget build(BuildContext context) {
     final AsyncValue<List<Counter>> counters = ref.watch(countersProvider);
     Widget content;
+    // Same missing `else` as counters_screen had: without it the loading
+    // indicator is dead code, overwritten before it can ever be shown.
     if (counters.isLoading) {
       content = const LoadingIndicator();
-    }
-    if (counters.value == null || counters.value!.isEmpty) {
+    } else if (counters.value == null || counters.value!.isEmpty) {
       content = Center(child: Text(AppLocalizations.of(context)!.noCounter));
     } else {
       content = Column(

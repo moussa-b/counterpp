@@ -40,10 +40,13 @@ class _CountersScreenState extends ConsumerState<CountersScreen> {
     Widget content;
     AsyncValue<Settings> settings = ref.watch(settingsProvider);
     AsyncValue<List<Counter>> counters = ref.watch(countersProvider);
-    if (settings.isLoading || counters.isLoading) {
+    final Settings? currentSettings = settings.value;
+    // The loading branch needs the `else`: without it the checks below
+    // overwrite `content` on the very next line, and the else branch then
+    // dereferences settings.value while it is still null.
+    if (settings.isLoading || counters.isLoading || currentSettings == null) {
       content = const LoadingIndicator();
-    }
-    if (counters.value == null || counters.value!.isEmpty) {
+    } else if (counters.value == null || counters.value!.isEmpty) {
       content = Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -58,10 +61,7 @@ class _CountersScreenState extends ConsumerState<CountersScreen> {
         ),
       );
     } else {
-      final bool showCounterGrid =
-          settings.hasValue &&
-          settings.value != null &&
-          settings.value!.counterCompactView == true;
+      final bool showCounterGrid = currentSettings.counterCompactView == true;
       content = Column(
         children: [
           const LastModifiedCounter(),
@@ -70,11 +70,11 @@ class _CountersScreenState extends ConsumerState<CountersScreen> {
               child: showCounterGrid
                   ? CounterGrid(
                       counters: counters.value!,
-                      settings: settings.value!,
+                      settings: currentSettings,
                     )
                   : CounterList(
                       counters: counters.value!,
-                      settings: settings.value!,
+                      settings: currentSettings,
                     ),
             ),
           if (_editMode)
