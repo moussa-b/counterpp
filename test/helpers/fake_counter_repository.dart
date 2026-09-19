@@ -390,9 +390,18 @@ class FakeCounterRepository implements CounterRepository {
     DateTime start,
     DateTime end,
   ) async {
-    return statistics
-        .where((Statistics item) => item.counterId == counterId)
-        .toList();
+    // The range matters: the statistics screen asks for one day, week, month
+    // or year at a time, and stepping to a period with no history is what
+    // makes it say so.
+    return statistics.where((Statistics item) {
+      if (item.counterId != counterId) {
+        return false;
+      }
+      final DateTime at = DateTime.fromMillisecondsSinceEpoch(
+        item.dateTimeStamp!,
+      );
+      return !at.isBefore(start) && !at.isAfter(end);
+    }).toList();
   }
 
   @override

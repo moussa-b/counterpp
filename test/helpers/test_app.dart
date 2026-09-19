@@ -16,6 +16,9 @@ import 'fake_counter_repository.dart';
 /// Pass [repository] to keep using one you already seeded; otherwise an empty
 /// [FakeCounterRepository] is created and returned.
 ///
+/// Pass [surfaceSize] in logical pixels for a screen that does not fit a phone
+/// and whose scrolling is not what the test is about.
+///
 /// Set [settle] to false when the widget under test keeps animating, which is
 /// the case for anything showing a `LoadingIndicator`: `pumpAndSettle` would
 /// spin until it times out.
@@ -34,13 +37,16 @@ Future<FakeCounterRepository> pumpApp(
   Locale locale = const Locale('en'),
   bool wrapInScaffold = true,
   bool settle = true,
+  Size? surfaceSize,
 }) async {
   final FakeCounterRepository repo = repository ?? FakeCounterRepository();
   // The default test surface is 800x600, which is wider and much shorter than
   // any phone this app ships to. Screens built for a tall viewport overflow
   // there and the failure says nothing about real devices. Use a phone-shaped
   // surface so a reported overflow is one a user could actually hit.
-  tester.view.physicalSize = const Size(1170, 2532);
+  tester.view.physicalSize = surfaceSize == null
+      ? const Size(1170, 2532)
+      : surfaceSize * 3.0;
   tester.view.devicePixelRatio = 3.0;
   addTearDown(() {
     tester.view.resetPhysicalSize();
