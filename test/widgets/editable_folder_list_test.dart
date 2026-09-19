@@ -72,6 +72,9 @@ void main() {
       find.byType(ReorderableListView),
     );
     expect(list.onReorderItem, isNotNull);
+    // Reading the deprecated field is the point: asserting it is null is what
+    // proves the widget is not wired to the old, unadjusted callback.
+    // ignore: deprecated_member_use
     expect(list.onReorder, isNull);
   });
 

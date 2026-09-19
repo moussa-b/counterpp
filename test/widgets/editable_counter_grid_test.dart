@@ -4,7 +4,6 @@ import 'package:counter/models/sorting_options.dart';
 import 'package:counter/providers/counters_provider.dart';
 import 'package:counter/widgets/counter_grid_item.dart';
 import 'package:counter/widgets/editable_counter_grid.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
