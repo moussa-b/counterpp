@@ -2,7 +2,6 @@ import 'package:counter/models/counter.dart';
 import 'package:counter/models/folder.dart';
 import 'package:counter/providers/last_modified_counter_provider.dart';
 import 'package:counter/widgets/last_modified_counter.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
