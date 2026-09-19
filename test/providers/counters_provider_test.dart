@@ -191,6 +191,32 @@ void main() {
     });
   });
 
+  group('a counter outside the list being shown', () {
+    // The bottom sheet can act on a counter the notifier is not currently
+    // holding. indexWhere returns -1 there, and indexing with it used to throw
+    // a RangeError that took the app down.
+    test('resetCounterById does not blow up', () async {
+      final Folder folder = await repository.createFolder('Work');
+      final Counter elsewhere = await createCounter('Elsewhere', folder);
+      await notifier.setFolderId(0);
+
+      expect(await notifier.resetCounterById(elsewhere.id!), isTrue);
+      expect(await names(), isEmpty);
+      expect((await repository.getCounterById(elsewhere.id!)).counterCount, 0);
+    });
+
+    test('updateCounter does not blow up', () async {
+      final Folder work = await repository.createFolder('Work');
+      final Folder home = await repository.createFolder('Home');
+      final Counter elsewhere = await createCounter('Elsewhere', home);
+      await notifier.setFolderId(work.id!);
+
+      elsewhere.name = 'Renamed';
+      expect(await notifier.updateCounter(elsewhere), isNotNull);
+      expect(await names(), isEmpty);
+    });
+  });
+
   group('onReorder', () {
     // newIndex is the index the counter ends up at once it has been removed
     // from oldIndex. That is what ReorderableListView.onReorderItem and

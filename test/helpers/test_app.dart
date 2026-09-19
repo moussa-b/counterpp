@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:counter/l10n/app_localizations.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:flutter/material.dart';
@@ -79,4 +81,46 @@ AppLocalizations l10n(WidgetTester tester) {
   // resolve the delegates. The MaterialApp element itself cannot: Localizations
   // is its descendant, not its ancestor.
   return AppLocalizations.of(tester.element(find.byType(Navigator).first))!;
+}
+
+/// Opens [sheet] as a modal bottom sheet over a blank page, the way a counter
+/// or folder row opens it, and returns what the sheet pops with.
+///
+/// The future is deliberately not awaited: the sheet stays up until the test
+/// drives it, and the result lands in the returned holder once it closes.
+Future<BottomSheetResultHolder<T>> openBottomSheet<T>(
+  WidgetTester tester,
+  Widget sheet, {
+  FakeCounterRepository? repository,
+}) async {
+  final BottomSheetResultHolder<T> holder = BottomSheetResultHolder<T>();
+  late BuildContext host;
+
+  await pumpApp(
+    tester,
+    Builder(
+      builder: (BuildContext context) {
+        host = context;
+        return const SizedBox.shrink();
+      },
+    ),
+    repository: repository,
+  );
+
+  unawaited(
+    showModalBottomSheet<T>(context: host, builder: (_) => sheet).then((
+      T? value,
+    ) {
+      holder.closed = true;
+      holder.value = value;
+    }),
+  );
+  await tester.pumpAndSettle();
+  return holder;
+}
+
+/// What a bottom sheet popped with, filled in once it closes.
+class BottomSheetResultHolder<T> {
+  bool closed = false;
+  T? value;
 }

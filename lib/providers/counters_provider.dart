@@ -53,7 +53,11 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
               (Counter counter) =>
                   counter.id != null && counter.id == updatedCounter.id,
             );
-            newState[index] = updatedCounter;
+            // -1 when the counter is not in the list being shown. Indexing
+            // with it throws a RangeError and takes the app down.
+            if (index >= 0) {
+              newState[index] = updatedCounter;
+            }
             return newState;
           });
         }
@@ -138,7 +142,9 @@ class CountersNotifier extends AsyncNotifier<List<Counter>> {
         final index = newState.indexWhere(
           (Counter counter) => counter.id != null && counter.id == counterId,
         );
-        newState[index].counterCount = 0;
+        if (index >= 0) {
+          newState[index].counterCount = 0;
+        }
         return newState;
       });
     }

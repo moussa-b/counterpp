@@ -60,7 +60,11 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
         final index = newState.indexWhere(
           (Folder folder) => folder.id != null && folder.id == updatedFolder.id,
         );
-        newState[index] = updatedFolder;
+        // -1 when the folder is not in the list being shown. Indexing with it
+        // throws a RangeError and takes the app down.
+        if (index >= 0) {
+          newState[index] = updatedFolder;
+        }
         return newState;
       });
       return updatedFolder;
@@ -115,7 +119,9 @@ class FoldersNotifier extends AsyncNotifier<List<Folder>> {
         final index = newState.indexWhere(
           (Folder folder) => folder.id != null && folder.id == folderId,
         );
-        newState[index].counterNumber = 0;
+        if (index >= 0) {
+          newState[index].counterNumber = 0;
+        }
         return newState;
       });
     }

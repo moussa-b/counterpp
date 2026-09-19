@@ -146,6 +146,34 @@ void main() {
     });
   });
 
+  group('a folder outside the list being shown', () {
+    // Same -1 index hazard as the counters notifier: acting on a folder the
+    // notifier is not holding used to throw a RangeError.
+    test('renameFolder does not blow up', () async {
+      final Folder? work = await notifier.addFolder('Work');
+      // Drop it from the shown list without touching the database.
+      await notifier.deleteFolderById(work!.id!);
+
+      expect(() => notifier.renameFolder(work.id!, 'Study'), returnsNormally);
+      await pumpEventQueue();
+    });
+
+    test('deleteAllCountersForFolderId does not blow up', () async {
+      final Folder? work = await notifier.addFolder('Work');
+      await repository.createCounter(
+        Counter(name: 'Alpha', counterCount: 5, folder: work, step: 1),
+      );
+      await notifier.deleteFolderById(work!.id!);
+
+      // The folder is gone from both the list and the database, so the call
+      // finds nothing to clear. What matters is that it returns instead of
+      // throwing on a -1 index.
+      await notifier.deleteAllCountersForFolderId(work.id!);
+
+      expect(await names(), isEmpty);
+    });
+  });
+
   group('onReorder', () {
     // newIndex is the index the folder ends up at once it has been removed
     // from oldIndex, matching ReorderableListView.onReorderItem.
