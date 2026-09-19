@@ -77,50 +77,62 @@ class _TutorialScreenState extends State<TutorialScreen> {
   }
 
   Widget _getPageButtons() {
+    // Both sides are Flexible and both labels can ellipsize. The buttons are
+    // sized by their text, so a longer translation than English used to push
+    // the row past the screen edge: "Suivant" and "Passer" overflowed by 5px
+    // at 390dp, and more on a 360dp phone.
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Padding(
-          padding: EdgeInsets.only(
-            left: horizontalPadding,
-            bottom: bottomPadding,
-          ),
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: TextButton(
-              onPressed: _onSkip,
-              child: Text(
-                AppLocalizations.of(context)!.skip,
-                style: buttonTextStyle.copyWith(color: Colors.white),
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: horizontalPadding,
+              bottom: bottomPadding,
+            ),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: TextButton(
+                onPressed: _onSkip,
+                child: Text(
+                  AppLocalizations.of(context)!.skip,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: buttonTextStyle.copyWith(color: Colors.white),
+                ),
               ),
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.only(
-            right: horizontalPadding,
-            bottom: bottomPadding,
-          ),
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: SizedBox(
-              height: buttonMinHeight,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                onPressed: _onNext,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: buttonHorizontalPadding,
-                    right: buttonHorizontalPadding,
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: horizontalPadding,
+              bottom: bottomPadding,
+            ),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: SizedBox(
+                height: buttonMinHeight,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: Text(
-                    AppLocalizations.of(context)!.next,
-                    style: buttonTextStyle.copyWith(color: Colors.black),
+                  onPressed: _onNext,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: buttonHorizontalPadding,
+                      right: buttonHorizontalPadding,
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.next,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: buttonTextStyle.copyWith(color: Colors.black),
+                    ),
                   ),
                 ),
               ),
