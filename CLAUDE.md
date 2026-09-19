@@ -114,6 +114,15 @@ Two seams exist purely for tests and are not used in production:
 `SynchronizationService().client`. HTTP is stubbed with `MockClient` from
 `package:http/testing`; no test touches the network.
 
+Two things are deliberately not covered by widget tests, both for the same
+reason: a `testWidgets` body runs under `FakeAsync`, where real file I/O never
+completes. `DeveloperLogsScreen` reads the log file in `initState`, and
+`SynchronizationService` awaits `LoggingService` on every error, which reaches
+the file system too. A test there would hang on a spinner and measure the
+harness rather than the app. Both are covered where the clock is real:
+`test/utils/logging_service_test.dart` and
+`test/utils/synchronization_service_test.dart`.
+
 One behaviour worth knowing before writing repository tests: the
 `*_history` delete triggers only fire when a non-empty
 `synchronizationAccessToken` is stored in `settings`. Tests that assert on
