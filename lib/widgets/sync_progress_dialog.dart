@@ -7,6 +7,7 @@ import 'package:counter/models/folder.dart';
 import 'package:counter/models/settings.dart';
 import 'package:counter/models/sync_result.dart';
 import 'package:counter/providers/counter_repository_provider.dart';
+import 'package:counter/repository/counter_repository.dart';
 import 'package:counter/utils/logging_service.dart';
 import 'package:counter/utils/synchronization_service.dart';
 import 'package:flutter/foundation.dart';
@@ -65,6 +66,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     T param,
     String stepName, {
     required SyncLabels labels,
+    required Settings settings,
+    Future<void> Function()? onSuccess,
     void Function(dynamic error)? onError,
   }) {
     return () async {
@@ -79,17 +82,34 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
           } catch (e) {
             // ignored
           }
-          return responseData != null && responseData['status'] == true
-              ? SyncResult.success(
-                  stepName: stepName,
-                  data: responseData,
-                  message: labels.syncSuccess,
-                )
-              : SyncResult.error(
-                  stepName: stepName,
-                  errorMessage: labels.syncError,
-                  statusCode: response.statusCode,
-                );
+          if (responseData != null && responseData['status'] == true) {
+            await onSuccess?.call();
+            return SyncResult.success(
+              stepName: stepName,
+              data: responseData,
+              message: labels.syncSuccess,
+            );
+          }
+          // The server accepted the request and still refused it in the body.
+          // logHttpFailure only fires on a non-2xx, so without this the log
+          // records the failure with no trace of what came back.
+          unawaited(
+            LoggingService().logMessage(
+              'Synchronization step rejected by the server',
+              details: {
+                'step': stepName,
+                'statusCode': response.statusCode,
+                'responseBody': response.body,
+              },
+              settings: settings,
+              sendEmail: false,
+            ),
+          );
+          return SyncResult.error(
+            stepName: stepName,
+            errorMessage: labels.syncError,
+            statusCode: response.statusCode,
+          );
         } else {
           String errorMessage =
               '${labels.httpError} ${response != null ? response.statusCode : ''}';
@@ -132,21 +152,18 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       synchronizationServerNotReachable: AppLocalizations.of(context)!
           .synchronizationServerNotReachable,
     );
-    final List<Folder> folders = await ref
-        .read(counterRepositoryProvider)
-        .getAllFoldersToSynchronize();
-    final List<Counter> counters = await ref
-        .read(counterRepositoryProvider)
+    // Read the repository once up front: the user can dismiss the dialog
+    // mid-flight and `ref` throws once the State is disposed, while the
+    // handle itself stays usable.
+    final CounterRepository repository = ref.read(counterRepositoryProvider);
+    final List<Folder> folders = await repository.getAllFoldersToSynchronize();
+    final List<Counter> counters = await repository
         .getAllCountersToSynchronize();
-    final List<int> folderIds = await ref
-        .read(counterRepositoryProvider)
+    final List<int> folderIds = await repository
         .getAllDeletedFolderIdsToSynchronize();
-    final List<int> counterIds = await ref
-        .read(counterRepositoryProvider)
+    final List<int> counterIds = await repository
         .getAllDeletedCounterIdsToSynchronize();
-    final Settings settings = await ref
-        .read(counterRepositoryProvider)
-        .getSettings();
+    final Settings settings = await repository.getSettings();
 
     errorHandler(error) {
       unawaited(
@@ -162,12 +179,29 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       }
     }
 
+    // Without these the dialog would ship the very same payload on every run,
+    // leaving the server to answer for rows nothing had touched.
+    final List<int> folderIdsToMark = folders
+        .map((Folder folder) => folder.id)
+        .nonNulls
+        .toList();
+    final List<int> counterIdsToMark = counters
+        .map((Counter counter) => counter.id)
+        .nonNulls
+        .toList();
+
     final List<Future<SyncResult> Function()> syncFunctions = [
       _convertToSyncResultFunction(
         SynchronizationService().synchronizeFolders,
         folders,
         _steps[0].title,
         labels: labels,
+        settings: settings,
+        onSuccess: folderIdsToMark.isEmpty
+            ? null
+            : () => repository.updateFoldersSynchronizationTimestamp(
+                folderIdsToMark,
+              ),
         onError: errorHandler,
       ),
       _convertToSyncResultFunction(
@@ -175,6 +209,12 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         folderIds,
         _steps[1].title,
         labels: labels,
+        settings: settings,
+        onSuccess: folderIds.isEmpty
+            ? null
+            : () => repository.updateDeletedFoldersSynchronizationTimestamp(
+                folderIds,
+              ),
         onError: errorHandler,
       ),
       _convertToSyncResultFunction(
@@ -182,6 +222,12 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         counters,
         _steps[2].title,
         labels: labels,
+        settings: settings,
+        onSuccess: counterIdsToMark.isEmpty
+            ? null
+            : () => repository.updateCountersSynchronizationTimestamp(
+                counterIdsToMark,
+              ),
         onError: errorHandler,
       ),
       _convertToSyncResultFunction(
@@ -189,6 +235,12 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         counterIds,
         _steps[3].title,
         labels: labels,
+        settings: settings,
+        onSuccess: counterIds.isEmpty
+            ? null
+            : () => repository.updateDeletedCountersSynchronizationTimestamp(
+                counterIds,
+              ),
         onError: errorHandler,
       ),
     ];

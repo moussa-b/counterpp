@@ -144,6 +144,41 @@ void main() {
     });
   });
 
+  group('when there is pending data', () {
+    setUp(() {
+      repository.pendingFolders.add(repository.seedFolder('Coran'));
+      repository.pendingCounters.add(repository.seedCounter(name: 'Al-Fatiha'));
+      repository.pendingDeletedFolderIds.add(7);
+      repository.pendingDeletedCounterIds.add(9);
+      repository.calls.clear();
+    });
+
+    testWidgets('it marks every shipped item as synchronized', (tester) async {
+      await openDialog(tester);
+
+      // Without this the next run would ship the very same payload, and the
+      // server would be asked to write rows nothing had touched.
+      expect(repository.calls, <String>[
+        'updateFoldersSynchronizationTimestamp([1])',
+        'updateDeletedFoldersSynchronizationTimestamp([7])',
+        'updateCountersSynchronizationTimestamp([1])',
+        'updateDeletedCountersSynchronizationTimestamp([9])',
+      ]);
+
+      await drainAutoClose(tester);
+    });
+  });
+
+  group('when nothing is pending', () {
+    testWidgets('it marks nothing', (tester) async {
+      await openDialog(tester);
+
+      expect(repository.calls, isEmpty);
+
+      await drainAutoClose(tester);
+    });
+  });
+
   // The failure path is deliberately not covered here. SynchronizationService
   // awaits LoggingService on every error, and LoggingService calls
   // getApplicationDocumentsDirectory() — a path_provider channel with no

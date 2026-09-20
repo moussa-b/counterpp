@@ -426,26 +426,39 @@ class FakeCounterRepository implements CounterRepository {
 
   // --- synchronization ------------------------------------------------------
   //
-  // No widget drives synchronization directly; the sync screen goes through
-  // SynchronizationService, which has its own tests. These exist so the class
-  // satisfies the interface.
+  // The sync dialog is the only widget that drives these. It reads what is
+  // pending, ships it, and marks it synchronized, so a test seeds the pending
+  // lists below and then asserts on [calls].
+
+  /// What the next synchronization run has to ship, seeded by the test.
+  final List<Counter> pendingCounters = <Counter>[];
+  final List<Folder> pendingFolders = <Folder>[];
+  final List<int> pendingDeletedCounterIds = <int>[];
+  final List<int> pendingDeletedFolderIds = <int>[];
 
   @override
-  Future<List<Counter>> getAllCountersToSynchronize() async => <Counter>[];
+  Future<List<Counter>> getAllCountersToSynchronize() async =>
+      List<Counter>.of(pendingCounters);
 
   @override
-  Future<List<int>> getAllDeletedCounterIdsToSynchronize() async => <int>[];
+  Future<List<int>> getAllDeletedCounterIdsToSynchronize() async =>
+      List<int>.of(pendingDeletedCounterIds);
 
   @override
-  Future<List<Folder>> getAllFoldersToSynchronize() async => <Folder>[];
+  Future<List<Folder>> getAllFoldersToSynchronize() async =>
+      List<Folder>.of(pendingFolders);
 
   @override
-  Future<List<int>> getAllDeletedFolderIdsToSynchronize() async => <int>[];
+  Future<List<int>> getAllDeletedFolderIdsToSynchronize() async =>
+      List<int>.of(pendingDeletedFolderIds);
 
   @override
   Future<bool> updateCountersSynchronizationTimestamp(
     List<int> counterIds,
-  ) async => true;
+  ) async {
+    _record('updateCountersSynchronizationTimestamp($counterIds)');
+    return true;
+  }
 
   @override
   Future<bool> updateCountersSynchronizationTimestampByFolderId(
@@ -455,17 +468,26 @@ class FakeCounterRepository implements CounterRepository {
   @override
   Future<bool> updateDeletedCountersSynchronizationTimestamp(
     List<int> counterIds,
-  ) async => true;
+  ) async {
+    _record('updateDeletedCountersSynchronizationTimestamp($counterIds)');
+    return true;
+  }
 
   @override
   Future<bool> updateFoldersSynchronizationTimestamp(
     List<int> folderIds,
-  ) async => true;
+  ) async {
+    _record('updateFoldersSynchronizationTimestamp($folderIds)');
+    return true;
+  }
 
   @override
   Future<bool> updateDeletedFoldersSynchronizationTimestamp(
     List<int> folderIds,
-  ) async => true;
+  ) async {
+    _record('updateDeletedFoldersSynchronizationTimestamp($folderIds)');
+    return true;
+  }
 
   @override
   Future<bool> synchronizeCountersCount(int folderId) async => true;
