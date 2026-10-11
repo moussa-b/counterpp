@@ -39,7 +39,7 @@ talks to a user-configured remote endpoint.
 ## Toolchain
 
 The Flutter SDK is pinned per project with [fvm](https://fvm.app): `.fvmrc`
-selects **Flutter 3.47.4 / Dart 3.13.3**, and `.fvm/flutter_sdk` symlinks it.
+selects **Flutter 3.47.7 / Dart 3.13.5**, and `.fvm/flutter_sdk` symlinks it.
 Always drive the project through `fvm`, never the global `flutter` on PATH:
 
 ```bash
@@ -51,8 +51,13 @@ fvm flutter test
 Gradle builds use the same SDK. That file is not in git — a fresh clone needs
 `fvm install` followed by `fvm flutter build apk` once to regenerate it.
 
-No package is held back any more; every direct dependency is on its latest
-release. `flutter pub outdated` can still overstate what is reachable, so
+Every direct dependency is on its latest release. `google_fonts` was dropped
+rather than held back: it fetched Lato from `fonts.gstatic.com` on first launch.
+The exact Latin subsets it downloaded now ship in `assets/fonts/lato/` (with
+their OFL licence, registered in `main()`), and the theme uses
+`fontFamily: 'Lato'`. Keep fonts bundled; the app must not need the network to
+render correctly. Those subsets cover Basic Latin, Latin-1 and a few more: characters
+outside them fall back per glyph to the system font. `flutter pub outdated` can still overstate what is reachable, so
 confirm a bump with a real build, not just `flutter analyze` (which does not
 analyse package sources).
 
