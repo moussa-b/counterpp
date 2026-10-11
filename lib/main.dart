@@ -7,17 +7,21 @@ import 'package:counter/screens/tutorial_screen.dart';
 import 'package:counter/widgets/loading_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 final theme = ThemeData(
   colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff0000ff)),
-  textTheme: GoogleFonts.latoTextTheme(),
+  fontFamily: 'Lato',
   useMaterial3: true,
 );
 
 void main() {
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('assets/fonts/lato/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['Lato'], license);
+  });
   runApp(const ProviderScope(child: App()));
 }
 
