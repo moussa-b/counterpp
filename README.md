@@ -35,15 +35,15 @@ This is a leisure project developed with passion and care.
 To generate i18n labels, run:
 
 ```bash
-flutter gen-l10n
+fvm flutter gen-l10n
 ```
 
 ### Android Version Support
 
 This app requires Android SDK API version 30 or higher.
 
-Configuration in `android/app/build.gradle`:
+Configuration in `android/app/build.gradle.kts`:
 
-```gradle
-minSdkVersion 30
+```kotlin
+minSdk = 30
 ```
