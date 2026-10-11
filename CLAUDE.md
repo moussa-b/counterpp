@@ -39,7 +39,7 @@ talks to a user-configured remote endpoint.
 ## Toolchain
 
 The Flutter SDK is pinned per project with [fvm](https://fvm.app): `.fvmrc`
-selects **Flutter 3.47.4 / Dart 3.13.3**, and `.fvm/flutter_sdk` symlinks it.
+selects **Flutter 3.47.7 / Dart 3.13.5**, and `.fvm/flutter_sdk` symlinks it.
 Always drive the project through `fvm`, never the global `flutter` on PATH:
 
 ```bash
