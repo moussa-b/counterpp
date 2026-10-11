@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:counter/l10n/app_localizations.dart';
+import 'package:counter/main.dart' show theme;
 import 'package:counter/providers/counter_repository_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,9 +28,8 @@ import 'fake_counter_repository.dart';
 /// which every screen does. Leave it on for the pieces under `lib/widgets/`,
 /// since `ListTile`, `Card` and friends need a `Material` ancestor.
 ///
-/// The real app themes with `GoogleFonts.latoTextTheme()`, which reaches for
-/// the network the first time it runs. Tests stay on the default text theme so
-/// nothing is fetched and no test depends on a font download.
+/// The app's own [theme] is used as-is: Lato is bundled as an asset, so
+/// nothing reaches for the network.
 Future<FakeCounterRepository> pumpApp(
   WidgetTester tester,
   Widget child, {
@@ -59,10 +59,7 @@ Future<FakeCounterRepository> pumpApp(
         locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff0000ff)),
-          useMaterial3: true,
-        ),
+        theme: theme,
         home: wrapInScaffold ? Scaffold(body: child) : child,
       ),
     ),
