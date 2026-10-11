@@ -56,7 +56,8 @@ rather than held back: it fetched Lato from `fonts.gstatic.com` on first launch.
 The exact Latin subsets it downloaded now ship in `assets/fonts/lato/` (with
 their OFL licence, registered in `main()`), and the theme uses
 `fontFamily: 'Lato'`. Keep fonts bundled; the app must not need the network to
-render correctly. `flutter pub outdated` can still overstate what is reachable, so
+render correctly. Those subsets cover Basic Latin, Latin-1 and a few more: characters
+outside them fall back per glyph to the system font. `flutter pub outdated` can still overstate what is reachable, so
 confirm a bump with a real build, not just `flutter analyze` (which does not
 analyse package sources).
 
