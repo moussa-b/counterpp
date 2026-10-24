@@ -249,12 +249,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     );
                   },
                 ),
-                const Divider(),
-                ListTile(
-                  title: Text(AppLocalizations.of(context)!.share),
-                  subtitle: Text(AppLocalizations.of(context)!.shareSummary),
-                  onTap: () => _shareApplication(context),
-                ),
+                if (AppConfig.hasShareUrl) ...[
+                  const Divider(),
+                  ListTile(
+                    title: Text(AppLocalizations.of(context)!.share),
+                    subtitle: Text(AppLocalizations.of(context)!.shareSummary),
+                    onTap: () => _shareApplication(context),
+                  ),
+                ],
                 const Divider(),
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.rate),

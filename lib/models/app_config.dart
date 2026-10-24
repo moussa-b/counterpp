@@ -1,14 +1,26 @@
+import 'dart:io';
+
 class AppConfig {
-  static const String shareUrl =
+  static const String playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.bdzapps.counter.counter';
+
+  /// App Store listing, `https://apps.apple.com/app/id<Apple ID>`. The Apple
+  /// ID only exists once the app is created in App Store Connect.
+  static const String appStoreUrl = '';
+
   static const String developerEmail = 'boudamouzm@gmail.com';
   static const String appName = 'Counter++';
 
-  /// Public privacy policy, the same URL declared in the Play Console listing.
-  ///
-  /// While this is empty the settings entry stays hidden: a visible row that
-  /// does nothing when tapped is worse than no row at all.
-  static const String privacyPolicyUrl = '';
+  /// Public privacy policy, the same URL declared in the Play Console and
+  /// App Store Connect listings.
+  static const String privacyPolicyUrl = 'https://bdzapps.com/counter/privacy/';
 
   static bool get hasPrivacyPolicy => privacyPolicyUrl.isNotEmpty;
+
+  /// Store link the share entry sends. Apple rejects an iOS app that points
+  /// users to Google Play, so each platform shares its own store.
+  static String get shareUrl => Platform.isIOS ? appStoreUrl : playStoreUrl;
+
+  /// While the platform has no store URL yet the share entry stays hidden.
+  static bool get hasShareUrl => shareUrl.isNotEmpty;
 }
