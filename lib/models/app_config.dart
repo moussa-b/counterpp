@@ -4,9 +4,8 @@ class AppConfig {
   static const String playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.bdzapps.counter.counter';
 
-  /// App Store listing, `https://apps.apple.com/app/id<Apple ID>`. The Apple
-  /// ID only exists once the app is created in App Store Connect.
-  static const String appStoreUrl = '';
+  /// App Store listing, built from the app's Apple ID in App Store Connect.
+  static const String appStoreUrl = 'https://apps.apple.com/app/id6826520493';
 
   static const String developerEmail = 'boudamouzm@gmail.com';
   static const String appName = 'Counter++';
