@@ -1,16 +1,15 @@
 # Publier Counter++ sur l'App Store
 
 État au 24/10/2026 : l'IPA signée **Apple Distribution (34AFV4S7Z8)** de la version
-**1.3.0 (build 15)** est dans `build/ios/ipa/counterpp.ipa`, l'archive Xcode dans
+**1.3.1 (build 16)** est dans `build/ios/ipa/counterpp.ipa`, l'archive Xcode dans
 `build/ios/archive/Runner.xcarchive`. Les captures sont dans `appstore/screenshots/`.
 
 ## À régler avant de soumettre (risques de rejet)
 
 1. **Politique de confidentialité** : réglé. URL `https://bdzapps.com/counter/privacy/`, à
    reporter aussi dans App Store Connect.
-2. **Lien « Partager l'app »** : réglé. Sur iOS, l'entrée reste masquée tant que
-   `AppConfig.appStoreUrl` est vide. Après création de la fiche (étape 1), y mettre
-   `https://apps.apple.com/app/id<APPLE_ID>` dans une version suivante pour la réactiver.
+2. **Lien « Partager l'app »** : réglé. iOS partage `https://apps.apple.com/app/id6826520493`
+   (Apple ID 6826520493), Android garde le lien Google Play.
 3. **Tutoriel** : ses images montrent un téléphone Android (barre ◀ ● ■). Même règle 2.3.10.
    Ça passe parfois, mais c'est le motif de rejet le plus probable.
 
@@ -47,14 +46,18 @@ chiffrement ne sera pas posée : `ITSAppUsesNonExemptEncryption = false` est dé
 Pour les prochaines versions : incrémenter `version:` dans `pubspec.yaml` (le numéro de build
 doit toujours augmenter), puis `fvm flutter build ipa --release --export-method app-store`.
 
-## 3. Remplir la version 1.3.0
+## 3. Remplir la version 1.3.1
 
 ### Captures
 
 Glisser les fichiers dans l'ordre 01 → 05 :
 
-- **iPhone 6,9"** : `appstore/screenshots/iphone-6.9/{fr,en}/` (1320×2868). Apple les réduit
-  pour les autres tailles d'iPhone.
+- **iPhone with Dynamic Island (medium display)**, obligatoire :
+  `appstore/screenshots/iphone-6.3/{fr,en}/` (1206×2622).
+- **iPhone with Dynamic Island (large display)**, facultatif : `appstore/screenshots/iphone-6.9/{fr,en}/`
+  (1320×2868). Sans elles, Apple agrandit les captures medium.
+
+Les captures ne doivent pas avoir de canal alpha (transparence), sinon l'upload est refusé.
 
 L'app est **iPhone uniquement** (`TARGETED_DEVICE_FAMILY = 1`), donc aucune capture iPad n'est
 demandée. Elle reste installable sur iPad en mode compatibilité iPhone. On pourra ajouter le
@@ -105,7 +108,7 @@ Counter++ helps you track anything you repeat: revision, vocabulary, prayers, wo
 | Copyright | `2026 Moussa Boudamouz` |
 | Catégorie | Productivité (secondaire : Éducation) |
 | Prix | Gratuit (onglet Tarifs et disponibilité) |
-| Build | sélectionner 1.3.0 (15) |
+| Build | sélectionner 1.3.1 (16) |
 | Connexion requise | Non (pas de compte de démo à fournir) |
 
 ### Confidentialité de l'app
